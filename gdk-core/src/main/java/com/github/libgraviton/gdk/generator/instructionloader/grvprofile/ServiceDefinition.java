@@ -1,8 +1,11 @@
-package com.github.libgraviton.gdk.generator.endpointdefinitionprovider.grvprofile;
+package com.github.libgraviton.gdk.generator.instructionloader.grvprofile;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 
+/**
+ * Represents a service definition of Graviton's main page.
+ */
 public class ServiceDefinition {
 
     @JsonProperty("$ref")
@@ -21,7 +24,4 @@ public class ServiceDefinition {
         return profile;
     }
 
-    public boolean isCollection() {
-        return true;
-    }
 }

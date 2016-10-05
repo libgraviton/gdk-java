@@ -2,9 +2,11 @@ package com.github.libgraviton.gdk.maven;
 
 
 import com.github.libgraviton.gdk.Graviton;
-import com.github.libgraviton.gdk.generator.EndpointMapper;
+import com.github.libgraviton.gdk.generator.GeneratedServiceManager;
 import com.github.libgraviton.gdk.generator.Generator;
-import com.github.libgraviton.gdk.generator.endpointdefinitionprovider.grvprofile.GrvProfileEndpointDefinitionProvider;
+import com.github.libgraviton.gdk.generator.instructionloader.grvprofile.GrvProfileInstructionLoader;
+import com.github.libgraviton.gdk.generator.exception.GeneratorException;
+import com.github.libgraviton.gdk.generator.exception.UnableToLoadServiceAssociationsException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.jsonschema2pojo.maven.Jsonschema2PojoMojo;
 
@@ -45,13 +47,25 @@ public class GenerateMojo extends Jsonschema2PojoMojo {
             );
         }
         getLog().info("Generating POJO classes for Graviton: " + gravitonUrl);
-        Graviton graviton = new Graviton(gravitonUrl, new EndpointMapper(endpointSerializationFile));
-        // @todo: make generation strategy configurable as soon as we provide multiple strategies
-        Generator generator = new Generator(
-                generatorConfig,
-                new GrvProfileEndpointDefinitionProvider(graviton)
-        );
-        generator.generate();
+        try {
+            Graviton graviton = new Graviton(
+                    gravitonUrl,
+                    new GeneratedServiceManager(endpointSerializationFile, false)
+            );
+            Generator generator = new Generator(
+                    generatorConfig,
+                    graviton,
+                    new GrvProfileInstructionLoader(graviton)
+            );
+            generator.generate();
+        } catch (GeneratorException e) {
+            throw new MojoExecutionException("POJO generation failed.", e);
+        } catch (UnableToLoadServiceAssociationsException e) {
+            throw new MojoExecutionException(
+                    "Service manager tried to load service associations. This should never happen at this point.",
+                    e
+            );
+        }
         getLog().info("POJO generation done.");
     }
 

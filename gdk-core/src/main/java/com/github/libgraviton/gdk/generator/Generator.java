@@ -1,6 +1,9 @@
 package com.github.libgraviton.gdk.generator;
 
+import com.github.libgraviton.gdk.ServiceManager;
+import com.github.libgraviton.gdk.Graviton;
 import com.github.libgraviton.gdk.generator.exception.GeneratorException;
+import com.github.libgraviton.gdk.generator.exception.UnableToPersistServiceAssociationsException;
 import com.sun.codemodel.JCodeModel;
 import org.jsonschema2pojo.*;
 import org.jsonschema2pojo.rules.RuleFactory;
@@ -10,7 +13,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * This is the POJO generator. It generates POJOs for all endpoints of a given Graviton instance.
+ * This is the POJO generator. It generates POJOs for all services of a given Graviton instance.
  */
 public class Generator {
 
@@ -26,25 +29,39 @@ public class Generator {
      */
     private GenerationConfig config;
 
-    private EndpointDefinitionProvider definitionProvider;
+    /**
+     * The Graviton instance to generator POJOs for
+     */
+    private Graviton graviton;
+
+    /**
+     * The generator instruction loader providing all services
+     */
+    private GeneratorInstructionLoader definitionProvider;
 
     /**
      * Constructor
      *
      * @param config The generator config
-     * @param definitionProvider The endpoint definition provider which should be used
+     * @param instructionLoader The generator instruction loader which should be used
      *
      * @throws GeneratorException When the POJO generation fails
      */
-    public Generator(GenerationConfig config, EndpointDefinitionProvider definitionProvider) throws GeneratorException {
+    public Generator(
+            GenerationConfig config,
+            Graviton graviton,
+            GeneratorInstructionLoader instructionLoader
+    ) throws GeneratorException {
         this.config = config;
-        this.definitionProvider = definitionProvider;
-        RuleFactory ruleFactory;
+        this.graviton = graviton;
+        this.definitionProvider = instructionLoader;
+
         AnnotatorFactory annotatorFactory = new AnnotatorFactory();
         Annotator annotator = annotatorFactory.getAnnotator(
                 annotatorFactory.getAnnotator(config.getAnnotationStyle()),
                 annotatorFactory.getAnnotator(config.getCustomAnnotator())
         );
+        RuleFactory ruleFactory;
         try {
             ruleFactory = config.getCustomRuleFactory().newInstance();
         } catch (InstantiationException | IllegalAccessException e) {
@@ -52,23 +69,26 @@ public class Generator {
         }
         ruleFactory.setAnnotator(annotator);
         ruleFactory.setGenerationConfig(config);
+
         this.schemaMapper = new SchemaMapper(ruleFactory, new SchemaGenerator());
     }
 
     /**
-     * Performs the POJO generation and persists an endpoint -> class mapping.
+     * Performs the POJO generation and persists a service -> class mapping.
+     *
+     * @throws GeneratorException If the POJO generation failed
      */
-    public void generate() {
-        List<EndpointDefinition> endpointDefinitions = definitionProvider.getEndpointDefinitions();
-        EndpointMapper endpointMapper = definitionProvider.getGraviton().getEndpointMapper();
-        for (EndpointDefinition definition : endpointDefinitions) {
+    public void generate() throws GeneratorException {
+        List<GeneratorInstruction> generatorInstructions = definitionProvider.loadInstructions();
+        ServiceManager serviceManager = graviton.getServiceManager();
+        for (GeneratorInstruction definition : generatorInstructions) {
             String className = definition.getClassName();
             String packageName = definition.getPackageName();
             if (0 == className.length() || 0 == packageName.length()) {
                 LOG.warn(
-                        "Ignoring endpoint '{}' because it does not define any package or class " +
+                        "Ignoring service '{}' because it does not define any package or class " +
                                 "(package: '{}', class: '{}').",
-                        definition.getEndpointUrl(),
+                        definition.getService().getItemUrl(),
                         packageName,
                         className
                 );
@@ -83,9 +103,18 @@ public class Generator {
             } catch (IOException e) {
                throw new GeneratorException("Unable to generate POJO.", e);
             }
-            endpointMapper.map(packageName + '.' + definition.getClassName(), definition.getEndpointUrl());
+            serviceManager.addService(
+                    packageName + '.' + definition.getClassName(),
+                    definition.getService()
+            );
         }
-        endpointMapper.persist();
+        try {
+            if (serviceManager instanceof GeneratedServiceManager) {
+                ((GeneratedServiceManager) serviceManager).persist();
+            }
+        } catch (UnableToPersistServiceAssociationsException e) {
+            throw new GeneratorException("Unable to persist service -> POJO association.", e);
+        }
     }
 
 

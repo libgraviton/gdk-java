@@ -1,9 +1,9 @@
 package com.github.libgraviton.gdk.generator.exception;
 
 /**
- * Created by tgdpaad2 on 28/09/16.
+ * Is thrown when the POJO generation fails.
  */
-public class GeneratorException extends RuntimeException {
+public class GeneratorException extends Exception {
 
     public GeneratorException(String message, Exception e) {
         super(message, e);
