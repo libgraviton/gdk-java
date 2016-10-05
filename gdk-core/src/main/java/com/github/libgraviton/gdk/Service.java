@@ -55,4 +55,14 @@ public class Service implements Serializable {
         return itemUrl;
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if (null == obj || !(obj instanceof Service)) {
+            return false;
+        }
+        Service service = (Service) obj;
+        return ((null == itemUrl && null == service.itemUrl) || (null != itemUrl && itemUrl.equals(service.itemUrl))) &&
+                ((null == collectionUrl && null == service.collectionUrl) ||
+                    (null != collectionUrl && collectionUrl.equals(service.collectionUrl)));
+    }
 }

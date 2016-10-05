@@ -2,7 +2,6 @@ package com.github.libgraviton.gdk;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.libgraviton.gdk.exception.NoCorrespondingServiceException;
-import com.github.libgraviton.gdk.generator.GeneratedServiceManager;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequest;
@@ -43,7 +42,7 @@ public class Graviton {
      * @param baseUrl The base url pointing to the Graviton server
      * @param serviceManager The service manager to use
      */
-    public Graviton(String baseUrl, GeneratedServiceManager serviceManager) {
+    public Graviton(String baseUrl, ServiceManager serviceManager) {
         this.baseUrl = baseUrl;
         this.serviceManager = serviceManager;
     }

@@ -67,6 +67,11 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
         return loadedInstructions;
     }
 
+    /**
+     * Loads the service list from Graviton.
+     *
+     * @return The service list.
+     */
     private ServiceList loadServiceList() {
         return graviton.get(graviton.getBaseUrl(), ServiceList.class);
     }
