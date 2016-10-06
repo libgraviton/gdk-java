@@ -98,7 +98,7 @@ public class Generator {
             String targetPackage = config.getTargetPackage();
             packageName = (targetPackage.length() > 0 ? targetPackage + '.' : "" ) + packageName;
             try {
-                schemaMapper.generate(codeModel, className, packageName, definition.getJsonSchema());
+                schemaMapper.generate(codeModel, className, packageName, definition.getJsonSchema().toString());
                 codeModel.build(config.getTargetDirectory());
             } catch (IOException e) {
                throw new GeneratorException("Unable to generate POJO.", e);

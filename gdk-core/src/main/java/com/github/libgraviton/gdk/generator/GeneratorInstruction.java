@@ -1,6 +1,7 @@
 package com.github.libgraviton.gdk.generator;
 
 import com.github.libgraviton.gdk.Service;
+import org.json.JSONObject;
 
 /**
  * Defines a service and the corresponding classes, which will be generated.
@@ -20,7 +21,7 @@ public class GeneratorInstruction {
     /**
      * The jsonschema of the service. Will be passed to the generator to create the class.
      */
-    private String jsonSchema;
+    private JSONObject jsonSchema;
 
     /**
      * The service for which classes will be generated.
@@ -35,7 +36,7 @@ public class GeneratorInstruction {
      * @param jsonSchema The jsonschema of the service.
      * @param service The service itself
      */
-    public GeneratorInstruction(String className, String packageName, String jsonSchema, Service service) {
+    public GeneratorInstruction(String className, String packageName, JSONObject jsonSchema, Service service) {
         this.className = className;
         this.packageName = packageName;
         this.jsonSchema = jsonSchema;
@@ -65,7 +66,7 @@ public class GeneratorInstruction {
      *
      * @return The jsonschema of the service.
      */
-    public String getJsonSchema() {
+    public JSONObject getJsonSchema() {
         return jsonSchema;
     }
 

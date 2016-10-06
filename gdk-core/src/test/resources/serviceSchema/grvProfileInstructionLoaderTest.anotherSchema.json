@@ -1,0 +1,29 @@
+{
+  "title": "Another Service",
+  "description": "Another Service - Without collection",
+  "type": "object",
+  "properties": {
+    "id": {
+      "title": "ID",
+      "description": "Unique identifier",
+      "type": "string",
+      "format": "custom_id"
+    },
+    "someField": {
+      "title": "Some Field",
+      "description": "This is a demo field",
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "x-documentClass": "Whatever\\AnotherService\\AnotherServiceDocument",
+  "x-recordOriginModifiable": true,
+  "additionalProperties": false,
+  "x-events": [
+    "document.demo.anotherservice.create",
+    "document.demo.anotherservice.update",
+    "document.demo.anotherservice.delete"
+  ]
+}

@@ -5,7 +5,7 @@
       "profile": "service://some-service/profile"
     },
     {
-      "$ref": "service://another-service/",
+      "$ref": "service://another-service",
       "profile": "service://another-service/profile"
     }
   ],

@@ -54,13 +54,12 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
             loadedInstructions = new ArrayList<>();
             for (ServiceDefinition serviceDefinition : loadServiceList().getServices()) {
                 String profileJson = graviton.get(serviceDefinition.getProfile());
-                JSONObject jsonObject = new JSONObject(profileJson);
+                JSONObject itemSchema = determineItemSchema(profileJson);
                 loadedInstructions.add(new GeneratorInstruction(
-                        determineClassName(jsonObject),
-                        determinePackageName(jsonObject),
-                        profileJson,
-                        generateService(serviceDefinition, jsonObject)
-
+                        determineClassName(itemSchema),
+                        determinePackageName(itemSchema),
+                        itemSchema,
+                        generateService(serviceDefinition)
                 ));
             }
         }
@@ -79,36 +78,46 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
     /**
      * Determines the classname for a given Graviton schema.
      *
-     * @param jsonObject The Graviton schema.
+     * @param itemSchema The Graviton item schema.
      *
      * @return The determined class name. May be empty if no class name could be determined.
      */
-    private String determineClassName(JSONObject jsonObject) {
-        if (jsonObject.has("items")) {
-            jsonObject = jsonObject.getJSONObject("items");
-        }
-        if (!jsonObject.has("x-documentClass")) {
+    private String determineClassName(JSONObject itemSchema) {
+        if (!itemSchema.has("x-documentClass")) {
             return "";
         }
-        String className = jsonObject.getString("x-documentClass");
+        String className = itemSchema.getString("x-documentClass");
         return className.substring(className.lastIndexOf('\\') + 1);
+    }
+
+    /**
+     * Determines the item schema of a given Graviton schema.
+     *
+     * @param schema The Graviton schema, which can already be an item schema but also a collection schema.
+     *
+     * @return The item schema
+     */
+    private JSONObject determineItemSchema(String schema) {
+        JSONObject schemaObject = new JSONObject(schema);
+        // If the schema contains an "items" field, we got an array and therefore a collection schema.
+        if (schemaObject.has("items")) {
+            schemaObject = schemaObject.getJSONObject("items");
+        }
+        return schemaObject;
     }
 
     /**
      * Determines the package name for generated classes for a given Graviton schema.
      *
-     * @param jsonObject The Graviton schema.
+     * @param itemSchema The Graviton item schema.
      *
      * @return The determined package name. May be empty if no package name could be determined.
      */
-    private String determinePackageName(JSONObject jsonObject) {
-        if (jsonObject.has("items")) {
-            jsonObject = jsonObject.getJSONObject("items");
-        }
-        if (!jsonObject.has("x-documentClass")) {
+    private String determinePackageName(JSONObject itemSchema) {
+        if (!itemSchema.has("x-documentClass")) {
             return "";
         }
-        String packageName = jsonObject.getString("x-documentClass");
+        String packageName = itemSchema.getString("x-documentClass");
         try {
             packageName = packageName.substring(0, packageName.lastIndexOf('\\'));
 
@@ -125,14 +134,12 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
      * Generates the service by a given serviceDefinition and instruction schema.
      *
      * @param serviceDefinition The service definition.
-     * @param jsonObject The Graviton schema.
      *
      * @return The generated service.
      */
-    private Service generateService(ServiceDefinition serviceDefinition, JSONObject jsonObject) {
+    private Service generateService(ServiceDefinition serviceDefinition) {
         String url = serviceDefinition.get$ref();
-        if (jsonObject.has("items")) {
-            url += "{id}";
+        if (url.length() > 0 && '/' == url.charAt(url.length() - 1)) {
             return new Service(url + "{id}", url);
         }
         return new Service(url);

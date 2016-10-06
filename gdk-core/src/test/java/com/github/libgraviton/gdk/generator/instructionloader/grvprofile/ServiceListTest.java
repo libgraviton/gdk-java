@@ -12,13 +12,13 @@ public class ServiceListTest {
     @Test
     public void testBeanJson() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
-        URL jsonUrl = getClass().getClassLoader().getResource("json/grvServiceList.json");
+        URL jsonUrl = getClass().getClassLoader().getResource("serviceList/serviceListTest.json");
         ServiceList serviceList = objectMapper.readValue(jsonUrl, ServiceList.class);
 
         assertEquals(2, serviceList.getServices().size());
         assertEquals("service://some-service/", serviceList.getServices().get(0).get$ref());
         assertEquals("service://some-service/profile", serviceList.getServices().get(0).getProfile());
-        assertEquals("service://another-service/", serviceList.getServices().get(1).get$ref());
+        assertEquals("service://another-service", serviceList.getServices().get(1).get$ref());
         assertEquals("service://another-service/profile", serviceList.getServices().get(1).getProfile());
     }
 
