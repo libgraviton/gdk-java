@@ -2,6 +2,7 @@ package com.github.libgraviton.gdk.generator.instructionloader.grvprofile;
 
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
+import static org.mockito.AdditionalMatchers.*;
 import static org.mockito.internal.util.reflection.Whitebox.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -68,12 +69,12 @@ public class GrvProfileInstructionLoaderTest {
     public static Object[][] loadInstructionsData() {
         return new Object[][] {
                 {
-                    "serviceSchema/grvProfileInstructionLoaderTest.someSchema.json",
-                    "service://some-service/",
-                    "service://some-service/{id}",
-                    "SomeServiceDocument",
-                    "whatever.someservice",
-                    0
+                    "serviceSchema/grvProfileInstructionLoaderTest.someSchema.json", // schema file
+                    "service://some-service/", // collection url
+                    "service://some-service/{id}", // item url
+                    "SomeServiceDocument", // expected class name
+                    "whatever.someservice", // expected package name
+                    0 // index in instruction list
                 },
                 {
                     "serviceSchema/grvProfileInstructionLoaderTest.anotherSchema.json",
@@ -113,17 +114,7 @@ public class GrvProfileInstructionLoaderTest {
             int instructionIndex
     ) throws Exception{
         String schema = IOUtils.toString(getClass().getClassLoader().getResource(schemaFile).openStream());
-        when(graviton.get(argThat(new BaseMatcher<String>() {
-            @Override
-            public boolean matches(Object o) {
-                return !"service://graviton".equals(o);
-            }
-
-            @Override
-            public void describeTo(Description description) {
-
-            }
-        }))).thenReturn(schema);
+        when(graviton.get(not(eq("service://graviton")))).thenReturn(schema);
 
         List<GeneratorInstruction> instructions = instructionLoader.loadInstructions();
         assertEquals(3, instructions.size());

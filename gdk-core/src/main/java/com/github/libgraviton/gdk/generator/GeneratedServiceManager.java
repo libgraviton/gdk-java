@@ -67,7 +67,7 @@ public class GeneratedServiceManager extends ServiceManager {
             services = (Map<String, Service>) objectinputstream.readObject();
         } catch (IOException e) {
             throw new UnableToLoadServiceAssociationsException(
-                    "Unable to access file '" + serializationFile.getAbsolutePath() + "'.",
+                    "Unable to deserialize file '" + serializationFile.getAbsolutePath() + "'.",
                     e
             );
         } catch (ClassNotFoundException e) {
@@ -76,11 +76,11 @@ public class GeneratedServiceManager extends ServiceManager {
                             "' because one ore multiple destination classes do not exist.",
                     e
             );
-        }
-        if (null == services) {
+        } catch (ClassCastException e) {
             throw new UnableToLoadServiceAssociationsException(
                     "Failed to load from file '" + serializationFile.getAbsolutePath() +
-                            "'. File content may be incompatible."
+                            "'. File content is incompatible.",
+                    e
             );
         }
         return services.size();

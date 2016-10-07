@@ -37,12 +37,13 @@ public class Generator {
     /**
      * The generator instruction loader providing all services
      */
-    private GeneratorInstructionLoader definitionProvider;
+    private GeneratorInstructionLoader instructionLoader;
 
     /**
      * Constructor
      *
      * @param config The generator config
+     * @param graviton The graviton instance to generate POJOs for
      * @param instructionLoader The generator instruction loader which should be used
      *
      * @throws GeneratorException When the POJO generation fails
@@ -52,10 +53,102 @@ public class Generator {
             Graviton graviton,
             GeneratorInstructionLoader instructionLoader
     ) throws GeneratorException {
+        this(
+                config,
+                graviton,
+                instructionLoader,
+                new SchemaMapper(instantiateRuleFactory(config), new SchemaGenerator())
+        );
+    }
+
+    /**
+     * Constructor
+     *
+     * @param config The generator config
+     * @param graviton The graviton instance to generate POJOs for
+     * @param instructionLoader The generator instruction loader which should be used
+     * @param schemaMapper The schema mapper to use for generating the POJOs
+     */
+    public Generator(
+            GenerationConfig config,
+            Graviton graviton,
+            GeneratorInstructionLoader instructionLoader,
+            SchemaMapper schemaMapper
+    ) {
         this.config = config;
         this.graviton = graviton;
-        this.definitionProvider = instructionLoader;
+        this.instructionLoader = instructionLoader;
+        this.schemaMapper = schemaMapper;
+    }
 
+    /**
+     * Performs the POJO generation and persists a service -> class mapping.
+     *
+     * @throws GeneratorException If the POJO generation failed
+     */
+    public void generate() throws GeneratorException {
+        List<GeneratorInstruction> generatorInstructions = instructionLoader.loadInstructions();
+        ServiceManager serviceManager = graviton.getServiceManager();
+        for (GeneratorInstruction definition : generatorInstructions) {
+            String className = definition.getClassName();
+            if (0 == className.length()) {
+                LOG.warn(
+                        "Ignoring service '{}' because it does not define any class.",
+                        definition.getService().getItemUrl()
+                );
+                continue;
+            }
+            String packageName = generatePackageName(config.getTargetPackage(), definition.getPackageName());
+            JCodeModel codeModel = new JCodeModel();
+            try {
+                schemaMapper.generate(codeModel, className, packageName, definition.getJsonSchema().toString());
+                codeModel.build(config.getTargetDirectory());
+            } catch (IOException e) {
+               throw new GeneratorException("Unable to generate POJO.", e);
+            }
+            serviceManager.addService(
+                    packageName + (packageName.length() > 0 ? '.' : "")  + definition.getClassName(),
+                    definition.getService()
+            );
+        }
+        try {
+            if (serviceManager instanceof GeneratedServiceManager) {
+                ((GeneratedServiceManager) serviceManager).persist();
+            }
+        } catch (UnableToPersistServiceAssociationsException e) {
+            throw new GeneratorException("Unable to persist service -> POJO association.", e);
+        }
+    }
+
+    /**
+     * Generates a package name based on a given root and sub package name.
+     *
+     * @param rootPackage The root package name.
+     * @param subPackage The sub package name.
+     *
+     * @return The generated package name.
+     */
+    private String generatePackageName(String rootPackage, String subPackage) {
+        String packageName = "";
+        if (null != rootPackage && rootPackage.length() > 1) {
+            packageName += rootPackage;
+        }
+        if (null != subPackage && subPackage.length() > 0) {
+            packageName += (packageName.length() > 0 ? "." : "") + subPackage;
+        }
+        return packageName;
+    }
+
+    /**
+     * Instantiates a rule factory corresponding to a given generation config.
+     *
+     * @param config The generation config
+     *
+     * @return The rule factory
+     *
+     * @throws GeneratorException If the rule factory cannot be created.
+     */
+    private static RuleFactory instantiateRuleFactory(GenerationConfig config) throws GeneratorException {
         AnnotatorFactory annotatorFactory = new AnnotatorFactory();
         Annotator annotator = annotatorFactory.getAnnotator(
                 annotatorFactory.getAnnotator(config.getAnnotationStyle()),
@@ -69,53 +162,7 @@ public class Generator {
         }
         ruleFactory.setAnnotator(annotator);
         ruleFactory.setGenerationConfig(config);
-
-        this.schemaMapper = new SchemaMapper(ruleFactory, new SchemaGenerator());
+        return ruleFactory;
     }
-
-    /**
-     * Performs the POJO generation and persists a service -> class mapping.
-     *
-     * @throws GeneratorException If the POJO generation failed
-     */
-    public void generate() throws GeneratorException {
-        List<GeneratorInstruction> generatorInstructions = definitionProvider.loadInstructions();
-        ServiceManager serviceManager = graviton.getServiceManager();
-        for (GeneratorInstruction definition : generatorInstructions) {
-            String className = definition.getClassName();
-            String packageName = definition.getPackageName();
-            if (0 == className.length() || 0 == packageName.length()) {
-                LOG.warn(
-                        "Ignoring service '{}' because it does not define any package or class " +
-                                "(package: '{}', class: '{}').",
-                        definition.getService().getItemUrl(),
-                        packageName,
-                        className
-                );
-                continue;
-            }
-            JCodeModel codeModel = new JCodeModel();
-            String targetPackage = config.getTargetPackage();
-            packageName = (targetPackage.length() > 0 ? targetPackage + '.' : "" ) + packageName;
-            try {
-                schemaMapper.generate(codeModel, className, packageName, definition.getJsonSchema().toString());
-                codeModel.build(config.getTargetDirectory());
-            } catch (IOException e) {
-               throw new GeneratorException("Unable to generate POJO.", e);
-            }
-            serviceManager.addService(
-                    packageName + '.' + definition.getClassName(),
-                    definition.getService()
-            );
-        }
-        try {
-            if (serviceManager instanceof GeneratedServiceManager) {
-                ((GeneratedServiceManager) serviceManager).persist();
-            }
-        } catch (UnableToPersistServiceAssociationsException e) {
-            throw new GeneratorException("Unable to persist service -> POJO association.", e);
-        }
-    }
-
 
 }
