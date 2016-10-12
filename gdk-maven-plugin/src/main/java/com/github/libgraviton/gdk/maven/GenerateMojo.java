@@ -28,7 +28,7 @@ public class GenerateMojo extends Jsonschema2PojoMojo {
     /**
      * @parameter
      */
-    private File endpointSerializationFile;
+    private File pojoServiceAssocFile;
 
     /**
      * @parameter
@@ -41,16 +41,16 @@ public class GenerateMojo extends Jsonschema2PojoMojo {
             throw new MojoExecutionException(
                     "Plugin configuration 'gravitonUrl' must be specified."
             );
-        } else if (null == endpointSerializationFile) {
+        } else if (null == pojoServiceAssocFile) {
             throw new MojoExecutionException(
-                    "Plugin configuration 'endpointSerializationFile' must be specified."
+                    "Plugin configuration 'pojoServiceAssocFile' must be specified."
             );
         }
         getLog().info("Generating POJO classes for Graviton: " + gravitonUrl);
         try {
             Graviton graviton = new Graviton(
                     gravitonUrl,
-                    new GeneratedServiceManager(endpointSerializationFile, false)
+                    new GeneratedServiceManager(pojoServiceAssocFile, false)
             );
             Generator generator = new Generator(
                     generatorConfig,
