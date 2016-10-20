@@ -18,11 +18,16 @@
     <parent>
         <groupId>com.github.libgraviton</groupId>
         <artifactId>gdk</artifactId>
-        <version>${gdkVersion}</version>
+        <version>0.0.1-SNAPSHOT</version>
     </parent>
     <artifactId>gdk-core</artifactId>
     <name>gdk-core</name>
     <url>https://github.com/libgraviton/gdk-java</url>
+
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>org.jsonschema2pojo</groupId>
