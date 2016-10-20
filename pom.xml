@@ -5,14 +5,13 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.libgraviton</groupId>
     <artifactId>gdk</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
     <name>gdk</name>
     <description>Graviton Development Kit</description>
     <url>https://github.com/libgraviton/gdk-java</url>
     <properties>
         <jsonschema2PojoVersion>0.4.28-SNAPSHOT</jsonschema2PojoVersion>
-        <gdkVersion>{version}</gdkVersion>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
     <modules>

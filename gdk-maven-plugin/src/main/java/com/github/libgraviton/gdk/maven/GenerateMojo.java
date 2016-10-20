@@ -8,31 +8,25 @@ import com.github.libgraviton.gdk.generator.instructionloader.grvprofile.GrvProf
 import com.github.libgraviton.gdk.generator.exception.GeneratorException;
 import com.github.libgraviton.gdk.generator.exception.UnableToLoadServiceAssociationsException;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Execute;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.jsonschema2pojo.maven.Jsonschema2PojoMojo;
 
 import java.io.File;
 
-/**
- * @goal generate
- * @phase generate-sources
- * @requiresDependencyResolution compile
- * @threadSafe
- */
+@Execute(goal = "generate", phase = LifecyclePhase.GENERATE_SOURCES)
+@Mojo(name = "generate", threadSafe = true)
 public class GenerateMojo extends Jsonschema2PojoMojo {
 
-    /**
-     * @parameter
-     */
+    @Parameter
     private String gravitonUrl;
 
-    /**
-     * @parameter
-     */
+    @Parameter
     private File pojoServiceAssocFile;
 
-    /**
-     * @parameter
-     */
+    @Parameter
     private Jsonschema2PojoMojo generatorConfig = new Jsonschema2PojoMojo();
 
     public void execute() throws MojoExecutionException
