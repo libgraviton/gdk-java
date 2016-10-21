@@ -1,6 +1,6 @@
 package com.github.libgraviton.gdk.generator.instructionloader.grvprofile;
 
-import com.github.libgraviton.gdk.Service;
+import com.github.libgraviton.gdk.Endpoint;
 import com.github.libgraviton.gdk.Graviton;
 import com.github.libgraviton.gdk.generator.GeneratorInstruction;
 import com.github.libgraviton.gdk.generator.GeneratorInstructionLoader;
@@ -14,7 +14,7 @@ import java.util.List;
 public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
 
     /**
-     * The Graviton instance where the service definitions will be loaded from.
+     * The Graviton instance where the endpoint definitions will be loaded from.
      */
     private Graviton graviton;
 
@@ -52,14 +52,14 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
     public List<GeneratorInstruction> loadInstructions(boolean reload) {
         if (reload || null == this.loadedInstructions) {
             loadedInstructions = new ArrayList<>();
-            for (ServiceDefinition serviceDefinition : loadServiceList().getServices()) {
-                String profileJson = graviton.get(serviceDefinition.getProfile());
+            for (EndpointDefinition endpointDefinition : loadService().getEndpointDefinitions()) {
+                String profileJson = graviton.get(endpointDefinition.getProfile());
                 JSONObject itemSchema = determineItemSchema(profileJson);
                 loadedInstructions.add(new GeneratorInstruction(
                         determineClassName(itemSchema),
                         determinePackageName(itemSchema),
                         itemSchema,
-                        generateService(serviceDefinition)
+                        generateEndpoint(endpointDefinition)
                 ));
             }
         }
@@ -67,12 +67,12 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
     }
 
     /**
-     * Loads the service list from Graviton.
+     * Loads the Graviton service.
      *
-     * @return The service list.
+     * @return The Graviton service.
      */
-    private ServiceList loadServiceList() {
-        return graviton.get(graviton.getBaseUrl(), ServiceList.class);
+    private Service loadService() {
+        return graviton.get(graviton.getBaseUrl(), Service.class);
     }
 
     /**
@@ -93,7 +93,7 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
     /**
      * Determines the item schema of a given Graviton schema.
      *
-     * @param schema The Graviton schema, which can already be an item schema but also a collection schema.
+     * @param schema The Graviton endpoint schema, which can already be an item schema but also a collection schema.
      *
      * @return The item schema
      */
@@ -120,7 +120,6 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
         String packageName = itemSchema.getString("x-documentClass");
         try {
             packageName = packageName.substring(0, packageName.lastIndexOf('\\'));
-
         } catch (Exception e) {
             return "";
         }
@@ -131,17 +130,17 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
     }
 
     /**
-     * Generates the service by a given serviceDefinition and instruction schema.
+     * Generates the endpoint by a given endpointDefinition and instruction schema.
      *
-     * @param serviceDefinition The service definition.
+     * @param endpointDefinition The endpoint definition.
      *
-     * @return The generated service.
+     * @return The generated endpoint.
      */
-    private Service generateService(ServiceDefinition serviceDefinition) {
-        String url = serviceDefinition.get$ref();
+    private Endpoint generateEndpoint(EndpointDefinition endpointDefinition) {
+        String url = endpointDefinition.getRef();
         if (url.length() > 0 && '/' == url.charAt(url.length() - 1)) {
-            return new Service(url + "{id}", url);
+            return new Endpoint(url + "{id}", url);
         }
-        return new Service(url);
+        return new Endpoint(url);
     }
 }

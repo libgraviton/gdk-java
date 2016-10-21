@@ -1,10 +1,10 @@
 package com.github.libgraviton.gdk.generator;
 
-import com.github.libgraviton.gdk.Service;
+import com.github.libgraviton.gdk.Endpoint;
 import org.json.JSONObject;
 
 /**
- * Defines a service and the corresponding classes, which will be generated.
+ * Defines a endpoint and the corresponding classes, which will be generated.
  */
 public class GeneratorInstruction {
 
@@ -19,28 +19,28 @@ public class GeneratorInstruction {
     private String packageName;
 
     /**
-     * The jsonschema of the service. Will be passed to the generator to create the class.
+     * The jsonschema of the endpoint. Will be passed to the generator to create the class.
      */
     private JSONObject jsonSchema;
 
     /**
-     * The service for which classes will be generated.
+     * The endpoint for which classes will be generated.
      */
-    private Service service;
+    private Endpoint endpoint;
 
     /**
      * Constructor. Initializes all the things.
      *
      * @param className The name of the generated class.
      * @param packageName The sub-package name of the generated class.
-     * @param jsonSchema The jsonschema of the service.
-     * @param service The service itself
+     * @param jsonSchema The jsonschema of the endpoint.
+     * @param endpoint The endpoint itself
      */
-    public GeneratorInstruction(String className, String packageName, JSONObject jsonSchema, Service service) {
+    public GeneratorInstruction(String className, String packageName, JSONObject jsonSchema, Endpoint endpoint) {
         this.className = className;
         this.packageName = packageName;
         this.jsonSchema = jsonSchema;
-        this.service = service;
+        this.endpoint = endpoint;
     }
 
     /**
@@ -62,20 +62,20 @@ public class GeneratorInstruction {
     }
 
     /**
-     * Gets the jsonschema of the service.
+     * Gets the jsonschema of the endpoint.
      *
-     * @return The jsonschema of the service.
+     * @return The jsonschema of the endpoint.
      */
     public JSONObject getJsonSchema() {
         return jsonSchema;
     }
 
     /**
-     * Gets the service for which classes will be generated.
+     * Gets the endpoint for which classes will be generated.
      *
-     * @return The service for which classes will be generated.
+     * @return The endpoint for which classes will be generated.
      */
-    public Service getService() {
-        return service;
+    public Endpoint getEndpoint() {
+        return endpoint;
     }
 }

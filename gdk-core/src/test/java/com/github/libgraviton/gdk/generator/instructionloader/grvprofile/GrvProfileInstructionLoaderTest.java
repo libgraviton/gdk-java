@@ -6,15 +6,12 @@ import static org.mockito.AdditionalMatchers.*;
 import static org.mockito.internal.util.reflection.Whitebox.*;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.jr.ob.JSON;
 import com.github.libgraviton.gdk.Graviton;
 import com.github.libgraviton.gdk.generator.GeneratorInstruction;
 import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.DataProviderRunner;
 import com.tngtech.java.junit.dataprovider.UseDataProvider;
 import org.apache.commons.io.IOUtils;
-import org.hamcrest.BaseMatcher;
-import org.hamcrest.Description;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -39,8 +36,8 @@ public class GrvProfileInstructionLoaderTest {
     public void setupInstructionLoader() throws Exception {
         ClassLoader classLoader = getClass().getClassLoader();
 
-        String serviceList = IOUtils.toString(classLoader.getResource(
-                "serviceList/grvProfileInstructionLoaderTest.json"
+        String service = IOUtils.toString(classLoader.getResource(
+                "service/grvProfileInstructionLoaderTest.json"
         ).openStream());
         someSchema = IOUtils.toString(classLoader.getResource(
                 "serviceSchema/grvProfileInstructionLoaderTest.someSchema.json"
@@ -57,7 +54,7 @@ public class GrvProfileInstructionLoaderTest {
 
         when(graviton.getBaseUrl()).thenReturn("service://graviton");
         when(graviton.get(anyString(), any(Class.class))).thenCallRealMethod();
-        when(graviton.get("service://graviton")).thenReturn(serviceList);
+        when(graviton.get("service://graviton")).thenReturn(service);
         when(graviton.get("service://some-service/profile")).thenReturn(someSchema);
         when(graviton.get("service://another-service/profile")).thenReturn(anotherSchema);
         when(graviton.get("service://some-more-service/profile")).thenReturn(someMoreSchema);
@@ -130,8 +127,8 @@ public class GrvProfileInstructionLoaderTest {
         }
 
         assertEquals(schemaObject.toString(), instruction.getJsonSchema().toString());
-        assertEquals(expectedCollectionUrl, instruction.getService().getCollectionUrl());
-        assertEquals(expectedItemUrl, instruction.getService().getItemUrl());
+        assertEquals(expectedCollectionUrl, instruction.getEndpoint().getSchemaUrl());
+        assertEquals(expectedItemUrl, instruction.getEndpoint().getUrl());
     }
 
 }

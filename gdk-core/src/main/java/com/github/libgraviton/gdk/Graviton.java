@@ -2,7 +2,7 @@ package com.github.libgraviton.gdk;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.libgraviton.gdk.exception.NoCorrespondingServiceException;
+import com.github.libgraviton.gdk.exception.NoCorrespondingEndpointException;
 import okhttp3.*;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -88,10 +88,10 @@ public class Graviton {
         }
     }
 
-    public boolean post(Object data) throws NoCorrespondingServiceException {
-        Service service = serviceManager.getService(data.getClass().getName());
+    public boolean post(Object data) throws NoCorrespondingEndpointException {
+        Endpoint endpoint = serviceManager.getEndpoint(data.getClass().getName());
         try {
-            return post(service.getCollectionUrl(), objectMapper.writeValueAsString(data));
+            return post(endpoint.getSchemaUrl(), objectMapper.writeValueAsString(data));
         } catch (JsonProcessingException e){
             return false;
         }
@@ -109,12 +109,12 @@ public class Graviton {
         }
     }
 
-    public boolean put(Object data) throws NoCorrespondingServiceException {
-        Service service = serviceManager.getService(data.getClass().getName());
+    public boolean put(Object data) throws NoCorrespondingEndpointException {
+        Endpoint endpoint = serviceManager.getEndpoint(data.getClass().getName());
         Map<String, String> params = new HashMap<>();
         params.put("id", extractId(data));
         try {
-            return put(service.getCollectionUrl(), objectMapper.writeValueAsString(data), params);
+            return put(endpoint.getSchemaUrl(), objectMapper.writeValueAsString(data), params);
         } catch (JsonProcessingException e) {
             return false;
         }
@@ -136,11 +136,11 @@ public class Graviton {
         return put(applyParams(url, params), data);
     }
 
-    public boolean delete(Object data) throws NoCorrespondingServiceException {
-        Service service = serviceManager.getService(data.getClass().getName());
+    public boolean delete(Object data) throws NoCorrespondingEndpointException {
+        Endpoint endpoint = serviceManager.getEndpoint(data.getClass().getName());
         Map<String, String> params = new HashMap<>();
         params.put("id", extractId(data));
-        return delete(service.getCollectionUrl(), params);
+        return delete(endpoint.getSchemaUrl(), params);
     }
 
     public boolean delete(String url) {

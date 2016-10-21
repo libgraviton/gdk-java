@@ -1,59 +1,59 @@
 package com.github.libgraviton.gdk;
 
-import com.github.libgraviton.gdk.exception.NoCorrespondingServiceException;
+import com.github.libgraviton.gdk.exception.NoCorrespondingEndpointException;
 
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Manages all available services and associates them with a corresponding POJO class.
+ * Manages all available endpoints of and associates them with a corresponding POJO class.
  */
 public class ServiceManager {
 
     /**
-     * The POJO class -> service association.
+     * The POJO class -> endpoint association.
      */
-    protected Map<String, Service> services = new HashMap<>();
+    protected Map<String, Endpoint> endpoints = new HashMap<>();
 
     /**
-     * Adds a service and associates it with a given POJO class.
+     * Adds a endpoint and associates it with a given POJO class.
      *
      * @param className The POJO class name.
-     * @param service The service.
+     * @param endpoint The endpoint.
      *
-     * @return The number of currently added services.
+     * @return The number of currently added endpoints.
      */
-    public int addService(String className, Service service) {
-        services.put(className, service);
-        return services.size();
+    public int addEndpoint(String className, Endpoint endpoint) {
+        endpoints.put(className, endpoint);
+        return endpoints.size();
     }
 
     /**
-     * Tells whether the service manager is aware of a service for a given POJO class.
+     * Tells whether the service manager is aware of an endpoint for a given POJO class.
      *
      * @param className The POJO class name.
      *
      * @return true when the service manager is aware of a service of the given POJO class, otherwise false.
      */
-    public boolean hasService(String className) {
-        return services.containsKey(className);
+    public boolean hasEndpoint(String className) {
+        return endpoints.containsKey(className);
     }
 
     /**
-     * Gets the service associated to the given class.
+     * Gets the endpoint associated to the given class.
      *
      * @param className The class name.
      *
      * @return The associated service.
      *
-     * @throws NoCorrespondingServiceException When the service manager is not aware of a service associated to
+     * @throws NoCorrespondingEndpointException When the service manager is not aware of a service associated to
      * the given POJO class.
      */
-    public Service getService(String className) throws NoCorrespondingServiceException {
-        if (!hasService(className)) {
-            throw new NoCorrespondingServiceException(className);
+    public Endpoint getEndpoint(String className) throws NoCorrespondingEndpointException {
+        if (!hasEndpoint(className)) {
+            throw new NoCorrespondingEndpointException(className);
         }
-        return services.get(className);
+        return endpoints.get(className);
     }
 
 }

@@ -4,20 +4,25 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 
 /**
- * Represents a service definition of Graviton's main page.
+ * Represents an endpoint definition of Graviton's main page. For example:
+ *
+ *  {
+ *    $ref: "https://api.rel-pub.zgkb.evoja.ch/core/config/",
+ *    profile: "https://api.rel-pub.zgkb.evoja.ch/schema/core/config/collection"
+ *  }
  */
-public class ServiceDefinition {
+public class EndpointDefinition {
 
     @JsonProperty("$ref")
     @JsonPropertyDescription("")
-    private String $ref;
+    private String ref;
 
     @JsonProperty("profile")
     @JsonPropertyDescription("")
     private String profile;
 
-    public String get$ref() {
-        return $ref;
+    public String getRef() {
+        return ref;
     }
 
     public String getProfile() {

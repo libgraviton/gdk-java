@@ -3,8 +3,8 @@ package com.github.libgraviton.gdk.generator;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
+import com.github.libgraviton.gdk.Endpoint;
 import com.github.libgraviton.gdk.Graviton;
-import com.github.libgraviton.gdk.Service;
 import com.github.libgraviton.gdk.generator.exception.GeneratorException;
 import com.sun.codemodel.JCodeModel;
 import com.tngtech.java.junit.dataprovider.DataProvider;
@@ -48,19 +48,19 @@ public class GeneratorTest {
                                 "{\"x-matcher-hint\":1,\"type\":\"object\",\"properties\":" +
                                         "{\"property\":{\"type\":\"string\"}}}"
                         ),
-                        new Service("service://some-service")
+                        new Endpoint("service://some-service")
                 ),
                 new GeneratorInstruction(
                         "AnotherClass",
                         "",
                         new JSONObject("{\"x-matcher-hint\":2,\"type\":\"object\",\"properties\":{}}"),
-                        new Service("service://another-service")
+                        new Endpoint("service://another-service")
                 ),
                 new GeneratorInstruction(
                         "",
                         "some.package",
                         new JSONObject("{\"schema\":1}"),
-                        new Service("service://no-class")
+                        new Endpoint("service://no-class")
                 )
         );
         instructionLoader = mock(GeneratorInstructionLoader.class);
@@ -123,14 +123,14 @@ public class GeneratorTest {
                 contains("\"x-matcher-hint\":2")
         );
 
-        verify(serviceManager, times(2)).addService(anyString(), any(Service.class));
-        verify(serviceManager, times(1)).addService(
+        verify(serviceManager, times(2)).addEndpoint(anyString(), any(Endpoint.class));
+        verify(serviceManager, times(1)).addEndpoint(
                 eq(firstPackageName + (firstPackageName.length() > 0 ? '.' : "") + "SomeClass"),
-                eq(new Service("service://some-service"))
+                eq(new Endpoint("service://some-service"))
         );
-        verify(serviceManager, times(1)).addService(
+        verify(serviceManager, times(1)).addEndpoint(
                 eq(secondPackageName + (secondPackageName.length() > 0 ? '.' : "") + "AnotherClass"),
-                eq(new Service("service://another-service"))
+                eq(new Endpoint("service://another-service"))
         );
 
         verify(serviceManager, times(1)).persist();

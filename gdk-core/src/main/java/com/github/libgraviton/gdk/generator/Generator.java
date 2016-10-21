@@ -3,7 +3,7 @@ package com.github.libgraviton.gdk.generator;
 import com.github.libgraviton.gdk.ServiceManager;
 import com.github.libgraviton.gdk.Graviton;
 import com.github.libgraviton.gdk.generator.exception.GeneratorException;
-import com.github.libgraviton.gdk.generator.exception.UnableToPersistServiceAssociationsException;
+import com.github.libgraviton.gdk.generator.exception.UnableToPersistEndpointAssociationsException;
 import com.sun.codemodel.JCodeModel;
 import org.jsonschema2pojo.*;
 import org.jsonschema2pojo.rules.RuleFactory;
@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * This is the POJO generator. It generates POJOs for all services of a given Graviton instance.
+ * This is the POJO generator. It generates POJOs for all endpoints of a given Graviton instance.
  */
 public class Generator {
 
@@ -35,7 +35,7 @@ public class Generator {
     private Graviton graviton;
 
     /**
-     * The generator instruction loader providing all services
+     * The generator instruction loader providing all endpoints
      */
     private GeneratorInstructionLoader instructionLoader;
 
@@ -94,7 +94,7 @@ public class Generator {
             if (0 == className.length()) {
                 LOG.warn(
                         "Ignoring service '{}' because it does not define any class.",
-                        definition.getService().getItemUrl()
+                        definition.getEndpoint().getUrl()
                 );
                 continue;
             }
@@ -106,16 +106,16 @@ public class Generator {
             } catch (IOException e) {
                throw new GeneratorException("Unable to generate POJO.", e);
             }
-            serviceManager.addService(
+            serviceManager.addEndpoint(
                     packageName + (packageName.length() > 0 ? '.' : "")  + definition.getClassName(),
-                    definition.getService()
+                    definition.getEndpoint()
             );
         }
         try {
             if (serviceManager instanceof GeneratedServiceManager) {
                 ((GeneratedServiceManager) serviceManager).persist();
             }
-        } catch (UnableToPersistServiceAssociationsException e) {
+        } catch (UnableToPersistEndpointAssociationsException e) {
             throw new GeneratorException("Unable to persist service -> POJO association.", e);
         }
     }

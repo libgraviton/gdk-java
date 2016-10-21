@@ -6,7 +6,7 @@ import com.github.libgraviton.gdk.generator.GeneratedServiceManager;
 import com.github.libgraviton.gdk.generator.Generator;
 import com.github.libgraviton.gdk.generator.instructionloader.grvprofile.GrvProfileInstructionLoader;
 import com.github.libgraviton.gdk.generator.exception.GeneratorException;
-import com.github.libgraviton.gdk.generator.exception.UnableToLoadServiceAssociationsException;
+import com.github.libgraviton.gdk.generator.exception.UnableToLoadEndpointAssociationsException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Execute;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -54,9 +54,9 @@ public class GenerateMojo extends Jsonschema2PojoMojo {
             generator.generate();
         } catch (GeneratorException e) {
             throw new MojoExecutionException("POJO generation failed.", e);
-        } catch (UnableToLoadServiceAssociationsException e) {
+        } catch (UnableToLoadEndpointAssociationsException e) {
             throw new MojoExecutionException(
-                    "Service manager tried to load service associations. This should never happen at this point.",
+                    "Endpoint manager tried to load service associations. This should never happen at this point.",
                     e
             );
         }
