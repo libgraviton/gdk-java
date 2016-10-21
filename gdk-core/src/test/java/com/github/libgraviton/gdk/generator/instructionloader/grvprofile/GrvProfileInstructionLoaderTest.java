@@ -1,53 +1,43 @@
 package com.github.libgraviton.gdk.generator.instructionloader.grvprofile;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-import static org.mockito.AdditionalMatchers.*;
-import static org.mockito.internal.util.reflection.Whitebox.*;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.libgraviton.gdk.Graviton;
 import com.github.libgraviton.gdk.generator.GeneratorInstruction;
 import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.DataProviderRunner;
 import com.tngtech.java.junit.dataprovider.UseDataProvider;
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+
+import java.io.File;
 import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.mockito.AdditionalMatchers.not;
+import static org.mockito.Mockito.*;
+import static org.mockito.internal.util.reflection.Whitebox.setInternalState;
 
 @RunWith(DataProviderRunner.class)
 public class GrvProfileInstructionLoaderTest {
 
     private GrvProfileInstructionLoader instructionLoader;
 
-    private String someSchema;
-
-    private String anotherSchema;
-
-    private String someMoreSchema;
-
     @Mock Graviton graviton;
 
     @Before
     public void setupInstructionLoader() throws Exception {
-        ClassLoader classLoader = getClass().getClassLoader();
-
-        String service = IOUtils.toString(classLoader.getResource(
-                "service/grvProfileInstructionLoaderTest.json"
-        ).openStream());
-        someSchema = IOUtils.toString(classLoader.getResource(
-                "serviceSchema/grvProfileInstructionLoaderTest.someSchema.json"
-        ).openStream());
-        anotherSchema = IOUtils.toString(classLoader.getResource(
-                "serviceSchema/grvProfileInstructionLoaderTest.anotherSchema.json"
-        ).openStream());
-        someMoreSchema = IOUtils.toString(classLoader.getResource(
-                "serviceSchema/grvProfileInstructionLoaderTest.someMoreSchema.json"
-        ).openStream());
+        String service = FileUtils.readFileToString(
+                new File("src/test/resources/service/grvProfileInstructionLoaderTest.json"));
+        String someSchema = FileUtils.readFileToString(
+                new File("src/test/resources/serviceSchema/grvProfileInstructionLoaderTest.someSchema.json"));
+        String anotherSchema = FileUtils.readFileToString(
+                new File("src/test/resources/serviceSchema/grvProfileInstructionLoaderTest.anotherSchema.json"));
+        String someMoreSchema = FileUtils.readFileToString(
+                new File("src/test/resources/serviceSchema/grvProfileInstructionLoaderTest.someMoreSchema.json"));
 
         graviton = mock(Graviton.class, withSettings());
         setInternalState(graviton, "objectMapper", new ObjectMapper());
@@ -110,7 +100,8 @@ public class GrvProfileInstructionLoaderTest {
             String expectedPackageName,
             int instructionIndex
     ) throws Exception{
-        String schema = IOUtils.toString(getClass().getClassLoader().getResource(schemaFile).openStream());
+        String schema = FileUtils.readFileToString(
+                new File("src/test/resources/" + schemaFile));
         when(graviton.get(not(eq("service://graviton")))).thenReturn(schema);
 
         List<GeneratorInstruction> instructions = instructionLoader.loadInstructions();

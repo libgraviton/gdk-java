@@ -42,6 +42,4 @@ public class EndpointTest {
         assertFalse(endpoint.equals(equalEndpoint));
         assertFalse(equalEndpoint.equals(endpoint));
     }
-
 }
-

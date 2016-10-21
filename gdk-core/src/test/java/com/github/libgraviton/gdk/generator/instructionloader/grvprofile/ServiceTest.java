@@ -1,19 +1,22 @@
 package com.github.libgraviton.gdk.generator.instructionloader.grvprofile;
 
-import static org.junit.Assert.*;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
-import java.net.URL;
+import java.io.File;
+
+import static org.junit.Assert.assertEquals;
 
 public class ServiceTest {
 
     @Test
     public void testBeanJson() throws Exception {
         ObjectMapper objectMapper = new ObjectMapper();
-        URL jsonUrl = getClass().getClassLoader().getResource("service/serviceTest.json");
-        Service service = objectMapper.readValue(jsonUrl, Service.class);
+
+        String serviceJson = FileUtils.readFileToString(
+                new File("src/test/resources/service/serviceTest.json"));;
+        Service service = objectMapper.readValue(serviceJson, Service.class);
 
         assertEquals(2, service.getEndpointDefinitions().size());
         assertEquals("service://some-service/", service.getEndpointDefinitions().get(0).getRef());
