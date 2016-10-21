@@ -14,7 +14,7 @@ public interface GeneratorInstructionLoader {
      *
      * @return The instruction set.
      */
-    public List<GeneratorInstruction> loadInstructions();
+    List<GeneratorInstruction> loadInstructions();
 
     /**
      * Loads all generator instructions.
@@ -24,6 +24,6 @@ public interface GeneratorInstructionLoader {
      *
      * @return The instruction set.
      */
-    public List<GeneratorInstruction> loadInstructions(boolean reload);
+    List<GeneratorInstruction> loadInstructions(boolean reload);
 
 }
