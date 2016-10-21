@@ -1,12 +1,9 @@
 package com.github.libgraviton.gdk;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.libgraviton.gdk.exception.NoCorrespondingServiceException;
-import com.mashape.unirest.http.Unirest;
-import com.mashape.unirest.http.exceptions.UnirestException;
-import com.mashape.unirest.request.HttpRequest;
-import com.mashape.unirest.request.HttpRequestWithBody;
-
+import okhttp3.*;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -15,11 +12,15 @@ import java.util.Map;
 /**
  * This is the base class used for Graviton API calls.
  *
+ * @todo do proper implementation (EVO-7721)
+ *
  * @author List of contributors {@literal <https://github.com/libgraviton/gdk-java/graphs/contributors>}
  * @see <a href="http://swisscom.ch">http://swisscom.ch</a>
  * @version $Id: $Id
  */
 public class Graviton {
+
+    public static final MediaType CONTENT_TYPE = MediaType.parse("application/json; charset=utf-8");
 
     /**
      * Defines the base url of the Graviton server
@@ -37,6 +38,11 @@ public class Graviton {
     private ServiceManager serviceManager;
 
     /**
+     * The http client for making http calls.
+     */
+    private OkHttpClient okHttp;
+
+    /**
      * Constructor
      *
      * @param baseUrl The base url pointing to the Graviton server
@@ -45,6 +51,7 @@ public class Graviton {
     public Graviton(String baseUrl, ServiceManager serviceManager) {
         this.baseUrl = baseUrl;
         this.serviceManager = serviceManager;
+        this.okHttp = new OkHttpClient();
     }
 
     /**
@@ -70,49 +77,63 @@ public class Graviton {
     }
 
     public String get(String url) {
+        Request request = new Request.Builder()
+                .url(url)
+                .get()
+                .build();
         try {
-            return Unirest.get(url).asString().getBody();
-        } catch (UnirestException e) {
-            // @todo
+            return okHttp.newCall(request).execute().body().string();
+        } catch (IOException e) {
             return null;
         }
     }
 
     public boolean post(Object data) throws NoCorrespondingServiceException {
         Service service = serviceManager.getService(data.getClass().getName());
-        return post(service.getCollectionUrl(), data);
-
-    }
-
-    public boolean post(String url, Object data) {
         try {
-            Unirest.post(url).body(data).asString();
-        } catch (UnirestException e) {
+            return post(service.getCollectionUrl(), objectMapper.writeValueAsString(data));
+        } catch (JsonProcessingException e){
             return false;
         }
-        return true;
+    }
+
+    public boolean post(String url, String data) {
+        try {
+            Request request = new Request.Builder()
+                    .url(url)
+                    .post(RequestBody.create(CONTENT_TYPE, data))
+                    .build();
+            return okHttp.newCall(request).execute().isSuccessful();
+        } catch (IOException e) {
+            return false;
+        }
     }
 
     public boolean put(Object data) throws NoCorrespondingServiceException {
         Service service = serviceManager.getService(data.getClass().getName());
         Map<String, String> params = new HashMap<>();
         params.put("id", extractId(data));
-        return put(service.getCollectionUrl(), data, params);
-    }
-
-    public boolean put(String url, Object data) {
-        return put(url, data, new HashMap<String, String>());
-    }
-
-    public boolean put(String url, Object data, Map<String, String> params) {
-        HttpRequestWithBody request = Unirest.put(url);
-        addRequestParams(request, params);
         try {
-            request.body(data).asString();
-        } catch (UnirestException e) {
+            return put(service.getCollectionUrl(), objectMapper.writeValueAsString(data), params);
+        } catch (JsonProcessingException e) {
             return false;
         }
-        return true;
+    }
+
+    public boolean put(String url, String data) {
+        try {
+            Request request = new Request.Builder()
+                    .url(url)
+                    .put(RequestBody.create(CONTENT_TYPE, data))
+                    .build();
+            return okHttp.newCall(request).execute().isSuccessful();
+        } catch (IOException e) {
+            return false;
+        }
+    }
+
+    public boolean put(String url, String data, Map<String, String> params) {
+        return put(applyParams(url, params), data);
     }
 
     public boolean delete(Object data) throws NoCorrespondingServiceException {
@@ -123,26 +144,28 @@ public class Graviton {
     }
 
     public boolean delete(String url) {
-        return delete(url, new HashMap<String, String>());
+        try {
+            Request request = new Request.Builder()
+                    .url(url)
+                    .delete()
+                    .build();
+            return okHttp.newCall(request).execute().isSuccessful();
+        } catch (IOException e) {
+            return false;
+        }
     }
 
     public boolean delete(String url, Map<String, String> params) {
-        HttpRequest request = Unirest.put(url);
-        addRequestParams(request, params);
-        try {
-            request.asString();
-        } catch (UnirestException e) {
-            return false;
-        }
-        return true;
+        return delete(applyParams(url, params));
     }
 
-    private void addRequestParams(HttpRequest request, Map<String, String> params) {
+    private String applyParams(String url, Map<String, String> params) {
         if (params.size() > 0) {
             for (Map.Entry<String, String> param : params.entrySet()) {
-                request.routeParam(param.getKey(), param.getValue());
+                url = url.replaceAll("\\{" + param.getKey() + "\\}", param.getValue());
             }
         }
+        return url;
     }
 
     /**
