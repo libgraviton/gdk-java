@@ -52,7 +52,7 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
     public List<GeneratorInstruction> loadInstructions(boolean reload) {
         if (reload || null == this.loadedInstructions) {
             loadedInstructions = new ArrayList<>();
-            for (EndpointDefinition endpointDefinition : loadService().getEndpointDefinitions()) {
+            for (EndpointDefinition endpointDefinition : loadEndpoint().getEndpointDefinitions()) {
                 String profileJson = graviton.get(endpointDefinition.getProfile());
                 JSONObject itemSchema = determineItemSchema(profileJson);
                 loadedInstructions.add(new GeneratorInstruction(
@@ -67,11 +67,11 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
     }
 
     /**
-     * Loads the Graviton service.
+     * Loads the Graviton endpooint.
      *
-     * @return The Graviton service.
+     * @return The Graviton endpoint.
      */
-    private Service loadService() {
+    private Service loadEndpoint() {
         return graviton.get(graviton.getBaseUrl(), Service.class);
     }
 
