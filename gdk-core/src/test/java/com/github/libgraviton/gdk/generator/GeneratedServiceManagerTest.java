@@ -43,7 +43,7 @@ public class GeneratedServiceManagerTest {
         thrown.expect(UnableToLoadEndpointAssociationsException.class);
         thrown.expectMessage("not exist");
 
-        File serializationFile = File.createTempFile("service-associations-deleted", ".tmp");
+        File serializationFile = File.createTempFile("endpoint-associations-deleted", ".tmp");
         // make sure the file does not exist
         assertTrue(serializationFile.delete());
         assertFalse(serializationFile.exists());

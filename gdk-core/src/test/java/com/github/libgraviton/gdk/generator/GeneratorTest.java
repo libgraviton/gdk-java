@@ -48,19 +48,19 @@ public class GeneratorTest {
                                 "{\"x-matcher-hint\":1,\"type\":\"object\",\"properties\":" +
                                         "{\"property\":{\"type\":\"string\"}}}"
                         ),
-                        new Endpoint("service://some-service")
+                        new Endpoint("endpoint://some-endpoint")
                 ),
                 new GeneratorInstruction(
                         "AnotherClass",
                         "",
                         new JSONObject("{\"x-matcher-hint\":2,\"type\":\"object\",\"properties\":{}}"),
-                        new Endpoint("service://another-service")
+                        new Endpoint("endpoint://another-endpoint")
                 ),
                 new GeneratorInstruction(
                         "",
                         "some.package",
                         new JSONObject("{\"schema\":1}"),
-                        new Endpoint("service://no-class")
+                        new Endpoint("endpoint://no-class")
                 )
         );
         instructionLoader = mock(GeneratorInstructionLoader.class);
@@ -126,11 +126,11 @@ public class GeneratorTest {
         verify(serviceManager, times(2)).addEndpoint(anyString(), any(Endpoint.class));
         verify(serviceManager, times(1)).addEndpoint(
                 eq(firstPackageName + (firstPackageName.length() > 0 ? '.' : "") + "SomeClass"),
-                eq(new Endpoint("service://some-service"))
+                eq(new Endpoint("endpoint://some-endpoint"))
         );
         verify(serviceManager, times(1)).addEndpoint(
                 eq(secondPackageName + (secondPackageName.length() > 0 ? '.' : "") + "AnotherClass"),
-                eq(new Endpoint("service://another-service"))
+                eq(new Endpoint("endpoint://another-endpoint"))
         );
 
         verify(serviceManager, times(1)).persist();

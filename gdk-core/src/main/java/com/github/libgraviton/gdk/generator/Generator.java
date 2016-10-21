@@ -93,7 +93,7 @@ public class Generator {
             String className = definition.getClassName();
             if (0 == className.length()) {
                 LOG.warn(
-                        "Ignoring service '{}' because it does not define any class.",
+                        "Ignoring endpoint '{}' because it does not define any class.",
                         definition.getEndpoint().getUrl()
                 );
                 continue;
@@ -116,7 +116,7 @@ public class Generator {
                 ((GeneratedServiceManager) serviceManager).persist();
             }
         } catch (UnableToPersistEndpointAssociationsException e) {
-            throw new GeneratorException("Unable to persist service -> POJO association.", e);
+            throw new GeneratorException("Unable to persist endpoint -> POJO association.", e);
         }
     }
 
