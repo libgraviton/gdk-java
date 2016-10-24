@@ -15,6 +15,7 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.jsonschema2pojo.maven.Jsonschema2PojoMojo;
 
 import java.io.File;
+import java.io.IOException;
 
 @Execute(goal = "generate", phase = LifecyclePhase.GENERATE_SOURCES)
 @Mojo(name = "generate", threadSafe = true)
@@ -35,13 +36,17 @@ public class GenerateMojo extends Jsonschema2PojoMojo {
             throw new MojoExecutionException(
                     "Plugin configuration 'gravitonUrl' must be specified."
             );
-        } else if (null == pojoServiceAssocFile) {
+        }
+        if (null == pojoServiceAssocFile) {
             throw new MojoExecutionException(
                     "Plugin configuration 'pojoServiceAssocFile' must be specified."
             );
         }
+
         getLog().info("Generating POJO classes for Graviton: " + gravitonUrl);
+
         try {
+            pojoServiceAssocFile.createNewFile();
             Graviton graviton = new Graviton(
                     gravitonUrl,
                     new GeneratedServiceManager(pojoServiceAssocFile, false)
@@ -52,7 +57,7 @@ public class GenerateMojo extends Jsonschema2PojoMojo {
                     new GrvProfileInstructionLoader(graviton)
             );
             generator.generate();
-        } catch (GeneratorException e) {
+        } catch (GeneratorException | IOException e) {
             throw new MojoExecutionException("POJO generation failed.", e);
         } catch (UnableToLoadEndpointAssociationsException e) {
             throw new MojoExecutionException(
