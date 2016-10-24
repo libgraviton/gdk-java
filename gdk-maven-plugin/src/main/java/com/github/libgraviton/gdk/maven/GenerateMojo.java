@@ -43,8 +43,6 @@ public class GenerateMojo extends Jsonschema2PojoMojo {
             );
         }
 
-        getLog().info("Generating POJO classes for Graviton: " + gravitonUrl);
-
         try {
             pojoServiceAssocFile.createNewFile();
             Graviton graviton = new Graviton(

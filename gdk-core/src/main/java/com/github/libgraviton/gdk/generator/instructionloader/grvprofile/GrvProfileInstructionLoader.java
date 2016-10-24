@@ -5,6 +5,9 @@ import com.github.libgraviton.gdk.Graviton;
 import com.github.libgraviton.gdk.generator.GeneratorInstruction;
 import com.github.libgraviton.gdk.generator.GeneratorInstructionLoader;
 import org.json.JSONObject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +15,8 @@ import java.util.List;
  * Instruction loader providing generator instructions based on Graviton's main page / service overview.
  */
 public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
+
+    private final Logger LOG = LoggerFactory.getLogger(GrvProfileInstructionLoader.class);
 
     /**
      * The Graviton instance where the endpoint definitions will be loaded from.
@@ -51,6 +56,7 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
      */
     public List<GeneratorInstruction> loadInstructions(boolean reload) {
         if (reload || null == this.loadedInstructions) {
+            LOG.info("Loading endpoint definitions and schema from '" + graviton.getBaseUrl() + "'.");
             loadedInstructions = new ArrayList<>();
             for (EndpointDefinition endpointDefinition : loadService().getEndpointDefinitions()) {
                 String profileJson = graviton.get(endpointDefinition.getProfile());
@@ -62,6 +68,7 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
                         generateEndpoint(endpointDefinition)
                 ));
             }
+            LOG.info("Loaded " + loadedInstructions.size() + " endpoint definitions.");
         }
         return loadedInstructions;
     }
