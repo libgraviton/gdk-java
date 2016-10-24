@@ -44,6 +44,11 @@ public class GenerateMojo extends Jsonschema2PojoMojo {
         }
 
         try {
+            if(!generatorConfig.getTargetDirectory().mkdirs()) {
+                getLog().info("Target directory '" + generatorConfig.getTargetDirectory() + "' already exists. Skipping POJO generation.");
+                return;
+            }
+
             pojoServiceAssocFile.createNewFile();
             Graviton graviton = new Graviton(
                     gravitonUrl,

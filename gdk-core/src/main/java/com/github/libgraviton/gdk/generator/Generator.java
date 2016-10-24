@@ -92,8 +92,6 @@ public class Generator {
         List<GeneratorInstruction> generatorInstructions = instructionLoader.loadInstructions();
         ServiceManager serviceManager = graviton.getServiceManager();
         LOG.info("Generating POJO classes for Graviton '" + graviton.getBaseUrl() + "'.");
-        File targetDirectory = config.getTargetDirectory();
-        targetDirectory.mkdirs();
         for (GeneratorInstruction definition : generatorInstructions) {
             String className = definition.getClassName();
             if (0 == className.length()) {
@@ -107,7 +105,7 @@ public class Generator {
             JCodeModel codeModel = new JCodeModel();
             try {
                 schemaMapper.generate(codeModel, className, packageName, definition.getJsonSchema().toString());
-                codeModel.build(targetDirectory);
+                codeModel.build(config.getTargetDirectory());
             } catch (IOException e) {
                throw new GeneratorException("Unable to generate POJO.", e);
             }
