@@ -16,6 +16,7 @@
     </properties>
     <repositories>
         <repository>
+            <!-- TODO Needs to be removed as soon as https://github.com/joelittlejohn/jsonschema2pojo/pull/622/files is merged and released -->
             <id>org.jsonschema2pojo</id>
             <url>file://${basedir}/lib</url>
         </repository>
