@@ -8,6 +8,7 @@ import com.github.libgraviton.gdk.generator.instructionloader.grvprofile.GrvProf
 import com.github.libgraviton.gdk.generator.exception.GeneratorException;
 import com.github.libgraviton.gdk.generator.exception.UnableToLoadEndpointAssociationsException;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugin.lifecycle.Lifecycle;
 import org.apache.maven.plugins.annotations.Execute;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
@@ -17,14 +18,14 @@ import org.jsonschema2pojo.maven.Jsonschema2PojoMojo;
 import java.io.File;
 import java.io.IOException;
 
-@Execute(goal = "generate", phase = LifecyclePhase.GENERATE_SOURCES)
-@Mojo(name = "generate", threadSafe = true)
+@Execute(goal = "generate")
+@Mojo(name = "generate", threadSafe = true, defaultPhase = LifecyclePhase.GENERATE_SOURCES)
 public class GenerateMojo extends Jsonschema2PojoMojo {
 
-    @Parameter
+    @Parameter(required = true)
     private String gravitonUrl;
 
-    @Parameter
+    @Parameter(required = true)
     private File pojoServiceAssocFile;
 
     @Parameter
@@ -32,17 +33,6 @@ public class GenerateMojo extends Jsonschema2PojoMojo {
 
     public void execute() throws MojoExecutionException
     {
-        if (null == gravitonUrl) {
-            throw new MojoExecutionException(
-                    "Plugin configuration 'gravitonUrl' must be specified."
-            );
-        }
-        if (null == pojoServiceAssocFile) {
-            throw new MojoExecutionException(
-                    "Plugin configuration 'pojoServiceAssocFile' must be specified."
-            );
-        }
-
         try {
             if(!generatorConfig.getTargetDirectory().mkdirs()) {
                 getLog().info("Target directory '" + generatorConfig.getTargetDirectory() + "' already exists. Skipping POJO generation.");
