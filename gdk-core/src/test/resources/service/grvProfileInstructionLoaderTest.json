@@ -1,0 +1,24 @@
+{
+  "services": [
+    {
+      "$ref": "service://some-service/",
+      "profile": "service://some-service/profile"
+    },
+    {
+      "$ref": "service://another-service",
+      "profile": "service://another-service/profile"
+    },
+    {
+      "$ref": "service://some-more-service/",
+      "profile": "service://some-more-service/profile"
+    }
+  ],
+  "thirdparty": {
+    "someThirdParty": [
+      {
+        "$ref": "service://thirdparty/some-third-party/some-service/",
+        "profile": "service://thirdparty/some-third-party/some-service/profile"
+      }
+    ]
+  }
+}

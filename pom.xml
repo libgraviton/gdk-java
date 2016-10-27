@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.github.libgraviton</groupId>
+    <artifactId>gdk</artifactId>
+    <version>0.1.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>gdk</name>
+    <description>Graviton Development Kit</description>
+    <url>https://github.com/libgraviton/gdk-java</url>
+    <properties>
+        <jsonschema2PojoVersion>0.4.28-SNAPSHOT</jsonschema2PojoVersion>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
+    <repositories>
+        <repository>
+            <!-- TODO Needs to be removed as soon as https://github.com/joelittlejohn/jsonschema2pojo/pull/622/files is merged and released -->
+            <id>org.jsonschema2pojo</id>
+            <url>file://${basedir}/lib</url>
+        </repository>
+    </repositories>
+    <modules>
+        <module>gdk-core</module>
+        <module>gdk-maven-plugin</module>
+    </modules>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-plugin-plugin</artifactId>
+                <version>3.4</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.5.1</version>
+                <configuration>
+                    <source>1.7</source>
+                    <target>1.7</target>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>
