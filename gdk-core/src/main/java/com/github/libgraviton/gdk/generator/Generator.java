@@ -10,7 +10,6 @@ import org.jsonschema2pojo.rules.RuleFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -97,7 +96,7 @@ public class Generator {
             if (0 == className.length()) {
                 LOG.warn(
                         "Ignoring endpoint '{}' because it does not define any class.",
-                        definition.getEndpoint().getUrl()
+                        definition.getEndpoint().getItemUrl()
                 );
                 continue;
             }
