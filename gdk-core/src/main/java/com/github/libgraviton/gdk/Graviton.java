@@ -2,8 +2,12 @@ package com.github.libgraviton.gdk;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.libgraviton.gdk.exception.CommunicationException;
 import com.github.libgraviton.gdk.exception.NoCorrespondingEndpointException;
 import okhttp3.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -19,6 +23,8 @@ import java.util.Map;
  * @version $Id: $Id
  */
 public class Graviton {
+
+    private final Logger LOG = LoggerFactory.getLogger(Graviton.class);
 
     public static final MediaType CONTENT_TYPE = MediaType.parse("application/json; charset=utf-8");
 
@@ -67,96 +73,104 @@ public class Graviton {
         return baseUrl;
     }
 
-    public <BeanClass> BeanClass get(String url, Class<? extends BeanClass> beanClass) {
-        try {
-            return objectMapper.readValue(get(url), beanClass);
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public String get(String url) {
+    public GravitonResponse get(String url) throws CommunicationException {
         Request request = new Request.Builder()
                 .url(url)
                 .get()
                 .build();
-        try {
-            return okHttp.newCall(request).execute().body().string();
-        } catch (IOException e) {
-            return null;
-        }
+        return doRequest("GET", url, request);
     }
 
-    public boolean post(Object data) throws NoCorrespondingEndpointException {
+    public GravitonResponse post(Object data) throws NoCorrespondingEndpointException, CommunicationException {
         Endpoint endpoint = serviceManager.getEndpoint(data.getClass().getName());
-        try {
-            return post(endpoint.getSchemaUrl(), objectMapper.writeValueAsString(data));
-        } catch (JsonProcessingException e){
-            return false;
-        }
+        return post(endpoint.getUrl(), serializeData(data));
     }
 
-    public boolean post(String url, String data) {
-        try {
-            Request request = new Request.Builder()
-                    .url(url)
-                    .post(RequestBody.create(CONTENT_TYPE, data))
-                    .build();
-            return okHttp.newCall(request).execute().isSuccessful();
-        } catch (IOException e) {
-            return false;
-        }
+    public GravitonResponse post(String url, String data) throws CommunicationException {
+        Request request = new Request.Builder()
+                .url(url)
+                .post(RequestBody.create(CONTENT_TYPE, data))
+                .build();
+        return doRequest("POST", url, request);
     }
 
-    public boolean put(Object data) throws NoCorrespondingEndpointException {
+    public GravitonResponse put(Object data) throws NoCorrespondingEndpointException, CommunicationException {
         Endpoint endpoint = serviceManager.getEndpoint(data.getClass().getName());
         Map<String, String> params = new HashMap<>();
         params.put("id", extractId(data));
-        try {
-            return put(endpoint.getSchemaUrl(), objectMapper.writeValueAsString(data), params);
-        } catch (JsonProcessingException e) {
-            return false;
-        }
+        return put(endpoint.getUrl(), serializeData(data), params);
     }
 
-    public boolean put(String url, String data) {
-        try {
-            Request request = new Request.Builder()
-                    .url(url)
-                    .put(RequestBody.create(CONTENT_TYPE, data))
-                    .build();
-            return okHttp.newCall(request).execute().isSuccessful();
-        } catch (IOException e) {
-            return false;
-        }
+    public GravitonResponse put(String url, String data) throws CommunicationException {
+        Request request = new Request.Builder()
+                .url(url)
+                .put(RequestBody.create(CONTENT_TYPE, data))
+                .build();
+        return doRequest("PUT", url, request);
     }
 
-    public boolean put(String url, String data, Map<String, String> params) {
+    public GravitonResponse put(String url, String data, Map<String, String> params) throws CommunicationException {
         return put(applyParams(url, params), data);
     }
 
-    public boolean delete(Object data) throws NoCorrespondingEndpointException {
+    public GravitonResponse delete(Object data) throws NoCorrespondingEndpointException, CommunicationException {
         Endpoint endpoint = serviceManager.getEndpoint(data.getClass().getName());
         Map<String, String> params = new HashMap<>();
         params.put("id", extractId(data));
-        return delete(endpoint.getSchemaUrl(), params);
+        return delete(endpoint.getUrl(), params);
     }
 
-    public boolean delete(String url) {
+    public GravitonResponse delete(String url) throws CommunicationException {
+        Request request = new Request.Builder()
+                .url(url)
+                .delete()
+                .build();
+        return doRequest("DELETE", url, request);
+    }
+
+    public GravitonResponse delete(String url, Map<String, String> params) throws CommunicationException {
+        return delete(applyParams(url, params));
+    }
+
+    protected GravitonResponse doRequest(String requestMethod, String url, Request request) throws CommunicationException {
+        LOG.info("Starting " + requestMethod + " to '" + url + "'...");
+        Response response;
         try {
-            Request request = new Request.Builder()
-                    .url(url)
-                    .delete()
-                    .build();
-            return okHttp.newCall(request).execute().isSuccessful();
+            response = okHttp.newCall(request).execute();
         } catch (IOException e) {
-            return false;
+            throw new CommunicationException("Unable to execute " + requestMethod + " to '" + url + "'.", e);
+        }
+
+        GravitonResponse gravitonResponse = new GravitonResponse(response);
+        try {
+            gravitonResponse.setBody(response.body().string());
+        } catch (IOException e) {
+            throw new CommunicationException("Unable to fetch response body from " + response.request().method() + " to '" + response.request().url() + "'.", e);
+        } finally {
+            response.close();
+        }
+
+        if(response.isSuccessful()) {
+            LOG.info("Successful " + requestMethod + " to '" + url + "'. Response was '" + response.code() +" - " + response.message() + "'.");
+        } else {
+            String message = "Failed " + requestMethod + " to '" + url + "'. Response was '" + response.code() +" - " + response.message() + "' with body '" + gravitonResponse.getBody() + "'.";
+            // TODO do we only want to throw an exception or also have the fail logged for sure?
+            LOG.warn(message);
+            throw new CommunicationException(message);
+        }
+        return gravitonResponse;
+    }
+
+    private String serializeData(Object data) throws CommunicationException {
+        try {
+            return objectMapper.writeValueAsString(data);
+        } catch (JsonProcessingException e){
+            throw new CommunicationException("Unable to serialize class '" + data.getClass().getName() + "'.", e);
         }
     }
 
-    public boolean delete(String url, Map<String, String> params) {
-        return delete(applyParams(url, params));
+    private String composeRequestFailedMessage(String requestMethod, String url, int code, String message, String body) {
+        return "Failed " + requestMethod + " to '" + url + "'. Response was '" + code +" - " + message + "' with body '" + body + "'.";
     }
 
     private String applyParams(String url, Map<String, String> params) {
@@ -188,4 +202,7 @@ public class Graviton {
         }
     }
 
+    protected void setOkHttp(OkHttpClient okHttp) {
+        this.okHttp = okHttp;
+    }
 }

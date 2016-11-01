@@ -2,6 +2,7 @@ package com.github.libgraviton.gdk.generator.instructionloader.grvprofile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.libgraviton.gdk.Graviton;
+import com.github.libgraviton.gdk.GravitonResponse;
 import com.github.libgraviton.gdk.generator.GeneratorInstruction;
 import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.DataProviderRunner;
@@ -19,17 +20,18 @@ import java.util.List;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.AdditionalMatchers.not;
 import static org.mockito.Mockito.*;
-import static org.mockito.internal.util.reflection.Whitebox.setInternalState;
 
 @RunWith(DataProviderRunner.class)
 public class GrvProfileInstructionLoaderTest {
 
     private GrvProfileInstructionLoader instructionLoader;
 
-    @Mock Graviton graviton;
+    @Mock
+    Graviton graviton;
+
 
     @Before
-    public void setupInstructionLoader() throws Exception {
+    public void setup() throws Exception {
         String service = FileUtils.readFileToString(
                 new File("src/test/resources/service/grvProfileInstructionLoaderTest.json"));
         String someSchema = FileUtils.readFileToString(
@@ -40,14 +42,23 @@ public class GrvProfileInstructionLoaderTest {
                 new File("src/test/resources/serviceSchema/grvProfileInstructionLoaderTest.someMoreSchema.json"));
 
         graviton = mock(Graviton.class, withSettings());
-        setInternalState(graviton, "objectMapper", new ObjectMapper());
+
+        GravitonResponse response1 = spy(GravitonResponse.class);
+        GravitonResponse response2 = spy(GravitonResponse.class);
+        GravitonResponse response3 = spy(GravitonResponse.class);
+        GravitonResponse response4 = spy(GravitonResponse.class);
 
         when(graviton.getBaseUrl()).thenReturn("service://graviton");
-        when(graviton.get(anyString(), any(Class.class))).thenCallRealMethod();
-        when(graviton.get("service://graviton")).thenReturn(service);
-        when(graviton.get("service://some-service/profile")).thenReturn(someSchema);
-        when(graviton.get("service://another-service/profile")).thenReturn(anotherSchema);
-        when(graviton.get("service://some-more-service/profile")).thenReturn(someMoreSchema);
+
+        doReturn(service).when(response1).getBody();
+        doReturn(someSchema).when(response2).getBody();
+        doReturn(anotherSchema).when(response3).getBody();
+        doReturn(someMoreSchema).when(response4).getBody();
+
+        when(graviton.get("service://graviton")).thenReturn(response1);
+        when(graviton.get("service://some-service/profile")).thenReturn(response2);
+        when(graviton.get("service://another-service/profile")).thenReturn(response3);
+        when(graviton.get("service://some-more-service/profile")).thenReturn(response4);
 
         instructionLoader = new GrvProfileInstructionLoader(graviton);
     }
@@ -102,7 +113,9 @@ public class GrvProfileInstructionLoaderTest {
     ) throws Exception{
         String schema = FileUtils.readFileToString(
                 new File("src/test/resources/" + schemaFile));
-        when(graviton.get(not(eq("service://graviton")))).thenReturn(schema);
+        GravitonResponse response = spy(GravitonResponse.class);
+        doReturn(schema).when(response).getBody();
+        when(graviton.get(not(eq("service://graviton")))).thenReturn(response);
 
         List<GeneratorInstruction> instructions = instructionLoader.loadInstructions();
         assertEquals(3, instructions.size());
@@ -118,8 +131,8 @@ public class GrvProfileInstructionLoaderTest {
         }
 
         assertEquals(schemaObject.toString(), instruction.getJsonSchema().toString());
-        assertEquals(expectedCollectionUrl, instruction.getEndpoint().getSchemaUrl());
-        assertEquals(expectedItemUrl, instruction.getEndpoint().getUrl());
+        assertEquals(expectedCollectionUrl, instruction.getEndpoint().getUrl());
+        assertEquals(expectedItemUrl, instruction.getEndpoint().getItemUrl());
     }
 
 }
