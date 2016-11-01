@@ -8,41 +8,41 @@ import java.io.Serializable;
 public class Endpoint implements Serializable {
 
     /**
+     * The url of the endpoint to address a single item.
+     */
+    private String itemUrl;
+
+    /**
      * The url of the endpoint.
      */
     private String url;
 
     /**
-     * The url of the endpoint schema.
-     */
-    private String schemaUrl;
-
-    /**
-     * Constructor. Sets the endpoint url.
+     * Constructor. Sets the endpoint itemUrl.
      *
-     * @param url The endpoint url.
+     * @param itemUrl The endpoint itemUrl.
      */
-    public Endpoint(String url) {
-        this.url = url;
+    public Endpoint(String itemUrl) {
+        this.itemUrl = itemUrl;
     }
 
     /**
-     * Constructor. Sets the item and collection endpoint url.
+     * Constructor. Sets the item and collection endpoint itemUrl.
      *
-     * @param url The item endpoint url.
-     * @param schemaUrl The collection endpoint url.
+     * @param itemUrl The item endpoint itemUrl.
+     * @param url The endpoint itemUrl.
      */
-    public Endpoint(String url, String schemaUrl) {
+    public Endpoint(String itemUrl, String url) {
+        this.itemUrl = itemUrl;
         this.url = url;
-        this.schemaUrl = schemaUrl;
-    }
-
-    public String getSchemaUrl() {
-        return schemaUrl;
     }
 
     public String getUrl() {
         return url;
+    }
+
+    public String getItemUrl() {
+        return itemUrl;
     }
 
     @Override
@@ -51,8 +51,8 @@ public class Endpoint implements Serializable {
             return false;
         }
         Endpoint endpoint = (Endpoint) obj;
-        return ((null == url && null == endpoint.url) || (null != url && url.equals(endpoint.url))) &&
-                ((null == schemaUrl && null == endpoint.schemaUrl) ||
-                    (null != schemaUrl && schemaUrl.equals(endpoint.schemaUrl)));
+        return ((null == itemUrl && null == endpoint.itemUrl) || (null != itemUrl && itemUrl.equals(endpoint.itemUrl))) &&
+                ((null == url && null == endpoint.url) ||
+                    (null != url && url.equals(endpoint.url)));
     }
 }
