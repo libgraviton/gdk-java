@@ -8,7 +8,7 @@ import java.util.Map;
 /**
  * Manages all available endpoints of and associates them with a corresponding POJO class.
  */
-public class ServiceManager {
+public class EndpointManager {
 
     /**
      * The POJO class -> endpoint association.

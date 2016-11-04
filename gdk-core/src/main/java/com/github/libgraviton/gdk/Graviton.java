@@ -39,9 +39,9 @@ public class Graviton {
     private ObjectMapper objectMapper = new ObjectMapper();
 
     /**
-     * The service manager which is used
+     * The endpoint manager which is used
      */
-    private ServiceManager serviceManager;
+    private EndpointManager endpointManager;
 
     /**
      * The http client for making http calls.
@@ -52,21 +52,21 @@ public class Graviton {
      * Constructor
      *
      * @param baseUrl The base url pointing to the Graviton server
-     * @param serviceManager The service manager to use
+     * @param endpointManager The endpoint manager to use
      */
-    public Graviton(String baseUrl, ServiceManager serviceManager) {
+    public Graviton(String baseUrl, EndpointManager endpointManager) {
         this.baseUrl = baseUrl;
-        this.serviceManager = serviceManager;
+        this.endpointManager = endpointManager;
         this.okHttp = new OkHttpClient();
     }
 
     /**
-     * Returns the service manager
+     * Returns the endpoint manager
      *
-     * @return The service manager
+     * @return The endpoint manager
      */
-    public ServiceManager getServiceManager() {
-        return serviceManager;
+    public EndpointManager getEndpointManager() {
+        return endpointManager;
     }
 
     public String getBaseUrl() {
@@ -82,7 +82,7 @@ public class Graviton {
     }
 
     public GravitonResponse post(Object data) throws NoCorrespondingEndpointException, CommunicationException {
-        Endpoint endpoint = serviceManager.getEndpoint(data.getClass().getName());
+        Endpoint endpoint = endpointManager.getEndpoint(data.getClass().getName());
         return post(endpoint.getUrl(), serializeData(data));
     }
 
@@ -95,7 +95,7 @@ public class Graviton {
     }
 
     public GravitonResponse put(Object data) throws NoCorrespondingEndpointException, CommunicationException {
-        Endpoint endpoint = serviceManager.getEndpoint(data.getClass().getName());
+        Endpoint endpoint = endpointManager.getEndpoint(data.getClass().getName());
         Map<String, String> params = new HashMap<>();
         params.put("id", extractId(data));
         return put(endpoint.getUrl(), serializeData(data), params);
@@ -114,7 +114,7 @@ public class Graviton {
     }
 
     public GravitonResponse delete(Object data) throws NoCorrespondingEndpointException, CommunicationException {
-        Endpoint endpoint = serviceManager.getEndpoint(data.getClass().getName());
+        Endpoint endpoint = endpointManager.getEndpoint(data.getClass().getName());
         Map<String, String> params = new HashMap<>();
         params.put("id", extractId(data));
         return delete(endpoint.getUrl(), params);

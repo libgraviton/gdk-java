@@ -12,7 +12,7 @@ import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 
 
-public class GeneratedServiceManagerTest {
+public class GeneratedEndpointManagerTest {
 
     @Rule
     public ExpectedException thrown= ExpectedException.none();
@@ -20,7 +20,7 @@ public class GeneratedServiceManagerTest {
     @Test
     public void testLoadAndPersist() throws Exception {
         File serializationFile = File.createTempFile("endpoint-associations-", ".tmp");
-        GeneratedServiceManager generatedServiceManager = new GeneratedServiceManager(serializationFile, false);
+        GeneratedEndpointManager generatedServiceManager = new GeneratedEndpointManager(serializationFile, false);
 
         String className = "some.ClassName";
         Endpoint endpoint = new Endpoint("endpoint://item", "endpoint://item/collection/");
@@ -31,7 +31,7 @@ public class GeneratedServiceManagerTest {
 
         assertEquals(1, generatedServiceManager.persist());
 
-        generatedServiceManager = new GeneratedServiceManager(serializationFile, false);
+        generatedServiceManager = new GeneratedEndpointManager(serializationFile, false);
         assertFalse(generatedServiceManager.hasEndpoint(className));
         assertEquals(1, generatedServiceManager.load());
         assertTrue(generatedServiceManager.hasEndpoint(className));
@@ -48,7 +48,7 @@ public class GeneratedServiceManagerTest {
         assertTrue(serializationFile.delete());
         assertFalse(serializationFile.exists());
 
-        GeneratedServiceManager generatedServiceManager = new GeneratedServiceManager(serializationFile, false);
+        GeneratedEndpointManager generatedServiceManager = new GeneratedEndpointManager(serializationFile, false);
         generatedServiceManager.load();
     }
 
@@ -65,7 +65,7 @@ public class GeneratedServiceManagerTest {
 
         assertTrue(serializationFile.exists());
 
-        GeneratedServiceManager generatedServiceManager = new GeneratedServiceManager(serializationFile, false);
+        GeneratedEndpointManager generatedServiceManager = new GeneratedEndpointManager(serializationFile, false);
         generatedServiceManager.load();
     }
 

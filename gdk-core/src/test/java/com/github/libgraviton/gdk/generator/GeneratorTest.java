@@ -33,7 +33,7 @@ public class GeneratorTest {
 
     private Graviton graviton;
 
-    private GeneratedServiceManager serviceManager;
+    private GeneratedEndpointManager serviceManager;
 
     private GeneratorInstructionLoader instructionLoader;
 
@@ -68,11 +68,11 @@ public class GeneratorTest {
         when(instructionLoader.loadInstructions(anyBoolean())).thenReturn(instructions);
 
         // Setup service manager mock
-        serviceManager = mock(GeneratedServiceManager.class);
+        serviceManager = mock(GeneratedEndpointManager.class);
 
         // Setup graviton mock
         graviton = mock(Graviton.class);
-        when(graviton.getServiceManager()).thenReturn(serviceManager);
+        when(graviton.getEndpointManager()).thenReturn(serviceManager);
     }
 
     @DataProvider

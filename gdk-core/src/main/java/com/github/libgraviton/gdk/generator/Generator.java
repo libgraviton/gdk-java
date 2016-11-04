@@ -1,6 +1,6 @@
 package com.github.libgraviton.gdk.generator;
 
-import com.github.libgraviton.gdk.ServiceManager;
+import com.github.libgraviton.gdk.EndpointManager;
 import com.github.libgraviton.gdk.Graviton;
 import com.github.libgraviton.gdk.generator.exception.GeneratorException;
 import com.github.libgraviton.gdk.generator.exception.UnableToPersistEndpointAssociationsException;
@@ -89,7 +89,7 @@ public class Generator {
      */
     public void generate() throws GeneratorException {
         List<GeneratorInstruction> generatorInstructions = instructionLoader.loadInstructions();
-        ServiceManager serviceManager = graviton.getServiceManager();
+        EndpointManager endpointManager = graviton.getEndpointManager();
         LOG.info("Generating POJO classes for Graviton '" + graviton.getBaseUrl() + "'.");
         for (GeneratorInstruction definition : generatorInstructions) {
             String className = definition.getClassName();
@@ -108,14 +108,14 @@ public class Generator {
             } catch (IOException e) {
                throw new GeneratorException("Unable to generate POJO.", e);
             }
-            serviceManager.addEndpoint(
+            endpointManager.addEndpoint(
                     packageName + (packageName.length() > 0 ? '.' : "")  + definition.getClassName(),
                     definition.getEndpoint()
             );
         }
         try {
-            if (serviceManager instanceof GeneratedServiceManager) {
-                ((GeneratedServiceManager) serviceManager).persist();
+            if (endpointManager instanceof GeneratedEndpointManager) {
+                ((GeneratedEndpointManager) endpointManager).persist();
             }
         } catch (UnableToPersistEndpointAssociationsException e) {
             throw new GeneratorException("Unable to persist endpoint -> POJO association.", e);

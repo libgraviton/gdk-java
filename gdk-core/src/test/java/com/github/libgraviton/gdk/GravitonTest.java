@@ -2,7 +2,7 @@ package com.github.libgraviton.gdk;
 
 
 import com.github.libgraviton.gdk.exception.CommunicationException;
-import com.github.libgraviton.gdk.generator.GeneratedServiceManager;
+import com.github.libgraviton.gdk.generator.GeneratedEndpointManager;
 import okhttp3.*;
 import org.junit.Before;
 import org.junit.Test;
@@ -30,7 +30,7 @@ public class GravitonTest {
 
     @Before
     public void setup() throws Exception {
-        graviton = new Graviton("https://api.rel-pub.zgkb.evoja.ch", new GeneratedServiceManager(new File("noPathToFindHere")));
+        graviton = new Graviton("https://api.rel-pub.zgkb.evoja.ch", new GeneratedEndpointManager(new File("noPathToFindHere")));
         OkHttpClient client = mock(OkHttpClient.class);
         graviton.setOkHttp(client);
 
