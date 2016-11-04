@@ -60,6 +60,10 @@ public class GravitonResponse {
      * @return link that has rel="eventStatus"
      */
     public String getEventStatusLink() {
+        return getLink("eventStatus");
+    }
+
+    public String getLink(String rel) {
         Headers headers = response.headers();
 
         if (null == headers) {
@@ -68,7 +72,7 @@ public class GravitonResponse {
 
         List<String> links = headers.values("Link");
         if (links != null) {
-            String linkHeaderSelfPattern = "(?<=<)((?!<).)*(?=>; *rel=\"eventStatus\")";
+            String linkHeaderSelfPattern = "(?<=<)((?!<).)*(?=>; *rel=\"" + rel + "\")";
             for (String link : links) {
                 Matcher matcher = Pattern.compile(linkHeaderSelfPattern).matcher(link);
                 if (matcher.find()) {
