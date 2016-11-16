@@ -28,13 +28,13 @@ You can use this library in your project by including this in your `pom.xml`:
 					<goals>
 						<goal>generate</goal>
 					</goals>
-					<phase>process-classes</phase>
 				</execution>
 			</executions>
 		</plugin>
 	</plugins>
 </build>
 ```
+
 Make sure that `version` points to the latest GDK version on maven central.
 
 | config element         | description                                                                                                                                                                                                                                                           |

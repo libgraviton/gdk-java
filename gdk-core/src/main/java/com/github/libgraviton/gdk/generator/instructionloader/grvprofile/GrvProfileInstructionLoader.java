@@ -72,7 +72,7 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
             for (EndpointDefinition endpointDefinition : endpointDefinitions) {
                 String profileJson = null;
                 try {
-                    GravitonResponse response = graviton.get(endpointDefinition.getProfile());
+                    GravitonResponse response = graviton.get(endpointDefinition.getProfile()).execute();
                     profileJson = response.getBody();
                 } catch (CommunicationException e) {
                     LOG.warn("Unable to fetch profile from '" + endpointDefinition.getProfile() + "'. Skipping...");
@@ -96,8 +96,8 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
      * @return The Graviton service.
      */
     private Service loadService() throws CommunicationException, SerializationException {
-        GravitonResponse response = graviton.get(graviton.getBaseUrl());
-        return response.deserializeBody(Service.class);
+        GravitonResponse response = graviton.get(graviton.getBaseUrl()).execute();
+        return response.getBody(Service.class);
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.github.libgraviton.gdk;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.libgraviton.gdk.exception.CommunicationException;
 import com.github.libgraviton.gdk.exception.SerializationException;
 import okhttp3.Headers;
 import okhttp3.Response;
@@ -21,35 +22,43 @@ public class GravitonResponse {
 
     private Response response;
 
+    private HeaderBag headerBag;
+
     private String responseBody;
 
     private ObjectMapper objectMapper = new ObjectMapper();
 
-    public GravitonResponse() {
-    }
-
-    public GravitonResponse(Response response) {
+    GravitonResponse(Response response, ObjectMapper objectMapper) throws CommunicationException {
         this.response = response;
+        this.objectMapper = objectMapper;
+        headerBag = new HeaderBag(response.headers());
+        try {
+            responseBody = response.body().string();
+        } catch (IOException e) {
+            throw new CommunicationException(String.format(
+                    "Unable to fetch response body from '%s' to '%s'.",
+                    response.request().method(),
+                    response.request().url()
+            ), e);
+        } finally {
+            response.close();
+        }
     }
 
-    public Response getOriginalResponse() {
-        return response;
-    }
-
-    public <BeanClass> BeanClass deserializeBody(Class<? extends BeanClass> beanClass) throws SerializationException {
+    public <BeanClass> BeanClass getBody(Class<? extends BeanClass> beanClass) throws SerializationException {
         try {
             return objectMapper.readValue(getBody(), beanClass);
         } catch (IOException e) {
-            throw new SerializationException("Unable to deserialize response body from '" + response.request().url() + "' to class '" + beanClass.getName() + "'.", e);
+            throw new SerializationException(String.format(
+                    "Unable to deserialize response body from '%s' to class '%s'.",
+                    response.request().url(),
+                    beanClass.getName()
+            ), e);
         }
     }
 
     public String getBody() {
         return responseBody;
-    }
-
-    protected void setBody(String responseBody) {
-        this.responseBody = responseBody;
     }
 
     /**
@@ -89,5 +98,9 @@ public class GravitonResponse {
 
     protected void setObjectMapper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
+    }
+
+    public HeaderBag getHeaders() {
+        return headerBag;
     }
 }

@@ -53,11 +53,11 @@ public class GravitonResponseTest {
 
     @Test(expected = SerializationException.class)
     public void testDeserializeBodyWithException() throws SerializationException {
-        gravitonResponse.deserializeBody(NoopClass.class);
+        gravitonResponse.getBody(NoopClass.class);
     }
 
     @Test
     public void testSuccessfulDeserializeBody() throws SerializationException {
-        gravitonResponse.deserializeBody(SerializationTestClass.class);
+        gravitonResponse.getBody(SerializationTestClass.class);
     }
 }
