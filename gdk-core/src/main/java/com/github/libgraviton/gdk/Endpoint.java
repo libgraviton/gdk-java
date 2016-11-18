@@ -8,12 +8,12 @@ import java.io.Serializable;
 public class Endpoint implements Serializable {
 
     /**
-     * The url of the endpoint to address a single item.
+     * The setUrl of the endpoint to address a single item.
      */
     private String itemUrl;
 
     /**
-     * The url of the endpoint.
+     * The setUrl of the endpoint.
      */
     private String url;
 

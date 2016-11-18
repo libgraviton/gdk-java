@@ -49,7 +49,7 @@ public class CommunicationException extends Exception {
         try {
             return response.body().string();
         } catch (IOException e) {
-            return "Unable to fetch response body. " + e.getMessage();
+            return "Unable to fetch response setBody. " + e.getMessage();
         }
     }
 }

@@ -1,14 +1,16 @@
 package com.github.libgraviton.gdk;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.libgraviton.gdk.api.GravitonRequest;
+import com.github.libgraviton.gdk.api.GravitonResponse;
+import com.github.libgraviton.gdk.api.gateway.OkHttpGateway;
 import com.github.libgraviton.gdk.exception.CommunicationException;
 import com.github.libgraviton.gdk.exception.NoCorrespondingEndpointException;
 import com.github.libgraviton.gdk.exception.SerializationException;
 import okhttp3.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
 import java.lang.reflect.Field;
 
 /**
@@ -27,7 +29,7 @@ public class Graviton {
     public static final MediaType CONTENT_TYPE = MediaType.parse("application/json; charset=utf-8");
 
     /**
-     * Defines the base url of the Graviton server
+     * Defines the base setUrl of the Graviton server
      */
     private String baseUrl;
 
@@ -44,18 +46,18 @@ public class Graviton {
     /**
      * The http client for making http calls.
      */
-    private OkHttpClient okHttp;
+    private OkHttpGateway gateway;
 
     /**
      * Constructor
      *
-     * @param baseUrl The base url pointing to the Graviton server
+     * @param baseUrl The base setUrl pointing to the Graviton server
      * @param endpointManager The endpoint manager to use
      */
     public Graviton(String baseUrl, EndpointManager endpointManager) {
         this.baseUrl = baseUrl;
         this.endpointManager = endpointManager;
-        this.okHttp = new OkHttpClient();
+        this.gateway = new OkHttpGateway();
     }
 
     /**
@@ -71,100 +73,85 @@ public class Graviton {
         return baseUrl;
     }
 
-    ObjectMapper getObjectMapper() {
-        return objectMapper;
-    }
-
     public GravitonRequest.Builder request() {
-        return new GravitonRequest.Builder(this);
+        return new GravitonRequest.ExecutableBuilder(this);
     }
 
-    public GravitonRequest.Builder head(String url) {
-        return request().url(url).head();
+    public GravitonRequest.ExecutableBuilder head(String url) {
+        return (GravitonRequest.ExecutableBuilder) request().setUrl(url).head();
     }
 
-    public GravitonRequest.Builder head(Object resource) throws NoCorrespondingEndpointException {
+    public GravitonRequest.ExecutableBuilder head(Object resource) throws NoCorrespondingEndpointException {
         return head(extractId(resource), resource.getClass());
     }
 
-    public GravitonRequest.Builder head(String id, Class clazz) throws NoCorrespondingEndpointException {
-        return head(endpointManager.getEndpoint(clazz.getName()).getUrl())
-                .param("id", id);
+    public GravitonRequest.ExecutableBuilder head(String id, Class clazz) throws NoCorrespondingEndpointException {
+        return (GravitonRequest.ExecutableBuilder) head(endpointManager.getEndpoint(clazz.getName()).getUrl())
+                .addParam("id", id);
     }
 
-    public GravitonRequest.Builder get(String url) {
-        return request().url(url).get();
+    public GravitonRequest.ExecutableBuilder get(String url) {
+        return (GravitonRequest.ExecutableBuilder) request().setUrl(url).get();
     }
 
-    public GravitonRequest.Builder get(Object resource) throws NoCorrespondingEndpointException {
+    public GravitonRequest.ExecutableBuilder get(Object resource) throws NoCorrespondingEndpointException {
         return get(extractId(resource), resource.getClass());
     }
 
-    public GravitonRequest.Builder get(String id, Class clazz) throws NoCorrespondingEndpointException {
-        return get(endpointManager.getEndpoint(clazz.getName()).getItemUrl())
-                .param("id", id);
+    public GravitonRequest.ExecutableBuilder get(String id, Class clazz) throws NoCorrespondingEndpointException {
+        return (GravitonRequest.ExecutableBuilder) get(endpointManager.getEndpoint(clazz.getName()).getItemUrl())
+                .addParam("id", id);
     }
 
-    public GravitonRequest.Builder delete(String url) {
-        return request().url(url).delete();
+    public GravitonRequest.ExecutableBuilder delete(String url) {
+        return (GravitonRequest.ExecutableBuilder) request().setUrl(url).delete();
     }
 
-    public GravitonRequest.Builder delete(Object resource) throws NoCorrespondingEndpointException {
+    public GravitonRequest.ExecutableBuilder delete(Object resource) throws NoCorrespondingEndpointException {
         return delete(extractId(resource), resource.getClass());
     }
 
-    public GravitonRequest.Builder delete(String id, Class clazz) throws NoCorrespondingEndpointException {
-        return delete(endpointManager.getEndpoint(clazz.getName()).getItemUrl())
-                .param("id", id);
+    public GravitonRequest.ExecutableBuilder delete(String id, Class clazz) throws NoCorrespondingEndpointException {
+        return (GravitonRequest.ExecutableBuilder) delete(endpointManager.getEndpoint(clazz.getName()).getItemUrl())
+                .addParam("id", id);
     }
 
-    public GravitonRequest.Builder put(Object resource) throws NoCorrespondingEndpointException, SerializationException {
-        return request()
-                .url(endpointManager.getEndpoint(resource.getClass().getName()).getItemUrl())
-                .param("id", extractId(resource))
-                .put(resource);
+    public GravitonRequest.ExecutableBuilder put(Object resource) throws NoCorrespondingEndpointException, SerializationException {
+        return (GravitonRequest.ExecutableBuilder) request()
+                .setUrl(endpointManager.getEndpoint(resource.getClass().getName()).getItemUrl())
+                .addParam("id", extractId(resource))
+                .put(serializeResource(resource));
     }
 
-    public GravitonRequest.Builder post(Object resource) throws NoCorrespondingEndpointException, SerializationException {
-        return request()
-                .url(endpointManager.getEndpoint(resource.getClass().getName()).getUrl())
-                .put(resource);
+    public GravitonRequest.ExecutableBuilder post(Object resource) throws NoCorrespondingEndpointException, SerializationException {
+        return (GravitonRequest.ExecutableBuilder) request()
+                .setUrl(endpointManager.getEndpoint(resource.getClass().getName()).getUrl())
+                .post(serializeResource(resource));
     }
 
     public GravitonResponse execute(GravitonRequest request) throws CommunicationException {
-        Request okhttpRequest = request.getOkhttpRequest();
-        LOG.info(String.format("Starting '%s' to '%s'...", okhttpRequest.method(), okhttpRequest.url()));
-        Response response;
-        try {
-            response = okHttp.newCall(okhttpRequest).execute();
-        } catch (IOException e) {
-            throw new CommunicationException(
-                    String.format("Unable to execute '%s' to '%s'.", okhttpRequest.method(), okhttpRequest.url()),
-                    e
-            );
-        }
-
-        GravitonResponse gravitonResponse = new GravitonResponse(response, objectMapper);
+        LOG.info(String.format("Starting '%s' to '%s'...", request.getMethod(), request.getUrl()));
+        GravitonResponse response = gateway.execute(request);
 
         if(response.isSuccessful()) {
             LOG.info(String.format(
                     "Successful '%s' to '%s'. Response was '%d' - '%s'.",
-                    okhttpRequest.method(),
-                    okhttpRequest.url(),
-                    response.code(),
-                    response.message()
+                    request.getMethod(),
+                    request.getUrl(),
+                    response.getCode(),
+                    response.getMessage()
             ));
         } else {
             throw new CommunicationException(String.format(
-                    "Failed '%s' to '%s'. Response was '%d' - '%s' with body '%s'.",
-                    okhttpRequest.method(),
-                    okhttpRequest.url(),
-                    response.code(),
-                    response.message(),
-                    response.body()
+                    "Failed '%s' to '%s'. Response was '%d' - '%s' with setBody '%s'.",
+                    request.getUrl(),
+                    request.getUrl(),
+                    response.getCode(),
+                    response.getMessage(),
+                    response.getBody()
             ));
         }
-        return gravitonResponse;
+        return response;
     }
 
     /**
@@ -187,7 +174,20 @@ public class Graviton {
         }
     }
 
-    protected void setOkHttp(OkHttpClient okHttp) {
-        this.okHttp = okHttp;
+    protected void setGateway(OkHttpGateway gateway) {
+        this.gateway = gateway;
+    }
+
+    private String serializeResource(Object data) throws SerializationException {
+        String json;
+        try {
+            json = objectMapper.writeValueAsString(data);
+        } catch (JsonProcessingException e) {
+            throw new SerializationException(
+                    String.format("Cannot serialize '%s' to json.", data.getClass().getName()),
+                    e
+            );
+        }
+        return json;
     }
 }

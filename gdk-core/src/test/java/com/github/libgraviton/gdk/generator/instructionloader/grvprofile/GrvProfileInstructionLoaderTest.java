@@ -2,7 +2,8 @@ package com.github.libgraviton.gdk.generator.instructionloader.grvprofile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.libgraviton.gdk.Graviton;
-import com.github.libgraviton.gdk.GravitonResponse;
+import com.github.libgraviton.gdk.api.GravitonRequest;
+import com.github.libgraviton.gdk.api.GravitonResponse;
 import com.github.libgraviton.gdk.generator.GeneratorInstruction;
 import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.DataProviderRunner;
@@ -26,6 +27,8 @@ public class GrvProfileInstructionLoaderTest {
 
     private GrvProfileInstructionLoader instructionLoader;
 
+    private ObjectMapper objectMapper = new ObjectMapper();
+
     @Mock
     Graviton graviton;
 
@@ -42,23 +45,31 @@ public class GrvProfileInstructionLoaderTest {
                 new File("src/test/resources/serviceSchema/grvProfileInstructionLoaderTest.someMoreSchema.json"));
 
         graviton = mock(Graviton.class, withSettings());
-
-        GravitonResponse response1 = spy(GravitonResponse.class);
-        GravitonResponse response2 = spy(GravitonResponse.class);
-        GravitonResponse response3 = spy(GravitonResponse.class);
-        GravitonResponse response4 = spy(GravitonResponse.class);
-
         when(graviton.getBaseUrl()).thenReturn("service://graviton");
 
-        doReturn(service).when(response1).getBody();
-        doReturn(someSchema).when(response2).getBody();
-        doReturn(anotherSchema).when(response3).getBody();
-        doReturn(someMoreSchema).when(response4).getBody();
+        GravitonResponse response1 = mock(GravitonResponse.class);
+        when(response1.getBody(Service.class)).thenReturn(objectMapper.readValue(service, Service.class));
+        GravitonRequest.ExecutableBuilder builder1 = mock(GravitonRequest.ExecutableBuilder.class);
+        when(builder1.execute()).thenReturn(response1);
+        when(graviton.get("service://graviton")).thenReturn(builder1);
 
-        when(graviton.get("service://graviton")).thenReturn(response1);
-        when(graviton.get("service://some-service/profile")).thenReturn(response2);
-        when(graviton.get("service://another-service/profile")).thenReturn(response3);
-        when(graviton.get("service://some-more-service/profile")).thenReturn(response4);
+        GravitonResponse response2 = mock(GravitonResponse.class);
+        when(response2.getBody()).thenReturn(someSchema);
+        GravitonRequest.ExecutableBuilder builder2 = mock(GravitonRequest.ExecutableBuilder.class);
+        when(builder2.execute()).thenReturn(response2);
+        when(graviton.get("service://some-service/profile")).thenReturn(builder2);
+
+        GravitonResponse response3 = mock(GravitonResponse.class);
+        when(response3.getBody()).thenReturn(anotherSchema);
+        GravitonRequest.ExecutableBuilder builder3 = mock(GravitonRequest.ExecutableBuilder.class);
+        when(builder2.execute()).thenReturn(response3);
+        when(graviton.get("service://another-service/profile")).thenReturn(builder3);
+
+        GravitonResponse response4 = mock(GravitonResponse.class);
+        when(response4.getBody()).thenReturn(someMoreSchema);
+        GravitonRequest.ExecutableBuilder builder4 = mock(GravitonRequest.ExecutableBuilder.class);
+        when(builder4.execute()).thenReturn(response4);
+        when(graviton.get("service://some-more-service/profile")).thenReturn(builder4);
 
         instructionLoader = new GrvProfileInstructionLoader(graviton);
     }
@@ -68,8 +79,8 @@ public class GrvProfileInstructionLoaderTest {
         return new Object[][] {
                 {
                     "serviceSchema/grvProfileInstructionLoaderTest.someSchema.json", // schema file
-                    "service://some-service/", // collection url
-                    "service://some-service/{id}", // item url
+                    "service://some-service/", // collection setUrl
+                    "service://some-service/{id}", // item setUrl
                     "SomeServiceDocument", // expected class name
                     "whatever.someservice", // expected package name
                     0 // index in instruction list
@@ -111,11 +122,12 @@ public class GrvProfileInstructionLoaderTest {
             String expectedPackageName,
             int instructionIndex
     ) throws Exception{
-        String schema = FileUtils.readFileToString(
-                new File("src/test/resources/" + schemaFile));
-        GravitonResponse response = spy(GravitonResponse.class);
+        String schema = FileUtils.readFileToString(new File("src/test/resources/" + schemaFile));
+        GravitonResponse response = mock(GravitonResponse.class);
         doReturn(schema).when(response).getBody();
-        when(graviton.get(not(eq("service://graviton")))).thenReturn(response);
+        GravitonRequest.ExecutableBuilder builder = mock(GravitonRequest.ExecutableBuilder.class);
+        when(builder.execute()).thenReturn(response);
+        when(graviton.get(not(eq("service://graviton")))).thenReturn(builder);
 
         List<GeneratorInstruction> instructions = instructionLoader.loadInstructions();
         assertEquals(3, instructions.size());

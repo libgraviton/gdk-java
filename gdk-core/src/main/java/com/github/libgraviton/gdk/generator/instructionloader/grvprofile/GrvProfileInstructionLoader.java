@@ -2,7 +2,7 @@ package com.github.libgraviton.gdk.generator.instructionloader.grvprofile;
 
 import com.github.libgraviton.gdk.Endpoint;
 import com.github.libgraviton.gdk.Graviton;
-import com.github.libgraviton.gdk.GravitonResponse;
+import com.github.libgraviton.gdk.api.GravitonResponse;
 import com.github.libgraviton.gdk.exception.SerializationException;
 import com.github.libgraviton.gdk.generator.GeneratorInstruction;
 import com.github.libgraviton.gdk.generator.GeneratorInstructionLoader;
@@ -11,6 +11,7 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.MalformedURLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -52,7 +53,7 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
     /**
      * Loads generator instructions according to Graviton's main page.
      *
-     * @param reload If the instructions are already loaded and this param is set to false, a cached instruction set
+     * @param reload If the instructions are already loaded and this addParam is set to false, a cached instruction set
      *               should be returned. Otherwise the instruction list should be (re-) loaded.
      *
      * @return All generator instructions.
@@ -64,7 +65,7 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
             List<EndpointDefinition> endpointDefinitions;
             try {
                 endpointDefinitions = loadService().getEndpointDefinitions();
-            } catch (CommunicationException | SerializationException e) {
+            } catch (MalformedURLException | CommunicationException | SerializationException e) {
                 LOG.warn("Unable to load service. No instructions loaded.");
                 return loadedInstructions;
             }
@@ -74,7 +75,7 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
                 try {
                     GravitonResponse response = graviton.get(endpointDefinition.getProfile()).execute();
                     profileJson = response.getBody();
-                } catch (CommunicationException e) {
+                } catch (MalformedURLException | CommunicationException e) {
                     LOG.warn("Unable to fetch profile from '" + endpointDefinition.getProfile() + "'. Skipping...");
                 }
                 JSONObject itemSchema = determineItemSchema(profileJson);
@@ -95,7 +96,7 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
      *
      * @return The Graviton service.
      */
-    private Service loadService() throws CommunicationException, SerializationException {
+    private Service loadService() throws CommunicationException, SerializationException, MalformedURLException {
         GravitonResponse response = graviton.get(graviton.getBaseUrl()).execute();
         return response.getBody(Service.class);
     }
