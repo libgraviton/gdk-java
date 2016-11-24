@@ -1,5 +1,6 @@
 package com.github.libgraviton.gdk.api.header;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -49,18 +50,21 @@ public class HeaderBag {
 
     public static class Builder {
 
-        private Map<String, Header> headers;
+        private Map<String, List<String>> headers;
 
         public Builder() {
             headers = new HashMap<>();
         }
 
         public Builder(HeaderBag headerBag) {
-            headers = new HashMap<>(headerBag.all());
+            headers = new HashMap<>();
+            for (Map.Entry<String, Header> header : headerBag.all().entrySet()) {
+                headers.put(header.getKey(), header.getValue().all());
+            }
         }
 
         public Builder set(String headerName, List<String> headerValues) {
-            headers.put(headerName, new Header(headerValues));
+            headers.put(headerName, headerValues);
             return this;
         }
 
@@ -70,14 +74,32 @@ public class HeaderBag {
 
         public Builder set(String headerName, String headerValue, boolean override) {
             if (!headers.containsKey(headerName) || override) {
-                headers.put(headerName, new Header());
+                headers.put(headerName, new ArrayList<String>());
             }
-            headers.put(headerName, new Header(headers.get(headerName), headerValue));
+            headers.get(headerName).add(headerValue);
+            return this;
+        }
+
+        public Builder unset(String headerName) {
+            if (headers.containsKey(headerName)) {
+                headers.remove(headerName);
+            }
+            return this;
+        }
+
+        public Builder unset(String headerName, String headerValue) {
+            if (headers.containsKey(headerName) && headers.get(headerName).contains(headerValue)) {
+                headers.get(headerName).remove(headerValue);
+            }
             return this;
         }
 
         public HeaderBag build() {
-            return new HeaderBag(headers);
+            Map<String, Header> builtHeaders = new HashMap<>();
+            for (Map.Entry<String, List<String>> header : headers.entrySet()) {
+                builtHeaders.put(header.getKey(), new Header(header.getValue()));
+            }
+            return new HeaderBag(builtHeaders);
         }
     }
 

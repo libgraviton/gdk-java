@@ -29,6 +29,10 @@ public class Header implements Iterable<String> {
         return values.get(index);
     }
 
+    public List<String> all() {
+        return new ArrayList<>(values);
+    }
+
     @Override
     public Iterator<String> iterator() {
         return values.iterator();
