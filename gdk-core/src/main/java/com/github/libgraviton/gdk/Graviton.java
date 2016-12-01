@@ -1,6 +1,7 @@
 package com.github.libgraviton.gdk;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.libgraviton.gdk.api.GravitonRequest;
 import com.github.libgraviton.gdk.api.GravitonResponse;
@@ -8,15 +9,18 @@ import com.github.libgraviton.gdk.api.gateway.OkHttpGateway;
 import com.github.libgraviton.gdk.exception.CommunicationException;
 import com.github.libgraviton.gdk.exception.NoCorrespondingEndpointException;
 import com.github.libgraviton.gdk.exception.SerializationException;
-import okhttp3.*;
+import com.github.libgraviton.gdk.serialization.JsonPatcher;
+import okhttp3.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.lang.reflect.Field;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 
 /**
  * This is the base class used for Graviton API calls.
- *
- * @todo do proper implementation (EVO-7721)
  *
  * @author List of contributors {@literal <https://github.com/libgraviton/gdk-java/graphs/contributors>}
  * @see <a href="http://swisscom.ch">http://swisscom.ch</a>
@@ -24,7 +28,7 @@ import java.lang.reflect.Field;
  */
 public class Graviton {
 
-    private final Logger LOG = LoggerFactory.getLogger(Graviton.class);
+    private static final Logger LOG = LoggerFactory.getLogger(Graviton.class);
 
     public static final MediaType CONTENT_TYPE = MediaType.parse("application/json; charset=utf-8");
 
@@ -36,7 +40,14 @@ public class Graviton {
     /**
      * The object mapper used to serialize / deserialize to / from JSON
      */
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private ObjectMapper objectMapper = getObjectMapper();
+
+    private ObjectMapper getObjectMapper() {
+        // TODO make dateformat and timezone configurable
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("UTC"));
+        return new ObjectMapper().setDateFormat(dateFormat);
+    }
 
     /**
      * The endpoint manager which is used
@@ -123,6 +134,14 @@ public class Graviton {
                 .put(serializeResource(resource));
     }
 
+    public GravitonRequest.ExecutableBuilder patch(Object resource) throws NoCorrespondingEndpointException, SerializationException {
+        JsonNode jsonNode = objectMapper.convertValue(resource, JsonNode.class);
+        return (GravitonRequest.ExecutableBuilder) request()
+                .setUrl(endpointManager.getEndpoint(resource.getClass().getName()).getItemUrl())
+                .addParam("id", extractId(resource))
+                .patch(serializeResource(JsonPatcher.getPatch(resource, jsonNode)));
+    }
+
     public GravitonRequest.ExecutableBuilder post(Object resource) throws NoCorrespondingEndpointException, SerializationException {
         return (GravitonRequest.ExecutableBuilder) request()
                 .setUrl(endpointManager.getEndpoint(resource.getClass().getName()).getUrl())
@@ -131,6 +150,7 @@ public class Graviton {
 
     public GravitonResponse execute(GravitonRequest request) throws CommunicationException {
         LOG.info(String.format("Starting '%s' to '%s'...", request.getMethod(), request.getUrl()));
+        LOG.debug("with request body '" + request.getBody() + "'");
         GravitonResponse response = gateway.execute(request);
 
         if(response.isSuccessful()) {
@@ -144,7 +164,7 @@ public class Graviton {
         } else {
             throw new CommunicationException(String.format(
                     "Failed '%s' to '%s'. Response was '%d' - '%s' with setBody '%s'.",
-                    request.getUrl(),
+                    request.getMethod(),
                     request.getUrl(),
                     response.getCode(),
                     response.getMessage(),
@@ -164,12 +184,10 @@ public class Graviton {
      * @return The extracted id.
      */
     private String extractId(Object data) {
-        Class<?> clazz = data.getClass();
-        Field field;
         try {
-            field = clazz.getField("id");
-            return (String) field.get(data);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
+            Method method = data.getClass().getMethod("getId");
+            return (String) method.invoke(data);
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             return "";
         }
     }
@@ -179,15 +197,13 @@ public class Graviton {
     }
 
     private String serializeResource(Object data) throws SerializationException {
-        String json;
         try {
-            json = objectMapper.writeValueAsString(data);
+            return objectMapper.writeValueAsString(data);
         } catch (JsonProcessingException e) {
             throw new SerializationException(
                     String.format("Cannot serialize '%s' to json.", data.getClass().getName()),
                     e
             );
         }
-        return json;
     }
 }

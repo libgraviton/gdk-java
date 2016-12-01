@@ -7,6 +7,7 @@ import com.github.libgraviton.gdk.api.header.Header;
 import com.github.libgraviton.gdk.api.header.HeaderBag;
 import com.github.libgraviton.gdk.exception.CommunicationException;
 import okhttp3.*;
+
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -50,6 +51,7 @@ public class OkHttpGateway implements GravitonGateway {
                 .code(okHttpResponse.code())
                 .headers(createHeaders(okHttpResponse.headers()))
                 .message(okHttpResponse.message())
+                .successful(okHttpResponse.isSuccessful())
                 .body(body)
                 .build();
     }

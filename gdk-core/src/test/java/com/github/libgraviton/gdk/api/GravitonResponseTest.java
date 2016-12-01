@@ -1,12 +1,11 @@
-package com.github.libgraviton.gdk;
+package com.github.libgraviton.gdk.api;
 
-import com.github.libgraviton.gdk.api.GravitonRequest;
-import com.github.libgraviton.gdk.api.GravitonResponse;
 import com.github.libgraviton.gdk.data.NoopClass;
 import com.github.libgraviton.gdk.data.SerializationTestClass;
 import com.github.libgraviton.gdk.exception.SerializationException;
 import org.junit.Before;
 import org.junit.Test;
+
 import static org.mockito.Mockito.mock;
 
 public class GravitonResponseTest {

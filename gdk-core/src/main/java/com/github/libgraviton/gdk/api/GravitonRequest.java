@@ -3,6 +3,7 @@ package com.github.libgraviton.gdk.api;
 import com.github.libgraviton.gdk.Graviton;
 import com.github.libgraviton.gdk.api.header.HeaderBag;
 import com.github.libgraviton.gdk.exception.CommunicationException;
+
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
@@ -18,7 +19,7 @@ public final class GravitonRequest {
 
     private final String body;
 
-    private GravitonRequest(Builder builder) throws MalformedURLException{
+    protected GravitonRequest(Builder builder) throws MalformedURLException{
         method = builder.method;
         url = builder.buildUrl();
         headers = builder.headerBuilder.build();
@@ -118,18 +119,25 @@ public final class GravitonRequest {
             return setMethod(HttpMethod.PUT).setBody(data);
         }
 
+        public Builder patch(String data) {
+            return setMethod(HttpMethod.PATCH).setBody(data);
+        }
+
         public GravitonRequest build() throws MalformedURLException {
             return new GravitonRequest(this);
         }
 
-        private URL buildUrl() throws MalformedURLException {
+        protected URL buildUrl() throws MalformedURLException {
             String url = this.url;
             for (Map.Entry<String, String> param : params.entrySet()) {
-                url = url.replaceAll(String.format("{%s}", param.getKey()), param.getValue());
+                url = url.replace(String.format("{%s}", param.getKey()), param.getValue());
             }
             return new URL(url);
         }
 
+        protected Map<String, String> getParams() {
+            return params;
+        }
     }
 
     public static class ExecutableBuilder extends Builder {

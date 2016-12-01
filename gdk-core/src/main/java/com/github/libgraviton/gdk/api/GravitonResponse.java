@@ -3,6 +3,8 @@ package com.github.libgraviton.gdk.api;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.libgraviton.gdk.api.header.HeaderBag;
 import com.github.libgraviton.gdk.exception.SerializationException;
+import com.github.libgraviton.gdk.serialization.JsonPatcher;
+
 import java.io.IOException;
 
 /**
@@ -24,11 +26,14 @@ public class GravitonResponse {
 
     private String body;
 
+    private boolean isSuccessful;
+
     private ObjectMapper objectMapper;
 
-    GravitonResponse(GravitonResponse.Builder builder) {
+    protected GravitonResponse(GravitonResponse.Builder builder) {
         request = builder.request;
         code = builder.code;
+        isSuccessful = builder.isSuccessful;
         message = builder.message;
         body = builder.body;
         headers = builder.headerBuilder.build();
@@ -36,12 +41,14 @@ public class GravitonResponse {
     }
 
     public boolean isSuccessful() {
-        return false;
+        return isSuccessful;
     }
 
     public <BeanClass> BeanClass getBody(Class<? extends BeanClass> beanClass) throws SerializationException {
         try {
-            return objectMapper.readValue(getBody(), beanClass);
+            BeanClass pojoValue = objectMapper.readValue(getBody(), beanClass);
+            JsonPatcher.add(pojoValue, objectMapper.readTree(getBody()));
+            return pojoValue;
         } catch (IOException e) {
             throw new SerializationException(String.format(
                     "Unable to deserialize response setBody from '%s' to class '%s'.",
@@ -81,6 +88,8 @@ public class GravitonResponse {
 
         private String body;
 
+        private boolean isSuccessful;
+
         private ObjectMapper objectMapper;
 
         private HeaderBag.Builder headerBuilder;
@@ -97,6 +106,11 @@ public class GravitonResponse {
 
         public Builder code(int code) {
             this.code = code;
+            return this;
+        }
+
+        public Builder successful(boolean isSuccessful) {
+            this.isSuccessful = isSuccessful;
             return this;
         }
 

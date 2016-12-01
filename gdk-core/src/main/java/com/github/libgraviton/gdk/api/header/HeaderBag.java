@@ -58,8 +58,10 @@ public class HeaderBag {
 
         public Builder(HeaderBag headerBag) {
             headers = new HashMap<>();
-            for (Map.Entry<String, Header> header : headerBag.all().entrySet()) {
-                headers.put(header.getKey(), header.getValue().all());
+            if (headerBag != null) {
+                for (Map.Entry<String, Header> header : headerBag.all().entrySet()) {
+                    headers.put(header.getKey(), header.getValue().all());
+                }
             }
         }
 
