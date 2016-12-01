@@ -56,11 +56,6 @@ public class OkHttpGateway implements GravitonGateway {
                 .build();
     }
 
-    public void executeAsync() {
-        // @todo
-    }
-
-
     private Headers createHeaders(HeaderBag headerBag) {
         Headers.Builder builder = new Headers.Builder();
         for (Map.Entry<String, Header> header : headerBag.all().entrySet()) {

@@ -183,7 +183,7 @@ public class Graviton {
      *
      * @return The extracted id.
      */
-    private String extractId(Object data) {
+    protected String extractId(Object data) {
         try {
             Method method = data.getClass().getMethod("getId");
             return (String) method.invoke(data);

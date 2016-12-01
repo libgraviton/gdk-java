@@ -1,15 +1,17 @@
 package com.github.libgraviton.gdk.generator;
 
-import static org.junit.Assert.*;
-
 import com.github.libgraviton.gdk.Endpoint;
+import com.github.libgraviton.gdk.exception.NoCorrespondingEndpointException;
 import com.github.libgraviton.gdk.generator.exception.UnableToLoadEndpointAssociationsException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
+
+import static org.junit.Assert.*;
 
 
 public class GeneratedEndpointManagerTest {
@@ -35,6 +37,16 @@ public class GeneratedEndpointManagerTest {
         assertFalse(generatedServiceManager.hasEndpoint(className));
         assertEquals(1, generatedServiceManager.load());
         assertTrue(generatedServiceManager.hasEndpoint(className));
+        assertEquals(generatedServiceManager.getEndpoint(className), endpoint);
+    }
+
+    @Test(expected = NoCorrespondingEndpointException.class)
+    public void testGetEndpointWhichIsMissing() throws Exception {
+        File serializationFile = File.createTempFile("endpoint-associations-", ".tmp");
+        GeneratedEndpointManager generatedServiceManager = new GeneratedEndpointManager(serializationFile, false);
+
+        String className = "some.ClassName";
+        Endpoint endpoint = new Endpoint("endpoint://item", "endpoint://item/collection/");
         assertEquals(generatedServiceManager.getEndpoint(className), endpoint);
     }
 

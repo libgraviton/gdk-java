@@ -42,7 +42,6 @@ public class OkHttpGatewayTest {
                 .setUrl("http://someUrl")
                 .build();
 
-
         // mock client.newCall()
         call = mock(Call.class);
         when(call.execute()).thenReturn(okHttpResponse);
