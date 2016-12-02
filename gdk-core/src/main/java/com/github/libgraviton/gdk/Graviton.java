@@ -101,6 +101,19 @@ public class Graviton {
                 .addParam("id", id);
     }
 
+    public GravitonRequest.ExecutableBuilder options(String url) {
+        return (GravitonRequest.ExecutableBuilder) request().setUrl(url).options();
+    }
+
+    public GravitonRequest.ExecutableBuilder options(Object resource) throws NoCorrespondingEndpointException {
+        return options(extractId(resource), resource.getClass());
+    }
+
+    public GravitonRequest.ExecutableBuilder options(String id, Class clazz) throws NoCorrespondingEndpointException {
+        return (GravitonRequest.ExecutableBuilder) options(endpointManager.getEndpoint(clazz.getName()).getUrl())
+                .addParam("id", id);
+    }
+
     public GravitonRequest.ExecutableBuilder get(String url) {
         return (GravitonRequest.ExecutableBuilder) request().setUrl(url).get();
     }
@@ -186,7 +199,8 @@ public class Graviton {
     protected String extractId(Object data) {
         try {
             Method method = data.getClass().getMethod("getId");
-            return (String) method.invoke(data);
+            String id = (String) method.invoke(data);
+            return id != null ? id : "";
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
             return "";
         }

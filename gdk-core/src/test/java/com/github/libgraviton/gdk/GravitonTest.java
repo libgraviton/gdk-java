@@ -89,6 +89,13 @@ public class GravitonTest {
     }
 
     @Test
+    public void testOptions() throws Exception {
+        SimpleClass resource = new SimpleClass();
+        GravitonResponse actualResponse = graviton.options(resource).execute();
+        assertEquals(response, actualResponse);
+    }
+
+    @Test
     public void testExtractId() throws Exception {
         NoopClass resourceWithoutId = new NoopClass();
         SimpleClass resource = new SimpleClass();

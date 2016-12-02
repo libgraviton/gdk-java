@@ -103,6 +103,10 @@ public final class GravitonRequest {
             return setMethod(HttpMethod.HEAD);
         }
 
+        public Builder options() {
+            return setMethod(HttpMethod.OPTIONS);
+        }
+
         public Builder get() {
             return setMethod(HttpMethod.GET);
         }

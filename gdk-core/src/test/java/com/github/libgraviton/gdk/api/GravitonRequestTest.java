@@ -70,6 +70,13 @@ public class GravitonRequestTest {
     }
 
     @Test
+    public void testOptions() throws Exception {
+        GravitonRequest request = builder.options().build();
+        assertEquals(HttpMethod.OPTIONS, request.getMethod());
+        assertNull(request.getBody());
+    }
+
+    @Test
     public void testParams() throws Exception {
         String param1 = "param1";
         String param2 = "param2";
