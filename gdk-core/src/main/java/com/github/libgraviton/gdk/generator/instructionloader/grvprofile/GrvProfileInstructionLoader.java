@@ -3,10 +3,11 @@ package com.github.libgraviton.gdk.generator.instructionloader.grvprofile;
 import com.github.libgraviton.gdk.Endpoint;
 import com.github.libgraviton.gdk.Graviton;
 import com.github.libgraviton.gdk.api.GravitonResponse;
+import com.github.libgraviton.gdk.exception.CommunicationException;
 import com.github.libgraviton.gdk.exception.SerializationException;
 import com.github.libgraviton.gdk.generator.GeneratorInstruction;
 import com.github.libgraviton.gdk.generator.GeneratorInstructionLoader;
-import com.github.libgraviton.gdk.exception.CommunicationException;
+import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,13 +83,32 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
                 loadedInstructions.add(new GeneratorInstruction(
                         determineClassName(itemSchema),
                         determinePackageName(itemSchema),
-                        itemSchema,
+                        enrichSchema(itemSchema),
                         generateEndpoint(endpointDefinition)
                 ));
             }
             LOG.info("Loaded " + loadedInstructions.size() + " endpoint definitions.");
         }
         return loadedInstructions;
+    }
+
+    /**
+     * Every class that matches an endpoint, should by definition always implement the com.github.libgraviton.gdk.data.GravitonBase interface.
+     * With that approach we know for sure, that all those classes implement the getId() method.
+     * To achieve this, the following needs to be added to the root of the schema.
+     *
+     * <pre>
+     *     "javaInterfaces" : ["com.github.libgraviton.gdk.data.GravitonBase"]
+     * </pre>
+     *
+     * @param itemSchema schema to enrich
+     * @return enriched schema
+     */
+    private JSONObject enrichSchema(JSONObject itemSchema) {
+        JSONArray interfaces = new JSONArray();
+        interfaces.put("com.github.libgraviton.gdk.data.GravitonBase");
+        itemSchema.put("javaInterfaces", interfaces);
+        return itemSchema;
     }
 
     /**

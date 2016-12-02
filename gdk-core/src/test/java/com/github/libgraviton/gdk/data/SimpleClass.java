@@ -3,7 +3,7 @@ package com.github.libgraviton.gdk.data;
 /**
  * Just a class used for serialization tests.
  */
-public class SimpleClass {
+public class SimpleClass implements GravitonBase {
 
     private String id;
 
