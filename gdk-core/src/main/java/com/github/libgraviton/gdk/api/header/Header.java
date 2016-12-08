@@ -8,11 +8,6 @@ public class Header implements Iterable<String> {
 
     private List<String> values;
 
-    public Header(Header header, String value) {
-        values = header.values;
-        values.add(value);
-    }
-
     public Header() {
         this(new ArrayList<String>());
     }

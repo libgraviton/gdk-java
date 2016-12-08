@@ -79,11 +79,21 @@ public class Graviton {
         return endpointManager;
     }
 
+    /**
+     * Returns the base url
+     *
+     * @return The base url
+     */
     public String getBaseUrl() {
         return baseUrl;
     }
 
-    public GravitonRequest.Builder request() {
+    /**
+     * Creates a new executable request builder to build and perform a new request.
+     *
+     * @return A new executable request builder
+     */
+    public GravitonRequest.ExecutableBuilder request() {
         return new GravitonRequest.ExecutableBuilder(this);
     }
 
@@ -160,6 +170,15 @@ public class Graviton {
                 .post(serializeResource(resource));
     }
 
+    /**
+     * Executes a given Graviton request.
+     *
+     * @param request The Graviton request
+     *
+     * @return The corresponding Graviton response
+     *
+     * @throws CommunicationException If the request was not successful
+     */
     public GravitonResponse execute(GravitonRequest request) throws CommunicationException {
         LOG.info(String.format("Starting '%s' to '%s'...", request.getMethod(), request.getUrl()));
         LOG.debug("with request body '" + request.getBody() + "'");
