@@ -22,6 +22,7 @@
       },
     },
     "x-documentClass": "AnotherMoreServiceDocument",
+    "javaInterfaces" : ["com.github.libgraviton.gdk.data.GravitonBase"],
     "x-recordOriginModifiable": true,
     "additionalProperties": false,
     "x-events": [

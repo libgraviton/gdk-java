@@ -17,6 +17,7 @@ You can use this library in your project by including this in your `pom.xml`:
 				<pojoServiceAssocFile>/path/to/pojoServiceAssocFile</pojoServiceAssocFile>
 				<gravitonUrl>https://graviton.example.org</gravitonUrl>
 				<generatorConfig>
+				    <includeHashcodeAndEquals>false</includeHashcodeAndEquals>
 					<useContextualClassNames>true</useContextualClassNames>
 					<outputDirectory>the/output/dir</outputDirectory>
 					<targetPackage>the.target.package</targetPackage>
@@ -28,14 +29,15 @@ You can use this library in your project by including this in your `pom.xml`:
 					<goals>
 						<goal>generate</goal>
 					</goals>
-					<phase>process-classes</phase>
 				</execution>
 			</executions>
 		</plugin>
 	</plugins>
 </build>
 ```
+
 Make sure that `version` points to the latest GDK version on maven central.
+IMPORTANT: To have working PATCH requests with GDK, `includeHashcodeAndEquals` within generatorConfig needs to be configured false!
 
 | config element         | description                                                                                                                                                                                                                                                           |
 |:-----------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|

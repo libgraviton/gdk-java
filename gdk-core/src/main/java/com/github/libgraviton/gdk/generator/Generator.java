@@ -1,6 +1,6 @@
 package com.github.libgraviton.gdk.generator;
 
-import com.github.libgraviton.gdk.ServiceManager;
+import com.github.libgraviton.gdk.EndpointManager;
 import com.github.libgraviton.gdk.Graviton;
 import com.github.libgraviton.gdk.generator.exception.GeneratorException;
 import com.github.libgraviton.gdk.generator.exception.UnableToPersistEndpointAssociationsException;
@@ -10,7 +10,6 @@ import org.jsonschema2pojo.rules.RuleFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -90,14 +89,14 @@ public class Generator {
      */
     public void generate() throws GeneratorException {
         List<GeneratorInstruction> generatorInstructions = instructionLoader.loadInstructions();
-        ServiceManager serviceManager = graviton.getServiceManager();
+        EndpointManager endpointManager = graviton.getEndpointManager();
         LOG.info("Generating POJO classes for Graviton '" + graviton.getBaseUrl() + "'.");
         for (GeneratorInstruction definition : generatorInstructions) {
             String className = definition.getClassName();
             if (0 == className.length()) {
                 LOG.warn(
                         "Ignoring endpoint '{}' because it does not define any class.",
-                        definition.getEndpoint().getUrl()
+                        definition.getEndpoint().getItemUrl()
                 );
                 continue;
             }
@@ -109,14 +108,14 @@ public class Generator {
             } catch (IOException e) {
                throw new GeneratorException("Unable to generate POJO.", e);
             }
-            serviceManager.addEndpoint(
+            endpointManager.addEndpoint(
                     packageName + (packageName.length() > 0 ? '.' : "")  + definition.getClassName(),
                     definition.getEndpoint()
             );
         }
         try {
-            if (serviceManager instanceof GeneratedServiceManager) {
-                ((GeneratedServiceManager) serviceManager).persist();
+            if (endpointManager instanceof GeneratedEndpointManager) {
+                ((GeneratedEndpointManager) endpointManager).persist();
             }
         } catch (UnableToPersistEndpointAssociationsException e) {
             throw new GeneratorException("Unable to persist endpoint -> POJO association.", e);

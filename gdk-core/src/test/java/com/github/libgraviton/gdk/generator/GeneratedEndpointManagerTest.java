@@ -1,18 +1,20 @@
 package com.github.libgraviton.gdk.generator;
 
-import static org.junit.Assert.*;
-
 import com.github.libgraviton.gdk.Endpoint;
+import com.github.libgraviton.gdk.exception.NoCorrespondingEndpointException;
 import com.github.libgraviton.gdk.generator.exception.UnableToLoadEndpointAssociationsException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.ObjectOutputStream;
 
+import static org.junit.Assert.*;
 
-public class GeneratedServiceManagerTest {
+
+public class GeneratedEndpointManagerTest {
 
     @Rule
     public ExpectedException thrown= ExpectedException.none();
@@ -20,7 +22,7 @@ public class GeneratedServiceManagerTest {
     @Test
     public void testLoadAndPersist() throws Exception {
         File serializationFile = File.createTempFile("endpoint-associations-", ".tmp");
-        GeneratedServiceManager generatedServiceManager = new GeneratedServiceManager(serializationFile, false);
+        GeneratedEndpointManager generatedServiceManager = new GeneratedEndpointManager(serializationFile, false);
 
         String className = "some.ClassName";
         Endpoint endpoint = new Endpoint("endpoint://item", "endpoint://item/collection/");
@@ -31,10 +33,20 @@ public class GeneratedServiceManagerTest {
 
         assertEquals(1, generatedServiceManager.persist());
 
-        generatedServiceManager = new GeneratedServiceManager(serializationFile, false);
+        generatedServiceManager = new GeneratedEndpointManager(serializationFile, false);
         assertFalse(generatedServiceManager.hasEndpoint(className));
         assertEquals(1, generatedServiceManager.load());
         assertTrue(generatedServiceManager.hasEndpoint(className));
+        assertEquals(generatedServiceManager.getEndpoint(className), endpoint);
+    }
+
+    @Test(expected = NoCorrespondingEndpointException.class)
+    public void testGetEndpointWhichIsMissing() throws Exception {
+        File serializationFile = File.createTempFile("endpoint-associations-", ".tmp");
+        GeneratedEndpointManager generatedServiceManager = new GeneratedEndpointManager(serializationFile, false);
+
+        String className = "some.ClassName";
+        Endpoint endpoint = new Endpoint("endpoint://item", "endpoint://item/collection/");
         assertEquals(generatedServiceManager.getEndpoint(className), endpoint);
     }
 
@@ -48,7 +60,7 @@ public class GeneratedServiceManagerTest {
         assertTrue(serializationFile.delete());
         assertFalse(serializationFile.exists());
 
-        GeneratedServiceManager generatedServiceManager = new GeneratedServiceManager(serializationFile, false);
+        GeneratedEndpointManager generatedServiceManager = new GeneratedEndpointManager(serializationFile, false);
         generatedServiceManager.load();
     }
 
@@ -65,7 +77,7 @@ public class GeneratedServiceManagerTest {
 
         assertTrue(serializationFile.exists());
 
-        GeneratedServiceManager generatedServiceManager = new GeneratedServiceManager(serializationFile, false);
+        GeneratedEndpointManager generatedServiceManager = new GeneratedEndpointManager(serializationFile, false);
         generatedServiceManager.load();
     }
 

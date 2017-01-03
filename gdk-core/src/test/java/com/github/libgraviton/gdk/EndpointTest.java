@@ -1,9 +1,9 @@
 package com.github.libgraviton.gdk;
 
-import static org.junit.Assert.*;
-
 import org.junit.Before;
 import org.junit.Test;
+
+import static org.junit.Assert.*;
 
 public class EndpointTest {
 
@@ -41,5 +41,18 @@ public class EndpointTest {
         Endpoint equalEndpoint = new Endpoint(null, null);
         assertFalse(endpoint.equals(equalEndpoint));
         assertFalse(equalEndpoint.equals(endpoint));
+    }
+
+    @Test
+    public void testEndpointUrls() {
+        String itemUrl = "endpoint://other/item";
+        String url = "endpoint://other/collection/";
+        Endpoint endpoint = new Endpoint(itemUrl, url);
+        assertEquals(itemUrl, endpoint.getItemUrl());
+        assertEquals(url, endpoint.getUrl());
+
+        endpoint = new Endpoint(itemUrl);
+        assertEquals(itemUrl, endpoint.getItemUrl());
+        assertNull(endpoint.getUrl());
     }
 }

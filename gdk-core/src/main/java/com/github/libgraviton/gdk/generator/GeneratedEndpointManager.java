@@ -1,7 +1,7 @@
 package com.github.libgraviton.gdk.generator;
 
 import com.github.libgraviton.gdk.Endpoint;
-import com.github.libgraviton.gdk.ServiceManager;
+import com.github.libgraviton.gdk.EndpointManager;
 import com.github.libgraviton.gdk.generator.exception.UnableToLoadEndpointAssociationsException;
 import com.github.libgraviton.gdk.generator.exception.UnableToPersistEndpointAssociationsException;
 
@@ -12,7 +12,7 @@ import java.util.Map;
  * Endpoint manager for generated POJOs. This service manager is capable of serializing it's service -> POJO class
  * association to a file and deserialize it afterwards.
  */
-public class GeneratedServiceManager extends ServiceManager {
+public class GeneratedEndpointManager extends EndpointManager {
 
     /**
      * The file holding the serialized service -> POJO class association.
@@ -27,7 +27,7 @@ public class GeneratedServiceManager extends ServiceManager {
      *
      * @throws UnableToLoadEndpointAssociationsException When the serialization file cannot be loaded.
      */
-    public GeneratedServiceManager(
+    public GeneratedEndpointManager(
             File serializationFile,
             boolean loadExisting
     ) throws UnableToLoadEndpointAssociationsException {
@@ -44,16 +44,16 @@ public class GeneratedServiceManager extends ServiceManager {
      *
      * @throws UnableToLoadEndpointAssociationsException When the serialization file cannot be loaded.
      */
-    public GeneratedServiceManager(File serializationFile) throws UnableToLoadEndpointAssociationsException {
+    public GeneratedEndpointManager(File serializationFile) throws UnableToLoadEndpointAssociationsException {
         this(serializationFile, serializationFile.exists());
     }
 
     /**
-     * Loads the service -> POJO class association from the serialization file.
+     * Loads the service endpoints -> POJO class association from the serialization file.
      *
-     * @return The number of currently loaded service -> POJO class associations.
+     * @return The number of currently loaded service endpoints -> POJO class associations.
      *
-     * @throws UnableToLoadEndpointAssociationsException When service loading is not possible / failed.
+     * @throws UnableToLoadEndpointAssociationsException When service endpoints loading is not possible / failed.
      */
     public int load() throws UnableToLoadEndpointAssociationsException {
         if (!serializationFile.exists()) {
