@@ -13,7 +13,6 @@ public class HeaderTest {
     @Test
     public void testCreateHeader() {
         String headerValue1 = "headerValue1";
-        String headerValue2 = "headerValue2";
 
         Header header1 = new Header();
         assertEquals(0, header1.all().size());
@@ -23,11 +22,6 @@ public class HeaderTest {
         Header header2 = new Header(headerValues);
         assertEquals(1, header2.all().size());
         assertEquals(headerValue1, header2.get(0));
-
-        Header header3 = new Header(header2, headerValue2);
-        assertEquals(2, header3.all().size());
-        assertEquals(headerValue1, header3.get(0));
-        assertEquals(headerValue2, header3.get(1));
     }
 
     @Test
