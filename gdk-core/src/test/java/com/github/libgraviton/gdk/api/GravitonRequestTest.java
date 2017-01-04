@@ -1,9 +1,11 @@
 package com.github.libgraviton.gdk.api;
 
+import com.github.libgraviton.gdk.api.multipart.Part;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
@@ -77,6 +79,34 @@ public class GravitonRequestTest {
     }
 
     @Test
+    public void testMultipartPost() throws Exception {
+        String formName = "something";
+        String body1 = "body part 1";
+        String body2 = "body part 2";
+        Part part1 = new Part(body1, formName);
+        Part part2 = new Part(body2);
+
+        GravitonRequest request = builder.post(part1, part2).build();
+        assertEquals(HttpMethod.POST, request.getMethod());
+        List<Part> parts = request.getParts();
+        assertEquals(2, parts.size());
+        assertEquals(part1, parts.get(0));
+        assertEquals(part2, parts.get(1));
+    }
+
+    @Test
+    public void testMultipartPut() throws Exception {
+        String body = "body part ";
+        Part part = new Part(body);
+
+        GravitonRequest request = builder.put(part).build();
+        assertEquals(HttpMethod.PUT, request.getMethod());
+        List<Part> parts = request.getParts();
+        assertEquals(1, parts.size());
+        assertEquals(part, parts.get(0));
+    }
+
+    @Test
     public void testParams() throws Exception {
         String param1 = "param1";
         String param2 = "param2";
@@ -105,13 +135,15 @@ public class GravitonRequestTest {
         String value1 = "value1";
         String value2 = "value2";
         GravitonRequest request = builder.build();
-        assertEquals(0, request.getHeaders().all().size());
+        assertEquals(2, request.getHeaders().all().size());
+        assertEquals("application/json", request.getHeaders().get("Content-Type").get(0));
+        assertEquals("application/json", request.getHeaders().get("Accept").get(0));
         request = builder.addHeader(param1, value1).build();
-        assertEquals(1, request.getHeaders().all().size());
+        assertEquals(3, request.getHeaders().all().size());
         assertEquals(value1, request.getHeaders().get(param1).get(0));
 
         request = builder.addHeader(param2, value2).build();
-        assertEquals(2, request.getHeaders().all().size());
+        assertEquals(4, request.getHeaders().all().size());
         assertEquals(value2, request.getHeaders().get(param2).get(0));
 
         request = builder.setHeaders(null).build();

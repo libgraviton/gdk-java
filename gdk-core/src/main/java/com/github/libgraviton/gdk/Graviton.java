@@ -11,7 +11,6 @@ import com.github.libgraviton.gdk.exception.CommunicationException;
 import com.github.libgraviton.gdk.exception.NoCorrespondingEndpointException;
 import com.github.libgraviton.gdk.exception.SerializationException;
 import com.github.libgraviton.gdk.serialization.JsonPatcher;
-import okhttp3.MediaType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,8 +27,6 @@ import java.util.TimeZone;
 public class Graviton {
 
     private static final Logger LOG = LoggerFactory.getLogger(Graviton.class);
-
-    public static final MediaType CONTENT_TYPE = MediaType.parse("application/json; charset=utf-8");
 
     /**
      * Defines the base setUrl of the Graviton server
@@ -181,7 +178,10 @@ public class Graviton {
      */
     public GravitonResponse execute(GravitonRequest request) throws CommunicationException {
         LOG.info(String.format("Starting '%s' to '%s'...", request.getMethod(), request.getUrl()));
-        LOG.debug("with request body '" + request.getBody() + "'");
+        if (LOG.isDebugEnabled() && request.getBody() != null) {
+            LOG.debug("with request body '" + request.getBody() + "'");
+        }
+
         GravitonResponse response = gateway.execute(request);
 
         if(response.isSuccessful()) {
@@ -221,7 +221,7 @@ public class Graviton {
         this.gateway = gateway;
     }
 
-    private String serializeResource(Object data) throws SerializationException {
+    protected String serializeResource(Object data) throws SerializationException {
         try {
             return objectMapper.writeValueAsString(data);
         } catch (JsonProcessingException e) {

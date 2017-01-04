@@ -1,10 +1,10 @@
 package com.github.libgraviton.gdk.api.gateway;
 
-import com.github.libgraviton.gdk.Graviton;
 import com.github.libgraviton.gdk.api.GravitonRequest;
 import com.github.libgraviton.gdk.api.GravitonResponse;
 import com.github.libgraviton.gdk.api.header.Header;
 import com.github.libgraviton.gdk.api.header.HeaderBag;
+import com.github.libgraviton.gdk.api.multipart.Part;
 import com.github.libgraviton.gdk.exception.CommunicationException;
 import okhttp3.*;
 
@@ -25,14 +25,7 @@ public class OkHttpGateway implements GravitonGateway {
     }
 
     public GravitonResponse execute(GravitonRequest request) throws CommunicationException {
-        Request.Builder requestBuilder = new Request.Builder();
-        RequestBody okHttpBody = null == request.getBody() ?
-                null : RequestBody.create(Graviton.CONTENT_TYPE, request.getBody());
-        Request okHttpRequest = requestBuilder
-                .method(request.getMethod().asString(), okHttpBody)
-                .url(request.getUrl())
-                .headers(createHeaders(request.getHeaders()))
-                .build();
+        Request okHttpRequest = generateRequest(request);
 
         Response okHttpResponse;
         String body;
@@ -46,6 +39,48 @@ public class OkHttpGateway implements GravitonGateway {
             );
         }
 
+        return generateResponse(request, okHttpResponse, body);
+    }
+
+    private Request generateRequest(GravitonRequest request) {
+        RequestBody okHttpBody;
+        if (request.isMultipartRequest()) {
+            okHttpBody = generateMultipartRequestBody(request);
+        } else {
+            okHttpBody = generateDefaultRequestBody(request);
+        }
+
+        Request.Builder requestBuilder = new Request.Builder();
+        return requestBuilder
+                .method(request.getMethod().asString(), okHttpBody)
+                .url(request.getUrl())
+                .headers(createHeaders(request.getHeaders()))
+                .build();
+    }
+
+    private RequestBody generateMultipartRequestBody(GravitonRequest request) {
+        MultipartBody.Builder builder = new MultipartBody.Builder();
+        for (Part part : request.getParts()) {
+            MultipartBody.Part bodyPart;
+            if (part.getFormName() != null) {
+                bodyPart = MultipartBody.Part.createFormData(part.getFormName(), part.getBody());
+            } else {
+                RequestBody requestBody = RequestBody.create(null, part.getBody());
+                bodyPart = MultipartBody.Part.create(null, requestBody);
+            }
+
+            builder.addPart(bodyPart);
+        }
+
+        return builder.build();
+    }
+
+    private RequestBody generateDefaultRequestBody(GravitonRequest request) {
+        return null == request.getBody() ? null :
+                RequestBody.create(MediaType.parse(request.getHeaders().get("Content-Type") + "; charset=utf-8"), request.getBody());
+    }
+
+    private GravitonResponse generateResponse(GravitonRequest request, Response okHttpResponse, String body) {
         GravitonResponse.Builder responseBuilder = new GravitonResponse.Builder(request);
         return responseBuilder
                 .code(okHttpResponse.code())
