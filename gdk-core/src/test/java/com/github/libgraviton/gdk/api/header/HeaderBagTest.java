@@ -13,7 +13,7 @@ public class HeaderBagTest {
         String inputLink = "<http://localhost:8000/some/graviton/endpoint/1234>; rel=\"self\",<http://localhost:8000/event/status/20c3b1f9c3b83d339bd88e8e5b0d7066>; rel=\"eventStatus\"";
         String expectedLink = "http://localhost:8000/event/status/20c3b1f9c3b83d339bd88e8e5b0d7066";
         HeaderBag headers = new HeaderBag.Builder()
-                .set("Link", inputLink)
+                .set("link", inputLink)
                 .build();
 
         assertEquals(expectedLink, headers.getLink(LinkHeader.EVENT_STATUS));
