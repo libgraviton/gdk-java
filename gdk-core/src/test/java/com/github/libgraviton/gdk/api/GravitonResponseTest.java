@@ -1,5 +1,6 @@
 package com.github.libgraviton.gdk.api;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.libgraviton.gdk.data.NoopClass;
 import com.github.libgraviton.gdk.data.SerializationTestClass;
 import com.github.libgraviton.gdk.exception.SerializationException;
@@ -25,6 +26,7 @@ public class GravitonResponseTest {
                 .message("a message")
                 .code(200)
                 .build();
+        response.setObjectMapper(new ObjectMapper());
     }
 
     @Test(expected = SerializationException.class)

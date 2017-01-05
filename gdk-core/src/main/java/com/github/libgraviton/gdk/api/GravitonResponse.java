@@ -37,7 +37,6 @@ public class GravitonResponse {
         message = builder.message;
         body = builder.body;
         headers = builder.headerBuilder.build();
-        objectMapper = builder.objectMapper;
     }
 
     public boolean isSuccessful() {
@@ -45,9 +44,13 @@ public class GravitonResponse {
     }
 
     public <BeanClass> BeanClass getBody(Class<? extends BeanClass> beanClass) throws SerializationException {
+        if(objectMapper == null) {
+            throw new IllegalStateException("'objectMapper' is not allowed to be null.");
+        }
+
         try {
             BeanClass pojoValue = objectMapper.readValue(getBody(), beanClass);
-            JsonPatcher.add(pojoValue, objectMapper.readTree(getBody()));
+            JsonPatcher.add(pojoValue, objectMapper.valueToTree(pojoValue));
             return pojoValue;
         } catch (IOException e) {
             throw new SerializationException(String.format(
@@ -70,6 +73,10 @@ public class GravitonResponse {
         return request;
     }
 
+    public void setObjectMapper(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
+    }
+
     public int getCode() {
         return code;
     }
@@ -90,17 +97,10 @@ public class GravitonResponse {
 
         private boolean isSuccessful;
 
-        private ObjectMapper objectMapper;
-
         private HeaderBag.Builder headerBuilder;
 
         public Builder(GravitonRequest request) {
-            this(request, new ObjectMapper());
-        }
-
-        public Builder(GravitonRequest request, ObjectMapper objectMapper) {
             this.request = request;
-            this.objectMapper = objectMapper;
             headerBuilder = new HeaderBag.Builder();
         }
 

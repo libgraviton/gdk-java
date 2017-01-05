@@ -24,11 +24,10 @@ public class GenerateMojo extends Jsonschema2PojoMojo {
     @Parameter(required = true)
     private String gravitonUrl;
 
-    @Parameter(required = true)
-    private File pojoServiceAssocFile;
-
     @Parameter
     private Jsonschema2PojoMojo generatorConfig = new Jsonschema2PojoMojo();
+
+    private String assocFilePath = "target/generated-sources/gdk-java/assoc";
 
     public void execute() throws MojoExecutionException
     {
@@ -38,6 +37,8 @@ public class GenerateMojo extends Jsonschema2PojoMojo {
                 return;
             }
 
+            File pojoServiceAssocFile = new File(assocFilePath);
+            pojoServiceAssocFile.getParentFile().mkdirs();
             pojoServiceAssocFile.createNewFile();
             Graviton graviton = new Graviton(
                     gravitonUrl,

@@ -38,6 +38,7 @@ public class GravitonTest {
         when(gateway.execute(any(GravitonRequest.class))).thenReturn(response);
 
         graviton = new Graviton(baseUrl, endpointManager);
+
         graviton.setGateway(gateway);
     }
 

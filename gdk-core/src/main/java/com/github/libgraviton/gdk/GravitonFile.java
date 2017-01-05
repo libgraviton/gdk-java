@@ -18,50 +18,54 @@ public class GravitonFile {
 
     private Graviton graviton;
 
+    public GravitonFile() {
+        this.graviton = new Graviton();
+    }
+
     public GravitonFile(Graviton graviton) {
         this.graviton = graviton;
     }
 
-    public GravitonRequest.ExecutableBuilder getFile(String url) {
+    public GravitonRequest.Builder getFile(String url) {
         // without the 'Accept' - 'application/json' header, we get the file instead of the metadata
         HeaderBag headers = new HeaderBag.Builder()
                 .set("Content-Type", "application/json")
                 .build();
 
-        return (GravitonRequest.ExecutableBuilder) graviton.request()
+        return graviton.request()
                 .setUrl(url)
                 .setHeaders(headers)
                 .get();
     }
 
-    public GravitonRequest.ExecutableBuilder getMetadata(String url) {
+    public GravitonRequest.Builder getMetadata(String url) {
         return graviton.get(url);
     }
 
-    public GravitonRequest.ExecutableBuilder post(String data, GravitonBase resource) throws NoCorrespondingEndpointException, SerializationException {
+    public GravitonRequest.Builder post(String data, GravitonBase resource) throws NoCorrespondingEndpointException, SerializationException {
         Part dataPart = new Part(data, "upload");
         Part metadataPart = new Part(graviton.serializeResource(resource));
 
-        return (GravitonRequest.ExecutableBuilder) graviton.request()
+        return graviton.request()
                 .setUrl(graviton.getEndpointManager().getEndpoint(resource.getClass().getName()).getUrl())
                 .post(dataPart, metadataPart);
     }
 
-    public GravitonRequest.ExecutableBuilder put(String data, GravitonBase resource) throws NoCorrespondingEndpointException, SerializationException {
+    public GravitonRequest.Builder put(String data, GravitonBase resource) throws NoCorrespondingEndpointException, SerializationException {
         Part dataPart = new Part(data, "upload");
         Part metadataPart = new Part(graviton.serializeResource(resource));
 
-        return (GravitonRequest.ExecutableBuilder) graviton.request()
+        return graviton.request()
                 .setUrl(graviton.getEndpointManager().getEndpoint(resource.getClass().getName()).getUrl())
                 .addParam("id", graviton.extractId(resource))
                 .put(dataPart, metadataPart);
     }
 
-    public GravitonRequest.ExecutableBuilder patch(GravitonBase resource) throws NoCorrespondingEndpointException, SerializationException {
+    public GravitonRequest.Builder patch(GravitonBase resource) throws NoCorrespondingEndpointException, SerializationException {
         return graviton.patch(resource);
     }
 
-    public GravitonRequest.ExecutableBuilder delete(GravitonBase resource) throws NoCorrespondingEndpointException {
+    public GravitonRequest.Builder delete(GravitonBase resource) throws NoCorrespondingEndpointException {
         return graviton.delete(resource);
     }
 

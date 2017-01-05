@@ -70,7 +70,10 @@ public final class GravitonRequest {
 
         private List<Part> parts = new ArrayList<>();
 
-        public Builder(){
+        private Graviton graviton;
+
+        public Builder(Graviton graviton){
+            this.graviton = graviton;
             setHeaders(getDefaultHeaders());
         }
 
@@ -175,6 +178,10 @@ public final class GravitonRequest {
             return new GravitonRequest(this);
         }
 
+        public GravitonResponse execute() throws CommunicationException, MalformedURLException {
+            return graviton.execute(build());
+        }
+
         // TODO make it configurable
         protected HeaderBag getDefaultHeaders() {
             return new HeaderBag.Builder()
@@ -194,22 +201,6 @@ public final class GravitonRequest {
         protected Map<String, String> getParams() {
             return params;
         }
-    }
-
-    public static class ExecutableBuilder extends Builder {
-
-        private Graviton graviton;
-
-        public ExecutableBuilder(Graviton graviton) {
-            super();
-            this.graviton = graviton;
-        }
-
-
-        public GravitonResponse execute() throws CommunicationException, MalformedURLException {
-            return graviton.execute(build());
-        }
-
     }
 
 }

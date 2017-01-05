@@ -30,7 +30,7 @@ public class GrvProfileInstructionLoaderTest {
     private ObjectMapper objectMapper = new ObjectMapper();
 
     @Mock
-    Graviton graviton;
+    private Graviton graviton;
 
 
     @Before
@@ -49,25 +49,25 @@ public class GrvProfileInstructionLoaderTest {
 
         GravitonResponse response1 = mock(GravitonResponse.class);
         when(response1.getBody(Service.class)).thenReturn(objectMapper.readValue(service, Service.class));
-        GravitonRequest.ExecutableBuilder builder1 = mock(GravitonRequest.ExecutableBuilder.class);
+        GravitonRequest.Builder builder1 = mock(GravitonRequest.Builder.class);
         when(builder1.execute()).thenReturn(response1);
         when(graviton.get("service://graviton")).thenReturn(builder1);
 
         GravitonResponse response2 = mock(GravitonResponse.class);
         when(response2.getBody()).thenReturn(someSchema);
-        GravitonRequest.ExecutableBuilder builder2 = mock(GravitonRequest.ExecutableBuilder.class);
+        GravitonRequest.Builder builder2 = mock(GravitonRequest.Builder.class);
         when(builder2.execute()).thenReturn(response2);
         when(graviton.get("service://some-service/profile")).thenReturn(builder2);
 
         GravitonResponse response3 = mock(GravitonResponse.class);
         when(response3.getBody()).thenReturn(anotherSchema);
-        GravitonRequest.ExecutableBuilder builder3 = mock(GravitonRequest.ExecutableBuilder.class);
+        GravitonRequest.Builder builder3 = mock(GravitonRequest.Builder.class);
         when(builder2.execute()).thenReturn(response3);
         when(graviton.get("service://another-service/profile")).thenReturn(builder3);
 
         GravitonResponse response4 = mock(GravitonResponse.class);
         when(response4.getBody()).thenReturn(someMoreSchema);
-        GravitonRequest.ExecutableBuilder builder4 = mock(GravitonRequest.ExecutableBuilder.class);
+        GravitonRequest.Builder builder4 = mock(GravitonRequest.Builder.class);
         when(builder4.execute()).thenReturn(response4);
         when(graviton.get("service://some-more-service/profile")).thenReturn(builder4);
 
@@ -125,7 +125,7 @@ public class GrvProfileInstructionLoaderTest {
         String schema = FileUtils.readFileToString(new File("src/test/resources/" + schemaFile));
         GravitonResponse response = mock(GravitonResponse.class);
         doReturn(schema).when(response).getBody();
-        GravitonRequest.ExecutableBuilder builder = mock(GravitonRequest.ExecutableBuilder.class);
+        GravitonRequest.Builder builder = mock(GravitonRequest.Builder.class);
         when(builder.execute()).thenReturn(response);
         when(graviton.get(not(eq("service://graviton")))).thenReturn(builder);
 

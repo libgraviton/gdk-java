@@ -11,13 +11,20 @@ import okhttp3.*;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 public class OkHttpGateway implements GravitonGateway {
 
     private OkHttpClient okHttp;
 
     public OkHttpGateway() {
-        this(new OkHttpClient());
+        this(
+            new OkHttpClient.Builder()
+                    .connectTimeout(60, TimeUnit.SECONDS)
+                    .writeTimeout(60, TimeUnit.SECONDS)
+                    .readTimeout(60, TimeUnit.SECONDS)
+                    .build()
+        );
     }
 
     public OkHttpGateway(OkHttpClient okHttp) {
