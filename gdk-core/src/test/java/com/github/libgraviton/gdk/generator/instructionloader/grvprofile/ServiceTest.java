@@ -15,7 +15,7 @@ public class ServiceTest {
         ObjectMapper objectMapper = new ObjectMapper();
 
         String serviceJson = FileUtils.readFileToString(
-                new File("src/test/resources/service/serviceTest.json"));;
+                new File("src/test/resources/service/serviceTest.json"));
         Service service = objectMapper.readValue(serviceJson, Service.class);
 
         assertEquals(2, service.getEndpointDefinitions().size());
