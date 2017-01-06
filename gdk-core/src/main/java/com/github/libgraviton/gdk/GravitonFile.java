@@ -38,8 +38,24 @@ public class GravitonFile {
                 .get();
     }
 
+    public GravitonRequest.Builder getFile(GravitonBase resource) throws NoCorrespondingEndpointException {
+        return getFile(graviton.extractId(resource), resource.getClass());
+    }
+
+    public GravitonRequest.Builder getFile(String id, Class clazz) throws NoCorrespondingEndpointException {
+        return getFile(graviton.getEndpointManager().getEndpoint(clazz.getName()).getItemUrl()).addParam("id", id);
+    }
+
     public GravitonRequest.Builder getMetadata(String url) {
         return graviton.get(url);
+    }
+
+    public GravitonRequest.Builder getMetadata(GravitonBase resource) throws NoCorrespondingEndpointException {
+        return getMetadata(graviton.extractId(resource), resource.getClass());
+    }
+
+    public GravitonRequest.Builder getMetadata(String id, Class clazz) throws NoCorrespondingEndpointException {
+        return getMetadata(graviton.getEndpointManager().getEndpoint(clazz.getName()).getItemUrl()).addParam("id", id);
     }
 
     public GravitonRequest.Builder post(String data, GravitonBase resource) throws NoCorrespondingEndpointException, SerializationException {
