@@ -14,9 +14,6 @@ import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.jsonschema2pojo.maven.Jsonschema2PojoMojo;
 
-import java.io.File;
-import java.io.IOException;
-
 @Execute(goal = "generate")
 @Mojo(name = "generate", threadSafe = true, defaultPhase = LifecyclePhase.GENERATE_SOURCES)
 public class GenerateMojo extends Jsonschema2PojoMojo {
@@ -27,8 +24,6 @@ public class GenerateMojo extends Jsonschema2PojoMojo {
     @Parameter
     private Jsonschema2PojoMojo generatorConfig = new Jsonschema2PojoMojo();
 
-    private String assocFilePath = "target/generated-sources/gdk-java/assoc";
-
     public void execute() throws MojoExecutionException
     {
         try {
@@ -37,12 +32,9 @@ public class GenerateMojo extends Jsonschema2PojoMojo {
                 return;
             }
 
-            File pojoServiceAssocFile = new File(assocFilePath);
-            pojoServiceAssocFile.getParentFile().mkdirs();
-            pojoServiceAssocFile.createNewFile();
             Graviton graviton = new Graviton(
                     gravitonUrl,
-                    new GeneratedEndpointManager(pojoServiceAssocFile, false)
+                    new GeneratedEndpointManager(GeneratedEndpointManager.Mode.CREATE)
             );
             Generator generator = new Generator(
                     generatorConfig,
@@ -50,7 +42,7 @@ public class GenerateMojo extends Jsonschema2PojoMojo {
                     new GrvProfileInstructionLoader(graviton)
             );
             generator.generate();
-        } catch (GeneratorException | IOException e) {
+        } catch (GeneratorException e) {
             throw new MojoExecutionException("POJO generation failed.", e);
         } catch (UnableToLoadEndpointAssociationsException e) {
             throw new MojoExecutionException(

@@ -28,4 +28,13 @@ public class PropertiesLoader {
 
         return properties;
     }
+
+    public static String load(String key) {
+        try {
+            Properties properties = load();
+            return properties.getProperty(key);
+        } catch (IOException e) {
+            throw new IllegalStateException("Unable to load properties files.", e);
+        }
+    }
 }

@@ -25,7 +25,7 @@ import static org.mockito.AdditionalMatchers.not;
 import static org.mockito.Mockito.*;
 
 @RunWith(DataProviderRunner.class)
-public class GrvProfileInstructionLoaderTest {
+public class GrvProfileInstructionModeTest {
 
     private GrvProfileInstructionLoader instructionLoader;
 

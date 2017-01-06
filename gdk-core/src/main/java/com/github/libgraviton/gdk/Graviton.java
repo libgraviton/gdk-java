@@ -17,7 +17,6 @@ import com.github.libgraviton.gdk.util.PropertiesLoader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Properties;
@@ -54,8 +53,6 @@ public class Graviton {
      */
     private OkHttpGateway gateway;
 
-    private String assocFilePath = "target/generated-sources/gdk-java/assoc";
-
     private Properties properties;
 
     public Graviton() {
@@ -63,9 +60,9 @@ public class Graviton {
         this.baseUrl = properties.getProperty("graviton.base.url");
 
         try {
-            this.endpointManager = new GeneratedEndpointManager(new File(assocFilePath));
+            this.endpointManager = new GeneratedEndpointManager();
         } catch (UnableToLoadEndpointAssociationsException e) {
-            throw new IllegalStateException("Unable to load '" + assocFilePath + "'.", e);
+            throw new IllegalStateException(e);
         }
     }
 

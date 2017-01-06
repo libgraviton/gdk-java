@@ -2,9 +2,7 @@ package com.github.libgraviton.gdk;
 
 import com.github.libgraviton.gdk.util.PropertiesLoader;
 
-import java.io.IOException;
 import java.io.Serializable;
-import java.util.Properties;
 
 /**
  * Represents a Graviton endpoint.
@@ -25,7 +23,7 @@ public class Endpoint implements Serializable {
     /**
      * Loads the base url once from the properties the first time an Endpoint class will be used.
      */
-    private static transient String baseUrl = initBaseUrl();
+    private static transient String baseUrl = PropertiesLoader.load("graviton.base.url");
 
     /**
      * Constructor. Sets the endpoint itemUrl.
@@ -64,14 +62,5 @@ public class Endpoint implements Serializable {
         return ((null == itemUrl && null == endpoint.itemUrl) || (null != itemUrl && itemUrl.equals(endpoint.itemUrl))) &&
                 ((null == url && null == endpoint.url) ||
                     (null != url && url.equals(endpoint.url)));
-    }
-
-    private static String initBaseUrl() {
-        try {
-            Properties properties = PropertiesLoader.load();
-            return properties.getProperty("graviton.base.url");
-        } catch (IOException e) {
-            throw new IllegalStateException("Unable to load properties files.", e);
-        }
     }
 }

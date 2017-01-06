@@ -22,7 +22,7 @@ public class GeneratedEndpointManagerTest {
     @Test
     public void testLoadAndPersist() throws Exception {
         File serializationFile = File.createTempFile("endpoint-associations-", ".tmp");
-        GeneratedEndpointManager generatedServiceManager = new GeneratedEndpointManager(serializationFile, false);
+        GeneratedEndpointManager generatedServiceManager = new GeneratedEndpointManager(serializationFile, GeneratedEndpointManager.Mode.CREATE);
 
         String className = "some.ClassName";
         Endpoint endpoint = new Endpoint("endpoint://item", "endpoint://item/collection/");
@@ -33,7 +33,7 @@ public class GeneratedEndpointManagerTest {
 
         assertEquals(1, generatedServiceManager.persist());
 
-        generatedServiceManager = new GeneratedEndpointManager(serializationFile, false);
+        generatedServiceManager = new GeneratedEndpointManager(serializationFile, GeneratedEndpointManager.Mode.CREATE);
         assertFalse(generatedServiceManager.hasEndpoint(className));
         assertEquals(1, generatedServiceManager.load());
         assertTrue(generatedServiceManager.hasEndpoint(className));
@@ -43,7 +43,7 @@ public class GeneratedEndpointManagerTest {
     @Test(expected = NoCorrespondingEndpointException.class)
     public void testGetEndpointWhichIsMissing() throws Exception {
         File serializationFile = File.createTempFile("endpoint-associations-", ".tmp");
-        GeneratedEndpointManager generatedServiceManager = new GeneratedEndpointManager(serializationFile, false);
+        GeneratedEndpointManager generatedServiceManager = new GeneratedEndpointManager(serializationFile, GeneratedEndpointManager.Mode.CREATE);
 
         String className = "some.ClassName";
         Endpoint endpoint = new Endpoint("endpoint://item", "endpoint://item/collection/");
@@ -60,7 +60,7 @@ public class GeneratedEndpointManagerTest {
         assertTrue(serializationFile.delete());
         assertFalse(serializationFile.exists());
 
-        GeneratedEndpointManager generatedServiceManager = new GeneratedEndpointManager(serializationFile, false);
+        GeneratedEndpointManager generatedServiceManager = new GeneratedEndpointManager(serializationFile, GeneratedEndpointManager.Mode.LOAD);
         generatedServiceManager.load();
     }
 
@@ -77,7 +77,7 @@ public class GeneratedEndpointManagerTest {
 
         assertTrue(serializationFile.exists());
 
-        GeneratedEndpointManager generatedServiceManager = new GeneratedEndpointManager(serializationFile, false);
+        GeneratedEndpointManager generatedServiceManager = new GeneratedEndpointManager(serializationFile, GeneratedEndpointManager.Mode.CREATE);
         generatedServiceManager.load();
     }
 
