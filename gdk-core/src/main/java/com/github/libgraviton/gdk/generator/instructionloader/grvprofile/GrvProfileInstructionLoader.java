@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,12 +81,16 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
                     LOG.warn("Unable to fetch profile from '" + endpointDefinition.getProfile() + "'. Skipping...");
                 }
                 JSONObject itemSchema = determineItemSchema(profileJson);
-                loadedInstructions.add(new GeneratorInstruction(
-                        determineClassName(itemSchema),
-                        determinePackageName(itemSchema),
-                        enrichSchema(itemSchema),
-                        generateEndpoint(endpointDefinition)
-                ));
+                try {
+                    loadedInstructions.add(new GeneratorInstruction(
+                            determineClassName(itemSchema),
+                            determinePackageName(itemSchema),
+                            enrichSchema(itemSchema),
+                            generateEndpoint(endpointDefinition)
+                    ));
+                } catch (MalformedURLException e) {
+                    LOG.warn("Skipping endpoint '" + endpointDefinition.getRef() + "' since it's a malformed Url.");
+                }
             }
             LOG.info("Loaded " + loadedInstructions.size() + " endpoint definitions.");
         }
@@ -182,11 +187,13 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
      *
      * @return The generated endpoint.
      */
-    private Endpoint generateEndpoint(EndpointDefinition endpointDefinition) {
+    private Endpoint generateEndpoint(EndpointDefinition endpointDefinition) throws MalformedURLException {
         String url = endpointDefinition.getRef();
-        if (url.length() > 0 && '/' == url.charAt(url.length() - 1)) {
-            return new Endpoint(url + "{id}", url);
+        String path = new URL(url).getPath();
+
+        if (path.length() > 0 && '/' == path.charAt(path.length() - 1)) {
+            return new Endpoint(path + "{id}", path);
         }
-        return new Endpoint(url);
+        return new Endpoint(path);
     }
 }

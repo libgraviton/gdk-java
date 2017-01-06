@@ -19,10 +19,10 @@ public class ServiceTest {
         Service service = objectMapper.readValue(serviceJson, Service.class);
 
         assertEquals(2, service.getEndpointDefinitions().size());
-        assertEquals("service://some-service/", service.getEndpointDefinitions().get(0).getRef());
-        assertEquals("service://some-service/profile", service.getEndpointDefinitions().get(0).getProfile());
-        assertEquals("service://another-service", service.getEndpointDefinitions().get(1).getRef());
-        assertEquals("service://another-service/profile", service.getEndpointDefinitions().get(1).getProfile());
+        assertEquals("http://some-service/", service.getEndpointDefinitions().get(0).getRef());
+        assertEquals("http://some-service/profile", service.getEndpointDefinitions().get(0).getProfile());
+        assertEquals("http://another-service", service.getEndpointDefinitions().get(1).getRef());
+        assertEquals("http://another-service/profile", service.getEndpointDefinitions().get(1).getProfile());
     }
 
 }

@@ -1,19 +1,19 @@
 {
   "services": [
     {
-      "$ref": "service://some-service/",
-      "profile": "service://some-service/profile"
+      "$ref": "http://some-service/",
+      "profile": "http://some-service/profile"
     },
     {
-      "$ref": "service://another-service",
-      "profile": "service://another-service/profile"
+      "$ref": "http://another-service",
+      "profile": "http://another-service/profile"
     }
   ],
   "thirdparty": {
     "someThirdParty": [
       {
-        "$ref": "service://thirdparty/some-third-party/some-service/",
-        "profile": "service://thirdparty/some-third-party/some-service/profile"
+        "$ref": "http://thirdparty/some-third-party/some-service/",
+        "profile": "http://thirdparty/some-third-party/some-service/profile"
       }
     ]
   }

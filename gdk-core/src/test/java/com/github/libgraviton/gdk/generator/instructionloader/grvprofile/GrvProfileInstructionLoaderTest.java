@@ -16,9 +16,11 @@ import org.junit.runner.RunWith;
 import org.mockito.Mock;
 
 import java.io.File;
+import java.net.URL;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.AdditionalMatchers.not;
 import static org.mockito.Mockito.*;
 
@@ -45,31 +47,31 @@ public class GrvProfileInstructionLoaderTest {
                 new File("src/test/resources/serviceSchema/grvProfileInstructionLoaderTest.someMoreSchema.json"));
 
         graviton = mock(Graviton.class, withSettings());
-        when(graviton.getBaseUrl()).thenReturn("service://graviton");
+        when(graviton.getBaseUrl()).thenReturn("http://graviton");
 
         GravitonResponse response1 = mock(GravitonResponse.class);
         when(response1.getBody(Service.class)).thenReturn(objectMapper.readValue(service, Service.class));
         GravitonRequest.Builder builder1 = mock(GravitonRequest.Builder.class);
         when(builder1.execute()).thenReturn(response1);
-        when(graviton.get("service://graviton")).thenReturn(builder1);
+        when(graviton.get("http://graviton")).thenReturn(builder1);
 
         GravitonResponse response2 = mock(GravitonResponse.class);
         when(response2.getBody()).thenReturn(someSchema);
         GravitonRequest.Builder builder2 = mock(GravitonRequest.Builder.class);
         when(builder2.execute()).thenReturn(response2);
-        when(graviton.get("service://some-service/profile")).thenReturn(builder2);
+        when(graviton.get("http://some-service/profile")).thenReturn(builder2);
 
         GravitonResponse response3 = mock(GravitonResponse.class);
         when(response3.getBody()).thenReturn(anotherSchema);
         GravitonRequest.Builder builder3 = mock(GravitonRequest.Builder.class);
         when(builder2.execute()).thenReturn(response3);
-        when(graviton.get("service://another-service/profile")).thenReturn(builder3);
+        when(graviton.get("http://another-service/profile")).thenReturn(builder3);
 
         GravitonResponse response4 = mock(GravitonResponse.class);
         when(response4.getBody()).thenReturn(someMoreSchema);
         GravitonRequest.Builder builder4 = mock(GravitonRequest.Builder.class);
         when(builder4.execute()).thenReturn(response4);
-        when(graviton.get("service://some-more-service/profile")).thenReturn(builder4);
+        when(graviton.get("http://some-more-service/profile")).thenReturn(builder4);
 
         instructionLoader = new GrvProfileInstructionLoader(graviton);
     }
@@ -79,8 +81,8 @@ public class GrvProfileInstructionLoaderTest {
         return new Object[][] {
                 {
                     "serviceSchema/grvProfileInstructionLoaderTest.someSchema.json", // schema file
-                    "service://some-service/", // collection setUrl
-                    "service://some-service/{id}", // item setUrl
+                    "http://some-service/", // collection setUrl
+                    "http://some-service/{id}", // item setUrl
                     "SomeServiceDocument", // expected class name
                     "whatever.someservice", // expected package name
                     0 // index in instruction list
@@ -88,23 +90,23 @@ public class GrvProfileInstructionLoaderTest {
                 {
                     "serviceSchema/grvProfileInstructionLoaderTest.anotherSchema.json",
                     null,
-                    "service://another-service",
+                    "http://another-service",
                     "AnotherServiceDocument",
                     "whatever.anotherservice",
                     1
                 },
                 {
                     "serviceSchema/grvProfileInstructionLoaderTest.someMoreSchema.json",
-                    "service://some-more-service/",
-                    "service://some-more-service/{id}",
+                    "http://some-more-service/",
+                    "http://some-more-service/{id}",
                     "",
                     "",
                     2
                 },
                 {
                     "serviceSchema/grvProfileInstructionLoaderTest.anotherMoreSchema.json",
-                    "service://some-more-service/",
-                    "service://some-more-service/{id}",
+                    "http://some-more-service/",
+                    "http://some-more-service/{id}",
                     "AnotherMoreServiceDocument",
                     "",
                     2
@@ -127,7 +129,7 @@ public class GrvProfileInstructionLoaderTest {
         doReturn(schema).when(response).getBody();
         GravitonRequest.Builder builder = mock(GravitonRequest.Builder.class);
         when(builder.execute()).thenReturn(response);
-        when(graviton.get(not(eq("service://graviton")))).thenReturn(builder);
+        when(graviton.get(not(eq("http://graviton")))).thenReturn(builder);
 
         List<GeneratorInstruction> instructions = instructionLoader.loadInstructions();
         assertEquals(3, instructions.size());
@@ -143,8 +145,9 @@ public class GrvProfileInstructionLoaderTest {
         }
 
         assertEquals(schemaObject.toString(), instruction.getJsonSchema().toString());
-        assertEquals(expectedCollectionUrl, instruction.getEndpoint().getUrl());
-        assertEquals(expectedItemUrl, instruction.getEndpoint().getItemUrl());
+
+        assertTrue(expectedCollectionUrl == null || instruction.getEndpoint().getUrl().contains(new URL(expectedCollectionUrl).getPath()));
+        assertTrue(expectedItemUrl == null || instruction.getEndpoint().getItemUrl().contains(new URL(expectedItemUrl).getPath()));
     }
 
 }
