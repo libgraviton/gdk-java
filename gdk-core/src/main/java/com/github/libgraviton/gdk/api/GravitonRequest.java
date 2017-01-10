@@ -24,7 +24,7 @@ public final class GravitonRequest {
 
     private final List<Part> parts;
 
-    protected GravitonRequest(Builder builder) throws MalformedURLException{
+    protected GravitonRequest(Builder builder) {
         method = builder.method;
         url = builder.buildUrl();
         headers = builder.headerBuilder.build();
@@ -174,11 +174,11 @@ public final class GravitonRequest {
             return setMethod(HttpMethod.PATCH).setBody(data);
         }
 
-        public GravitonRequest build() throws MalformedURLException {
+        public GravitonRequest build() {
             return new GravitonRequest(this);
         }
 
-        public GravitonResponse execute() throws CommunicationException, MalformedURLException {
+        public GravitonResponse execute() throws CommunicationException {
             return graviton.execute(build());
         }
 
@@ -190,12 +190,19 @@ public final class GravitonRequest {
                     .build();
         }
 
-        protected URL buildUrl() throws MalformedURLException {
+        protected URL buildUrl() {
             String url = this.url;
             for (Map.Entry<String, String> param : params.entrySet()) {
                 url = url.replace(String.format("{%s}", param.getKey()), param.getValue());
             }
-            return new URL(url);
+
+            // TODO fix exception handling
+            try {
+                return new URL(url);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+            return  null;
         }
 
         protected Map<String, String> getParams() {

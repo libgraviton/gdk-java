@@ -8,7 +8,6 @@ import com.github.libgraviton.gdk.api.GravitonResponse;
 import com.github.libgraviton.gdk.api.gateway.OkHttpGateway;
 import com.github.libgraviton.gdk.data.GravitonBase;
 import com.github.libgraviton.gdk.exception.CommunicationException;
-import com.github.libgraviton.gdk.exception.NoCorrespondingEndpointException;
 import com.github.libgraviton.gdk.exception.SerializationException;
 import com.github.libgraviton.gdk.generator.GeneratedEndpointManager;
 import com.github.libgraviton.gdk.generator.exception.UnableToLoadEndpointAssociationsException;
@@ -113,11 +112,11 @@ public class Graviton {
         return request().setUrl(url).head();
     }
 
-    public GravitonRequest.Builder head(GravitonBase resource) throws NoCorrespondingEndpointException {
+    public GravitonRequest.Builder head(GravitonBase resource) {
         return head(extractId(resource), resource.getClass());
     }
 
-    public GravitonRequest.Builder head(String id, Class clazz) throws NoCorrespondingEndpointException {
+    public GravitonRequest.Builder head(String id, Class clazz) {
         return head(endpointManager.getEndpoint(clazz.getName()).getUrl())
                 .addParam("id", id);
     }
@@ -126,11 +125,11 @@ public class Graviton {
         return request().setUrl(url).options();
     }
 
-    public GravitonRequest.Builder options(GravitonBase resource) throws NoCorrespondingEndpointException {
+    public GravitonRequest.Builder options(GravitonBase resource) {
         return options(extractId(resource), resource.getClass());
     }
 
-    public GravitonRequest.Builder options(String id, Class clazz) throws NoCorrespondingEndpointException {
+    public GravitonRequest.Builder options(String id, Class clazz) {
         return options(endpointManager.getEndpoint(clazz.getName()).getUrl())
                 .addParam("id", id);
     }
@@ -139,11 +138,11 @@ public class Graviton {
         return request().setUrl(url).get();
     }
 
-    public GravitonRequest.Builder get(GravitonBase resource) throws NoCorrespondingEndpointException {
+    public GravitonRequest.Builder get(GravitonBase resource) {
         return get(extractId(resource), resource.getClass());
     }
 
-    public GravitonRequest.Builder get(String id, Class clazz) throws NoCorrespondingEndpointException {
+    public GravitonRequest.Builder get(String id, Class clazz) {
         return get(endpointManager.getEndpoint(clazz.getName()).getItemUrl())
                 .addParam("id", id);
     }
@@ -152,23 +151,23 @@ public class Graviton {
         return request().setUrl(url).delete();
     }
 
-    public GravitonRequest.Builder delete(GravitonBase resource) throws NoCorrespondingEndpointException {
+    public GravitonRequest.Builder delete(GravitonBase resource) {
         return delete(extractId(resource), resource.getClass());
     }
 
-    public GravitonRequest.Builder delete(String id, Class clazz) throws NoCorrespondingEndpointException {
+    public GravitonRequest.Builder delete(String id, Class clazz) {
         return delete(endpointManager.getEndpoint(clazz.getName()).getItemUrl())
                 .addParam("id", id);
     }
 
-    public GravitonRequest.Builder put(GravitonBase resource) throws NoCorrespondingEndpointException, SerializationException {
+    public GravitonRequest.Builder put(GravitonBase resource) throws SerializationException {
         return request()
                 .setUrl(endpointManager.getEndpoint(resource.getClass().getName()).getItemUrl())
                 .addParam("id", extractId(resource))
                 .put(serializeResource(resource));
     }
 
-    public GravitonRequest.Builder patch(GravitonBase resource) throws NoCorrespondingEndpointException, SerializationException {
+    public GravitonRequest.Builder patch(GravitonBase resource) throws SerializationException {
         JsonNode jsonNode = objectMapper.convertValue(resource, JsonNode.class);
         return request()
                 .setUrl(endpointManager.getEndpoint(resource.getClass().getName()).getItemUrl())
@@ -176,7 +175,7 @@ public class Graviton {
                 .patch(serializeResource(JsonPatcher.getPatch(resource, jsonNode)));
     }
 
-    public GravitonRequest.Builder post(GravitonBase resource) throws NoCorrespondingEndpointException, SerializationException {
+    public GravitonRequest.Builder post(GravitonBase resource) throws SerializationException {
         return request()
                 .setUrl(endpointManager.getEndpoint(resource.getClass().getName()).getUrl())
                 .post(serializeResource(resource));

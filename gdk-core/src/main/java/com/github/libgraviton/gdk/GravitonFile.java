@@ -4,7 +4,6 @@ import com.github.libgraviton.gdk.api.GravitonRequest;
 import com.github.libgraviton.gdk.api.header.HeaderBag;
 import com.github.libgraviton.gdk.api.multipart.Part;
 import com.github.libgraviton.gdk.data.GravitonBase;
-import com.github.libgraviton.gdk.exception.NoCorrespondingEndpointException;
 import com.github.libgraviton.gdk.exception.SerializationException;
 
 /**
@@ -38,11 +37,11 @@ public class GravitonFile {
                 .get();
     }
 
-    public GravitonRequest.Builder getFile(GravitonBase resource) throws NoCorrespondingEndpointException {
+    public GravitonRequest.Builder getFile(GravitonBase resource) {
         return getFile(graviton.extractId(resource), resource.getClass());
     }
 
-    public GravitonRequest.Builder getFile(String id, Class clazz) throws NoCorrespondingEndpointException {
+    public GravitonRequest.Builder getFile(String id, Class clazz) {
         return getFile(graviton.getEndpointManager().getEndpoint(clazz.getName()).getItemUrl()).addParam("id", id);
     }
 
@@ -50,15 +49,15 @@ public class GravitonFile {
         return graviton.get(url);
     }
 
-    public GravitonRequest.Builder getMetadata(GravitonBase resource) throws NoCorrespondingEndpointException {
+    public GravitonRequest.Builder getMetadata(GravitonBase resource) {
         return getMetadata(graviton.extractId(resource), resource.getClass());
     }
 
-    public GravitonRequest.Builder getMetadata(String id, Class clazz) throws NoCorrespondingEndpointException {
+    public GravitonRequest.Builder getMetadata(String id, Class clazz) {
         return getMetadata(graviton.getEndpointManager().getEndpoint(clazz.getName()).getItemUrl()).addParam("id", id);
     }
 
-    public GravitonRequest.Builder post(String data, GravitonBase resource) throws NoCorrespondingEndpointException, SerializationException {
+    public GravitonRequest.Builder post(String data, GravitonBase resource) throws SerializationException {
         Part dataPart = new Part(data, "upload");
         Part metadataPart = new Part(graviton.serializeResource(resource));
 
@@ -67,7 +66,7 @@ public class GravitonFile {
                 .post(dataPart, metadataPart);
     }
 
-    public GravitonRequest.Builder put(String data, GravitonBase resource) throws NoCorrespondingEndpointException, SerializationException {
+    public GravitonRequest.Builder put(String data, GravitonBase resource) throws SerializationException {
         Part dataPart = new Part(data, "upload");
         Part metadataPart = new Part(graviton.serializeResource(resource));
 
@@ -77,11 +76,11 @@ public class GravitonFile {
                 .put(dataPart, metadataPart);
     }
 
-    public GravitonRequest.Builder patch(GravitonBase resource) throws NoCorrespondingEndpointException, SerializationException {
+    public GravitonRequest.Builder patch(GravitonBase resource) throws SerializationException {
         return graviton.patch(resource);
     }
 
-    public GravitonRequest.Builder delete(GravitonBase resource) throws NoCorrespondingEndpointException {
+    public GravitonRequest.Builder delete(GravitonBase resource) {
         return graviton.delete(resource);
     }
 

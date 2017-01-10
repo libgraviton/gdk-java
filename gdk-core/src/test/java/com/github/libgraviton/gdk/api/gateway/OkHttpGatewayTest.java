@@ -11,7 +11,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -56,7 +55,7 @@ public class OkHttpGatewayTest {
     }
 
     @Test
-    public void testDoRequestHappyPath() throws CommunicationException, MalformedURLException {
+    public void testDoRequestHappyPath() throws CommunicationException {
         when(okHttpResponse.isSuccessful()).thenReturn(true);
 
         GravitonResponse response = gateway.execute(request);
@@ -64,7 +63,7 @@ public class OkHttpGatewayTest {
     }
 
     @Test(expected = CommunicationException.class)
-    public void testDoRequestFailedCall() throws CommunicationException, MalformedURLException {
+    public void testDoRequestFailedCall() throws CommunicationException {
         try {
             when(call.execute()).thenThrow(new IOException("The call went wrong, but that's ok."));
         } catch (IOException e) {

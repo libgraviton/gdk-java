@@ -67,7 +67,7 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
             List<EndpointDefinition> endpointDefinitions;
             try {
                 endpointDefinitions = loadService().getEndpointDefinitions();
-            } catch (MalformedURLException | CommunicationException | SerializationException e) {
+            } catch (CommunicationException | SerializationException e) {
                 LOG.warn("Unable to load service. No instructions loaded.");
                 return loadedInstructions;
             }
@@ -77,7 +77,7 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
                 try {
                     GravitonResponse response = graviton.get(endpointDefinition.getProfile()).execute();
                     profileJson = response.getBody();
-                } catch (MalformedURLException | CommunicationException e) {
+                } catch (CommunicationException e) {
                     LOG.warn("Unable to fetch profile from '" + endpointDefinition.getProfile() + "'. Skipping...");
                 }
                 JSONObject itemSchema = determineItemSchema(profileJson);
@@ -121,7 +121,7 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
      *
      * @return The Graviton service.
      */
-    private Service loadService() throws CommunicationException, SerializationException, MalformedURLException {
+    private Service loadService() throws CommunicationException, SerializationException {
         GravitonResponse response = graviton.get(graviton.getBaseUrl()).execute();
         return response.getBody(Service.class);
     }
