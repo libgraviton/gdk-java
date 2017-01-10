@@ -54,7 +54,7 @@ public class GravitonResponse {
             return pojoValue;
         } catch (IOException e) {
             throw new SerializationException(String.format(
-                    "Unable to deserialize response setBody from '%s' to class '%s'.",
+                    "Unable to deserialize response body from '%s' to class '%s'.",
                     request.getUrl(),
                     beanClass.getName()
             ), e);
