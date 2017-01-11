@@ -1,11 +1,13 @@
 package com.github.libgraviton.gdk.api;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.type.CollectionType;
 import com.github.libgraviton.gdk.api.header.HeaderBag;
-import com.github.libgraviton.gdk.exception.SerializationException;
+import com.github.libgraviton.gdk.exception.DeserializationException;
 import com.github.libgraviton.gdk.serialization.JsonPatcher;
 
 import java.io.IOException;
+import java.util.List;
 
 /**
  * Graviton response wrapper with additional functionality and simplified interface.
@@ -43,17 +45,17 @@ public class GravitonResponse {
         return isSuccessful;
     }
 
-    public <BeanClass> BeanClass getBody(Class<? extends BeanClass> beanClass) throws SerializationException {
+    public <BeanClass> BeanClass getBodyItem(final Class<? extends BeanClass> beanClass) throws DeserializationException {
         if(objectMapper == null) {
             throw new IllegalStateException("'objectMapper' is not allowed to be null.");
         }
 
         try {
-            BeanClass pojoValue = objectMapper.readValue(getBody(), beanClass);
+            BeanClass pojoValue = objectMapper.readValue(getBodyItem(), beanClass);
             JsonPatcher.add(pojoValue, objectMapper.valueToTree(pojoValue));
             return pojoValue;
         } catch (IOException e) {
-            throw new SerializationException(String.format(
+            throw new DeserializationException(String.format(
                     "Unable to deserialize response body from '%s' to class '%s'.",
                     request.getUrl(),
                     beanClass.getName()
@@ -61,7 +63,29 @@ public class GravitonResponse {
         }
     }
 
-    public String getBody() {
+    public <BeanClass> List<BeanClass> getBodyItems(final Class<? extends BeanClass> beanClass) throws DeserializationException {
+        if(objectMapper == null) {
+            throw new IllegalStateException("'objectMapper' is not allowed to be null.");
+        }
+
+        try {
+            final CollectionType javaType =
+                    objectMapper.getTypeFactory().constructCollectionType(List.class, beanClass);
+            List<BeanClass> pojoValues = objectMapper.readValue(getBodyItem(), javaType);
+            for (BeanClass pojoValue : pojoValues) {
+                JsonPatcher.add(pojoValue, objectMapper.valueToTree(pojoValue));
+            }
+            return pojoValues;
+        } catch (IOException e) {
+            throw new DeserializationException(String.format(
+                    "Unable to deserialize response body from '%s' to class '%s'.",
+                    request.getUrl(),
+                    beanClass.getName()
+            ), e);
+        }
+    }
+
+    public String getBodyItem() {
         return body;
     }
 

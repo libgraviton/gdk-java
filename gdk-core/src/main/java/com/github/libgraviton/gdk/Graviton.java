@@ -9,6 +9,7 @@ import com.github.libgraviton.gdk.api.gateway.OkHttpGateway;
 import com.github.libgraviton.gdk.data.GravitonBase;
 import com.github.libgraviton.gdk.exception.CommunicationException;
 import com.github.libgraviton.gdk.exception.SerializationException;
+import com.github.libgraviton.gdk.exception.UnsuccessfulResponseException;
 import com.github.libgraviton.gdk.generator.GeneratedEndpointManager;
 import com.github.libgraviton.gdk.generator.exception.UnableToLoadEndpointAssociationsException;
 import com.github.libgraviton.gdk.serialization.JsonPatcher;
@@ -208,14 +209,7 @@ public class Graviton {
                     response.getMessage()
             ));
         } else {
-            throw new CommunicationException(String.format(
-                    "Failed '%s' to '%s'. Response was '%d' - '%s' with body '%s'.",
-                    request.getMethod(),
-                    request.getUrl(),
-                    response.getCode(),
-                    response.getMessage(),
-                    response.getBody()
-            ));
+            throw new UnsuccessfulResponseException(response);
         }
         return response;
     }

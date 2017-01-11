@@ -1,7 +1,7 @@
 package com.github.libgraviton.gdk.exception;
 
 /**
- * Whenever a call to the backend was not successful.
+ * Whenever a REST call roundtrip was not successfull (including mapping the response body to a POJO)
  */
 public class CommunicationException extends Exception {
 

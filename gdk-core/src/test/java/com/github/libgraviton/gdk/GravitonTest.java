@@ -108,6 +108,7 @@ public class GravitonTest {
     @Test(expected = CommunicationException.class)
     public void testExecuteFail() throws Exception {
         when(response.isSuccessful()).thenReturn(false);
+        when(response.getRequest()).thenReturn(mock(GravitonRequest.class));
 
         SimpleClass resource = new SimpleClass();
         resource.setId("111");

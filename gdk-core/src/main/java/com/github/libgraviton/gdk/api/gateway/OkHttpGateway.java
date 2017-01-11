@@ -6,6 +6,7 @@ import com.github.libgraviton.gdk.api.header.Header;
 import com.github.libgraviton.gdk.api.header.HeaderBag;
 import com.github.libgraviton.gdk.api.multipart.Part;
 import com.github.libgraviton.gdk.exception.CommunicationException;
+import com.github.libgraviton.gdk.exception.DeserializationException;
 import okhttp3.*;
 
 import java.io.IOException;
@@ -40,7 +41,7 @@ public class OkHttpGateway implements GravitonGateway {
             okHttpResponse = okHttp.newCall(okHttpRequest).execute();
             body = okHttpResponse.body().string();
         } catch (IOException e) {
-            throw new CommunicationException(
+            throw new DeserializationException(
                     String.format("'%s' to '%s' failed.", request.getMethod(), request.getUrl()),
                     e
             );

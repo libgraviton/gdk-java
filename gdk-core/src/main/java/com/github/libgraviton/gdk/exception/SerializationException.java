@@ -1,13 +1,9 @@
 package com.github.libgraviton.gdk.exception;
 
 /**
- * Whenever problems occur with serialization / deserialization.
+ * Whenever problems occur with serialization.
  */
-public class SerializationException extends Exception {
-
-    public SerializationException() {
-        super();
-    }
+public class SerializationException extends CommunicationException {
 
     public SerializationException(String message) {
         super(message);
@@ -17,7 +13,4 @@ public class SerializationException extends Exception {
         super(message, cause);
     }
 
-    public SerializationException(Throwable cause) {
-        super(cause);
-    }
 }

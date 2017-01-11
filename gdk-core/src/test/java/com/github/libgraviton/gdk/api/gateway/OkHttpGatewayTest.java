@@ -59,7 +59,7 @@ public class OkHttpGatewayTest {
         when(okHttpResponse.isSuccessful()).thenReturn(true);
 
         GravitonResponse response = gateway.execute(request);
-        assertEquals(responseBody, response.getBody());
+        assertEquals(responseBody, response.getBodyItem());
     }
 
     @Test(expected = CommunicationException.class)
