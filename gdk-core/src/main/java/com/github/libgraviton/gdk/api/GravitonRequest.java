@@ -1,6 +1,6 @@
 package com.github.libgraviton.gdk.api;
 
-import com.github.libgraviton.gdk.Graviton;
+import com.github.libgraviton.gdk.GravitonApi;
 import com.github.libgraviton.gdk.api.header.HeaderBag;
 import com.github.libgraviton.gdk.api.multipart.Part;
 import com.github.libgraviton.gdk.exception.CommunicationException;
@@ -70,10 +70,10 @@ public final class GravitonRequest {
 
         private List<Part> parts = new ArrayList<>();
 
-        private Graviton graviton;
+        private GravitonApi gravitonApi;
 
-        public Builder(Graviton graviton){
-            this.graviton = graviton;
+        public Builder(GravitonApi gravitonApi){
+            this.gravitonApi = gravitonApi;
             setHeaders(getDefaultHeaders());
         }
 
@@ -179,7 +179,7 @@ public final class GravitonRequest {
         }
 
         public GravitonResponse execute() throws CommunicationException {
-            return graviton.execute(build());
+            return gravitonApi.execute(build());
         }
 
         // TODO make it configurable

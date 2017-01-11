@@ -1,7 +1,7 @@
 package com.github.libgraviton.gdk.generator.instructionloader.grvprofile;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.libgraviton.gdk.Graviton;
+import com.github.libgraviton.gdk.GravitonApi;
 import com.github.libgraviton.gdk.api.GravitonRequest;
 import com.github.libgraviton.gdk.api.GravitonResponse;
 import com.github.libgraviton.gdk.generator.GeneratorInstruction;
@@ -32,7 +32,7 @@ public class GrvProfileInstructionModeTest {
     private ObjectMapper objectMapper = new ObjectMapper();
 
     @Mock
-    private Graviton graviton;
+    private GravitonApi gravitonApi;
 
 
     @Before
@@ -46,34 +46,34 @@ public class GrvProfileInstructionModeTest {
         String someMoreSchema = FileUtils.readFileToString(
                 new File("src/test/resources/serviceSchema/grvProfileInstructionLoaderTest.someMoreSchema.json"));
 
-        graviton = mock(Graviton.class, withSettings());
-        when(graviton.getBaseUrl()).thenReturn("http://graviton");
+        gravitonApi = mock(GravitonApi.class, withSettings());
+        when(gravitonApi.getBaseUrl()).thenReturn("http://gravitonApi");
 
         GravitonResponse response1 = mock(GravitonResponse.class);
         when(response1.getBodyItem(Service.class)).thenReturn(objectMapper.readValue(service, Service.class));
         GravitonRequest.Builder builder1 = mock(GravitonRequest.Builder.class);
         when(builder1.execute()).thenReturn(response1);
-        when(graviton.get("http://graviton")).thenReturn(builder1);
+        when(gravitonApi.get("http://gravitonApi")).thenReturn(builder1);
 
         GravitonResponse response2 = mock(GravitonResponse.class);
         when(response2.getBody()).thenReturn(someSchema);
         GravitonRequest.Builder builder2 = mock(GravitonRequest.Builder.class);
         when(builder2.execute()).thenReturn(response2);
-        when(graviton.get("http://some-service/profile")).thenReturn(builder2);
+        when(gravitonApi.get("http://some-service/profile")).thenReturn(builder2);
 
         GravitonResponse response3 = mock(GravitonResponse.class);
         when(response3.getBody()).thenReturn(anotherSchema);
         GravitonRequest.Builder builder3 = mock(GravitonRequest.Builder.class);
         when(builder2.execute()).thenReturn(response3);
-        when(graviton.get("http://another-service/profile")).thenReturn(builder3);
+        when(gravitonApi.get("http://another-service/profile")).thenReturn(builder3);
 
         GravitonResponse response4 = mock(GravitonResponse.class);
         when(response4.getBody()).thenReturn(someMoreSchema);
         GravitonRequest.Builder builder4 = mock(GravitonRequest.Builder.class);
         when(builder4.execute()).thenReturn(response4);
-        when(graviton.get("http://some-more-service/profile")).thenReturn(builder4);
+        when(gravitonApi.get("http://some-more-service/profile")).thenReturn(builder4);
 
-        instructionLoader = new GrvProfileInstructionLoader(graviton);
+        instructionLoader = new GrvProfileInstructionLoader(gravitonApi);
     }
 
     @DataProvider
@@ -129,7 +129,7 @@ public class GrvProfileInstructionModeTest {
         doReturn(schema).when(response).getBody();
         GravitonRequest.Builder builder = mock(GravitonRequest.Builder.class);
         when(builder.execute()).thenReturn(response);
-        when(graviton.get(not(eq("http://graviton")))).thenReturn(builder);
+        when(gravitonApi.get(not(eq("http://gravitonApi")))).thenReturn(builder);
 
         List<GeneratorInstruction> instructions = instructionLoader.loadInstructions();
         assertEquals(3, instructions.size());

@@ -29,9 +29,9 @@ import java.util.TimeZone;
  * @see <a href="http://swisscom.ch">http://swisscom.ch</a>
  * @version $Id: $Id
  */
-public class Graviton {
+public class GravitonApi {
 
-    private static final Logger LOG = LoggerFactory.getLogger(Graviton.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GravitonApi.class);
 
     /**
      * Defines the base setUrl of the Graviton server
@@ -55,7 +55,7 @@ public class Graviton {
 
     private Properties properties;
 
-    public Graviton() {
+    public GravitonApi() {
         setup();
         this.baseUrl = properties.getProperty("graviton.base.url");
 
@@ -66,7 +66,7 @@ public class Graviton {
         }
     }
 
-    public Graviton(String baseUrl, EndpointManager endpointManager) {
+    public GravitonApi(String baseUrl, EndpointManager endpointManager) {
         setup();
         this.endpointManager = endpointManager;
         this.baseUrl = baseUrl;

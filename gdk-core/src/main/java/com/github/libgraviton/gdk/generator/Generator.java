@@ -1,7 +1,7 @@
 package com.github.libgraviton.gdk.generator;
 
 import com.github.libgraviton.gdk.EndpointManager;
-import com.github.libgraviton.gdk.Graviton;
+import com.github.libgraviton.gdk.GravitonApi;
 import com.github.libgraviton.gdk.generator.exception.GeneratorException;
 import com.github.libgraviton.gdk.generator.exception.UnableToPersistEndpointAssociationsException;
 import com.sun.codemodel.JCodeModel;
@@ -14,7 +14,7 @@ import java.io.IOException;
 import java.util.List;
 
 /**
- * This is the POJO generator. It generates POJOs for all endpoints of a given Graviton instance.
+ * This is the POJO generator. It generates POJOs for all endpoints of a given GravitonApi instance.
  */
 public class Generator {
 
@@ -31,9 +31,9 @@ public class Generator {
     private GenerationConfig config;
 
     /**
-     * The Graviton instance to generator POJOs for
+     * The GravitonApi instance to generator POJOs for
      */
-    private Graviton graviton;
+    private GravitonApi gravitonApi;
 
     /**
      * The generator instruction loader providing all endpoints
@@ -44,19 +44,19 @@ public class Generator {
      * Constructor
      *
      * @param config The generator config
-     * @param graviton The graviton instance to generate POJOs for
+     * @param gravitonApi The gravitonApi instance to generate POJOs for
      * @param instructionLoader The generator instruction loader which should be used
      *
      * @throws GeneratorException When the POJO generation fails
      */
     public Generator(
             GenerationConfig config,
-            Graviton graviton,
+            GravitonApi gravitonApi,
             GeneratorInstructionLoader instructionLoader
     ) throws GeneratorException {
         this(
                 config,
-                graviton,
+                gravitonApi,
                 instructionLoader,
                 new SchemaMapper(instantiateRuleFactory(config), new SchemaGenerator())
         );
@@ -66,18 +66,18 @@ public class Generator {
      * Constructor
      *
      * @param config The generator config
-     * @param graviton The graviton instance to generate POJOs for
+     * @param gravitonApi The gravitonApi instance to generate POJOs for
      * @param instructionLoader The generator instruction loader which should be used
      * @param schemaMapper The schema mapper to use for generating the POJOs
      */
     public Generator(
             GenerationConfig config,
-            Graviton graviton,
+            GravitonApi gravitonApi,
             GeneratorInstructionLoader instructionLoader,
             SchemaMapper schemaMapper
     ) {
         this.config = config;
-        this.graviton = graviton;
+        this.gravitonApi = gravitonApi;
         this.instructionLoader = instructionLoader;
         this.schemaMapper = schemaMapper;
     }
@@ -89,8 +89,8 @@ public class Generator {
      */
     public void generate() throws GeneratorException {
         List<GeneratorInstruction> generatorInstructions = instructionLoader.loadInstructions();
-        EndpointManager endpointManager = graviton.getEndpointManager();
-        LOG.info("Generating POJO classes for Graviton '" + graviton.getBaseUrl() + "'.");
+        EndpointManager endpointManager = gravitonApi.getEndpointManager();
+        LOG.info("Generating POJO classes for Graviton '" + gravitonApi.getBaseUrl() + "'.");
         for (GeneratorInstruction definition : generatorInstructions) {
             String className = definition.getClassName();
             if (0 == className.length()) {

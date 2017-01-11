@@ -1,7 +1,7 @@
 package com.github.libgraviton.gdk.api.gateway;
 
 
-import com.github.libgraviton.gdk.Graviton;
+import com.github.libgraviton.gdk.GravitonApi;
 import com.github.libgraviton.gdk.api.GravitonRequest;
 import com.github.libgraviton.gdk.api.GravitonResponse;
 import com.github.libgraviton.gdk.api.HttpMethod;
@@ -37,8 +37,8 @@ public class OkHttpGatewayTest {
         gateway = new OkHttpGateway(client);
         okHttpResponse = mock(Response.class);
         when(okHttpResponse.headers()).thenReturn(new Headers.Builder().build());
-        Graviton graviton = mock(Graviton.class);
-        request = new GravitonRequest.Builder(graviton)
+        GravitonApi gravitonApi = mock(GravitonApi.class);
+        request = new GravitonRequest.Builder(gravitonApi)
                 .setMethod(HttpMethod.GET)
                 .setUrl("http://someUrl")
                 .build();

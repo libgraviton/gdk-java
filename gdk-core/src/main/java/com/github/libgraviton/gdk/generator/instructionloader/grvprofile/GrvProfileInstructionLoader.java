@@ -1,7 +1,7 @@
 package com.github.libgraviton.gdk.generator.instructionloader.grvprofile;
 
 import com.github.libgraviton.gdk.Endpoint;
-import com.github.libgraviton.gdk.Graviton;
+import com.github.libgraviton.gdk.GravitonApi;
 import com.github.libgraviton.gdk.api.GravitonResponse;
 import com.github.libgraviton.gdk.exception.CommunicationException;
 import com.github.libgraviton.gdk.exception.SerializationException;
@@ -25,9 +25,9 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
     private final Logger LOG = LoggerFactory.getLogger(GrvProfileInstructionLoader.class);
 
     /**
-     * The Graviton instance where the endpoint definitions will be loaded from.
+     * The GravitonApi instance where the endpoint definitions will be loaded from.
      */
-    private Graviton graviton;
+    private GravitonApi gravitonApi;
 
     /**
      * Holds all loaded generator instructions.
@@ -35,12 +35,12 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
     private List<GeneratorInstruction> loadedInstructions;
 
     /**
-     * Constructor. Sets the Graviton instance which will be used.
+     * Constructor. Sets the GravitonApi instance which will be used.
      *
-     * @param graviton The Graviton instance which will be used.
+     * @param gravitonApi The GravitonApi instance which will be used.
      */
-    public GrvProfileInstructionLoader(Graviton graviton) {
-        this.graviton = graviton;
+    public GrvProfileInstructionLoader(GravitonApi gravitonApi) {
+        this.gravitonApi = gravitonApi;
     }
 
     /**
@@ -62,7 +62,7 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
      */
     public List<GeneratorInstruction> loadInstructions(boolean reload) {
         if (reload || null == this.loadedInstructions) {
-            LOG.info("Loading endpoint definitions and schema from '" + graviton.getBaseUrl() + "'.");
+            LOG.info("Loading endpoint definitions and schema from '" + gravitonApi.getBaseUrl() + "'.");
             loadedInstructions = new ArrayList<>();
             List<EndpointDefinition> endpointDefinitions;
             try {
@@ -75,7 +75,7 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
             for (EndpointDefinition endpointDefinition : endpointDefinitions) {
                 String profileJson = null;
                 try {
-                    GravitonResponse response = graviton.get(endpointDefinition.getProfile()).execute();
+                    GravitonResponse response = gravitonApi.get(endpointDefinition.getProfile()).execute();
                     profileJson = response.getBody();
                 } catch (CommunicationException e) {
                     LOG.warn("Unable to fetch profile from '" + endpointDefinition.getProfile() + "'. Skipping...");
@@ -122,14 +122,14 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
      * @return The Graviton service.
      */
     private Service loadService() throws CommunicationException, SerializationException {
-        GravitonResponse response = graviton.get(graviton.getBaseUrl()).execute();
+        GravitonResponse response = gravitonApi.get(gravitonApi.getBaseUrl()).execute();
         return response.getBodyItem(Service.class);
     }
 
     /**
-     * Determines the classname for a given Graviton schema.
+     * Determines the classname for a given GravitonApi schema.
      *
-     * @param itemSchema The Graviton item schema.
+     * @param itemSchema The GravitonApi item schema.
      *
      * @return The determined class name. May be empty if no class name could be determined.
      */

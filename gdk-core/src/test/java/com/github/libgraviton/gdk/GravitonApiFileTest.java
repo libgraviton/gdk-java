@@ -13,11 +13,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.*;
 
-public class GravitonFileTest {
+public class GravitonApiFileTest {
 
-    private Graviton graviton;
+    private GravitonApi gravitonApi;
 
-    private GravitonFile gravitonFile;
+    private GravitonFileEndpoint gravitonFileEndpoint;
 
     private String url = "http://someUrl";
 
@@ -31,26 +31,26 @@ public class GravitonFileTest {
         when(endpoint.getItemUrl()).thenReturn(itemUrl);
         when(endpointManager.getEndpoint(anyString())).thenReturn(endpoint);
 
-        graviton = mock(Graviton.class);
-        when(graviton.request()).thenCallRealMethod();
-        when(graviton.get(url)).thenCallRealMethod();
-        when(graviton.getEndpointManager()).thenReturn(endpointManager);
-        when(graviton.extractId(any(GravitonBase.class))).thenCallRealMethod();
+        gravitonApi = mock(GravitonApi.class);
+        when(gravitonApi.request()).thenCallRealMethod();
+        when(gravitonApi.get(url)).thenCallRealMethod();
+        when(gravitonApi.getEndpointManager()).thenReturn(endpointManager);
+        when(gravitonApi.extractId(any(GravitonBase.class))).thenCallRealMethod();
 
-        gravitonFile = new GravitonFile(graviton);
+        gravitonFileEndpoint = new GravitonFileEndpoint(gravitonApi);
     }
 
     @Test
     public void testGetFile() throws Exception {
-        GravitonRequest request = gravitonFile.getFile(url).build();
+        GravitonRequest request = gravitonFileEndpoint.getFile(url).build();
         assertEquals(0, request.getHeaders().get("Accept").all().size());
     }
 
     @Test
     public void testGetMetadata() throws Exception {
-        GravitonRequest request = gravitonFile.getMetadata(url).build();
+        GravitonRequest request = gravitonFileEndpoint.getMetadata(url).build();
         assertEquals(1, request.getHeaders().get("Accept").all().size());
-        verify(graviton, times(1)).get(url);
+        verify(gravitonApi, times(1)).get(url);
     }
 
     @Test
@@ -59,7 +59,7 @@ public class GravitonFileTest {
         resource.setId("111");
         String data = "some real data";
 
-        GravitonRequest request = gravitonFile.post(data, resource).build();
+        GravitonRequest request = gravitonFileEndpoint.post(data, resource).build();
         List<Part> parts = request.getParts();
         assertEquals(2, parts.size());
 
@@ -69,7 +69,7 @@ public class GravitonFileTest {
 
         Part part2 = parts.get(1);
         assertNull(part2.getFormName());
-        assertEquals(graviton.serializeResource(resource), part2.getBody());
+        assertEquals(gravitonApi.serializeResource(resource), part2.getBody());
     }
 
     @Test
@@ -78,7 +78,7 @@ public class GravitonFileTest {
         resource.setId("111");
         String data = "some real data";
 
-        GravitonRequest request = gravitonFile.put(data, resource).build();
+        GravitonRequest request = gravitonFileEndpoint.put(data, resource).build();
         List<Part> parts = request.getParts();
         assertEquals(2, parts.size());
 
@@ -88,20 +88,20 @@ public class GravitonFileTest {
 
         Part part2 = parts.get(1);
         assertNull(part2.getFormName());
-        assertEquals(graviton.serializeResource(resource), part2.getBody());
+        assertEquals(gravitonApi.serializeResource(resource), part2.getBody());
     }
 
     @Test
     public void testPatch() throws Exception {
         SimpleClass resource = new SimpleClass();
-        gravitonFile.patch(resource);
-        verify(graviton, times(1)).patch(resource);
+        gravitonFileEndpoint.patch(resource);
+        verify(gravitonApi, times(1)).patch(resource);
     }
 
     @Test
     public void testDelete() throws Exception {
         SimpleClass resource = new SimpleClass();
-        gravitonFile.delete(resource);
-        verify(graviton, times(1)).delete(resource);
+        gravitonFileEndpoint.delete(resource);
+        verify(gravitonApi, times(1)).delete(resource);
     }
 }

@@ -1,7 +1,7 @@
 package com.github.libgraviton.gdk.maven;
 
 
-import com.github.libgraviton.gdk.Graviton;
+import com.github.libgraviton.gdk.GravitonApi;
 import com.github.libgraviton.gdk.generator.GeneratedEndpointManager;
 import com.github.libgraviton.gdk.generator.Generator;
 import com.github.libgraviton.gdk.generator.instructionloader.grvprofile.GrvProfileInstructionLoader;
@@ -32,14 +32,14 @@ public class GenerateMojo extends Jsonschema2PojoMojo {
                 return;
             }
 
-            Graviton graviton = new Graviton(
+            GravitonApi gravitonApi = new GravitonApi(
                     gravitonUrl,
                     new GeneratedEndpointManager(GeneratedEndpointManager.Mode.CREATE)
             );
             Generator generator = new Generator(
                     generatorConfig,
-                    graviton,
-                    new GrvProfileInstructionLoader(graviton)
+                    gravitonApi,
+                    new GrvProfileInstructionLoader(gravitonApi)
             );
             generator.generate();
         } catch (GeneratorException e) {

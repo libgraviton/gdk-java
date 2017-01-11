@@ -1,6 +1,6 @@
 package com.github.libgraviton.gdk.api;
 
-import com.github.libgraviton.gdk.Graviton;
+import com.github.libgraviton.gdk.GravitonApi;
 import com.github.libgraviton.gdk.api.multipart.Part;
 import org.junit.Before;
 import org.junit.Test;
@@ -13,14 +13,14 @@ import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 
-public class GravitonRequestTest {
+public class GravitonApiRequestTest {
 
     private GravitonRequest.Builder builder;
 
     @Before
     public void setup() throws Exception {
-        Graviton graviton = mock(Graviton.class);
-        builder = new GravitonRequest.Builder(graviton).setUrl("http://aRandomUrl");
+        GravitonApi gravitonApi = mock(GravitonApi.class);
+        builder = new GravitonRequest.Builder(gravitonApi).setUrl("http://aRandomUrl");
     }
 
     @Test

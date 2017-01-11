@@ -10,7 +10,7 @@ import java.io.File;
 
 import static org.junit.Assert.assertEquals;
 
-public class GravitonJsonPatchFilterTest {
+public class GravitonApiJsonPatchFilterTest {
 
     private GravitonJsonPatchFilter filter;
 

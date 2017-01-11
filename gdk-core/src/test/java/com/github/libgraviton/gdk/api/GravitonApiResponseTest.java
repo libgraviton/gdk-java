@@ -14,7 +14,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
-public class GravitonResponseTest {
+public class GravitonApiResponseTest {
 
     private GravitonResponse response;
 
