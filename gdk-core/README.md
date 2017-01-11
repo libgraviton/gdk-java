@@ -17,18 +17,30 @@ Let's say we want to execute a GET request and have an endpoint /person/customer
 
 ```java
 Graviton graviton = new Graviton();
-GravitonResponse response1 = graviton.get("123", Customer.class).execute();
-Customer customer1 = response1.getBody(Customer.class);
+try {
+  GravitonResponse response1 = graviton.get("123", Customer.class).execute();
+  Customer customer1 = response1.getBodyItem(Customer.class);
+} catch (CommunicationException e) {
+  // Unable to obtain customer1
+}
 
 // as an alternative we could go for
 Customer customer2 = new Customer();
 customer2.setId("123");
-GravitonResponse response2 = graviton.get(customer).execute();
-customer2 = response2.getBody(Customer.class);
+try {
+  GravitonResponse response2 = graviton.get(customer).execute();
+  customer2 = response2.getBodyItem(Customer.class);
+} catch (CommunicationException e) {
+  // Unable to obtain customer2
+}
 
 // or even
-GravitonResponse response3 = graviton.get("https://graviton-base-url/person/customer/123").execute();
-Customer customer3 = response3.getBody(Customer.class);
+try {
+  GravitonResponse response3 = graviton.get("https://graviton-base-url/person/customer/123").execute();
+  Customer customer3 = response3.getBodyItem(Customer.class);
+} catch (CommunicationException e) {
+  // Unable to obtain customer3
+}
 ```
 
 From this point on, all the REST calls are really simple to handle
@@ -36,54 +48,64 @@ From this point on, all the REST calls are really simple to handle
 ```java
 Graviton graviton = new Graviton();
 
-// POST request
-Customer customer = new Customer();
-customer.setFirstName("John");
-customer.setLastName("Smith");
-GravitonResponse response = graviton.post(customer).execute();
-// What is the link to the newly created customer?
-String targetLink = response.getHeaders().getLink(LinkHeader.SELF);
+try {
+  // POST request
+  Customer customer = new Customer();
+  customer.setFirstName("John");
+  customer.setLastName("Smith");
 
-// GET request
-response = graviton.get(targetLink).execute();
-Customer existingCustomer = response.getBody(Customer.class);
+  GravitonResponse response = graviton.post(customer).execute();
+  // What is the link to the newly created customer?
+  String targetLink = response.getHeaders().getLink(LinkHeader.SELF);
 
-// PATCH request
-existingCustomer.setLastName("Fletcher");
-graviton.patch(existingCustomer).execute();
+  // GET request
+  response = graviton.get(targetLink).execute();
+  Customer existingCustomer = response.getBodyItem(Customer.class);
 
-// DELETE request
-graviton.delete(existingCustomer).execute();
+  // PATCH request
+  existingCustomer.setLastName("Fletcher");
+  graviton.patch(existingCustomer).execute();
+
+  // DELETE request
+  graviton.delete(existingCustomer).execute();
+} catch (CommunicationException e) {
+  // Unable to complete example
+}
+
 
 ```
 
 ### Special use case - file service
 
-The file service endpoint behaves a little bit different from the other endpoints, since it allows us to retrieve the file itself or the file metadata via the same endpoint. Therefore the file service handling receives its own little helper, the **GravitonFile** class.
+The file service endpoint behaves a little bit different from the other endpoints, since it allows us to retrieve the file itself or the file metadata via the same endpoint. Therefore the file service handling receives its own little helper, the **GravitonFile** class. In this case the **File** class is part of the generated POJOs
 
 ```java
 GravitonFile gravitonFile = new GravitonFile();
 
-// GET the metadata
-File fileResource = new File();
-fileResource.setId("987");
-GravitonResponse response  = gravitonFile.getMetadata(fileResource).execute();
-File metadata = response.getBody(File.class);
+try {
+  // GET the metadata
+  File fileResource = new File();
+  fileResource.setId("987");
+  GravitonResponse response  = gravitonFile.getMetadata(fileResource).execute();
+  File metadata = response.getBody(File.class);
 
-// modify the metadata
-metadata.getMetadata().setFilename(System.currentTimeMillis() + ".txt");
-gravitonFile.patch(metadata).execute();
+  // modify the metadata
+  metadata.getMetadata().setFilename(System.currentTimeMillis() + ".txt");
+  gravitonFile.patch(metadata).execute();
 
-// GET the file itself
-response  = gravitonFile.getFile(fileResource).execute();
-String data = response.getBody();
+  // GET the file itself
+  response  = gravitonFile.getFile(fileResource).execute();
+  String data = response.getBodyItem();
 
-// create a new file via POST
-response = gravitonFile.post(data, metadata).execute();
-String targetLink = response.getHeaders().getLink(LinkHeader.SELF);
+  // create a new file via POST
+  response = gravitonFile.post(data, metadata).execute();
+  String targetLink = response.getHeaders().getLink(LinkHeader.SELF);
 
-// DELETE the newly created file
-response  = gravitonFile.getMetadata(targetLink).execute();
-metadata = response.getBody(File.class);
-gravitonFile.delete(metadata).execute();
+  // DELETE the newly created file
+  response  = gravitonFile.getMetadata(targetLink).execute();
+  metadata = response.getBodyItem(File.class);
+  gravitonFile.delete(metadata).execute();
+} catch (CommunicationException e) {
+  // Unable to complete example
+}
 ```
