@@ -43,7 +43,7 @@ public class GravitonResponseTest {
         assertTrue(response.isSuccessful());
         assertEquals(200, response.getCode());
         assertEquals("a message", response.getMessage());
-        assertEquals("{\"code\":0}", response.getBodyItem());
+        assertEquals("{\"code\":0}", response.getBody());
         assertEquals(request, response.getRequest());
         assertEquals(0, response.getHeaders().all().size());
     }

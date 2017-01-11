@@ -51,7 +51,7 @@ public class GravitonResponse {
         }
 
         try {
-            BeanClass pojoValue = objectMapper.readValue(getBodyItem(), beanClass);
+            BeanClass pojoValue = objectMapper.readValue(getBody(), beanClass);
             JsonPatcher.add(pojoValue, objectMapper.valueToTree(pojoValue));
             return pojoValue;
         } catch (IOException e) {
@@ -71,7 +71,7 @@ public class GravitonResponse {
         try {
             final CollectionType javaType =
                     objectMapper.getTypeFactory().constructCollectionType(List.class, beanClass);
-            List<BeanClass> pojoValues = objectMapper.readValue(getBodyItem(), javaType);
+            List<BeanClass> pojoValues = objectMapper.readValue(getBody(), javaType);
             for (BeanClass pojoValue : pojoValues) {
                 JsonPatcher.add(pojoValue, objectMapper.valueToTree(pojoValue));
             }
@@ -85,7 +85,7 @@ public class GravitonResponse {
         }
     }
 
-    public String getBodyItem() {
+    public String getBody() {
         return body;
     }
 

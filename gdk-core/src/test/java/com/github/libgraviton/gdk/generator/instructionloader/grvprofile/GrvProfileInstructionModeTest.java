@@ -56,19 +56,19 @@ public class GrvProfileInstructionModeTest {
         when(graviton.get("http://graviton")).thenReturn(builder1);
 
         GravitonResponse response2 = mock(GravitonResponse.class);
-        when(response2.getBodyItem()).thenReturn(someSchema);
+        when(response2.getBody()).thenReturn(someSchema);
         GravitonRequest.Builder builder2 = mock(GravitonRequest.Builder.class);
         when(builder2.execute()).thenReturn(response2);
         when(graviton.get("http://some-service/profile")).thenReturn(builder2);
 
         GravitonResponse response3 = mock(GravitonResponse.class);
-        when(response3.getBodyItem()).thenReturn(anotherSchema);
+        when(response3.getBody()).thenReturn(anotherSchema);
         GravitonRequest.Builder builder3 = mock(GravitonRequest.Builder.class);
         when(builder2.execute()).thenReturn(response3);
         when(graviton.get("http://another-service/profile")).thenReturn(builder3);
 
         GravitonResponse response4 = mock(GravitonResponse.class);
-        when(response4.getBodyItem()).thenReturn(someMoreSchema);
+        when(response4.getBody()).thenReturn(someMoreSchema);
         GravitonRequest.Builder builder4 = mock(GravitonRequest.Builder.class);
         when(builder4.execute()).thenReturn(response4);
         when(graviton.get("http://some-more-service/profile")).thenReturn(builder4);
@@ -126,7 +126,7 @@ public class GrvProfileInstructionModeTest {
     ) throws Exception{
         String schema = FileUtils.readFileToString(new File("src/test/resources/" + schemaFile));
         GravitonResponse response = mock(GravitonResponse.class);
-        doReturn(schema).when(response).getBodyItem();
+        doReturn(schema).when(response).getBody();
         GravitonRequest.Builder builder = mock(GravitonRequest.Builder.class);
         when(builder.execute()).thenReturn(response);
         when(graviton.get(not(eq("http://graviton")))).thenReturn(builder);

@@ -76,7 +76,7 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
                 String profileJson = null;
                 try {
                     GravitonResponse response = graviton.get(endpointDefinition.getProfile()).execute();
-                    profileJson = response.getBodyItem();
+                    profileJson = response.getBody();
                 } catch (CommunicationException e) {
                     LOG.warn("Unable to fetch profile from '" + endpointDefinition.getProfile() + "'. Skipping...");
                 }

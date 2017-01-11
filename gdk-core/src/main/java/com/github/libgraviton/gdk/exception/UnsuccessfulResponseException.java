@@ -33,7 +33,7 @@ public class UnsuccessfulResponseException extends CommunicationException {
                 response.getRequest().getUrl(),
                 response.getCode(),
                 response.getMessage(),
-                response.getBodyItem()
+                response.getBody()
         );
     }
 
