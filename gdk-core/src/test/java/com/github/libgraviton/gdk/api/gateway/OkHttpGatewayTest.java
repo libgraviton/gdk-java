@@ -1,6 +1,7 @@
 package com.github.libgraviton.gdk.api.gateway;
 
 
+import com.github.libgraviton.gdk.GravitonApi;
 import com.github.libgraviton.gdk.api.GravitonRequest;
 import com.github.libgraviton.gdk.api.GravitonResponse;
 import com.github.libgraviton.gdk.api.HttpMethod;
@@ -10,7 +11,6 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
-import java.net.MalformedURLException;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -37,7 +37,8 @@ public class OkHttpGatewayTest {
         gateway = new OkHttpGateway(client);
         okHttpResponse = mock(Response.class);
         when(okHttpResponse.headers()).thenReturn(new Headers.Builder().build());
-        request = new GravitonRequest.Builder()
+        GravitonApi gravitonApi = mock(GravitonApi.class);
+        request = new GravitonRequest.Builder(gravitonApi)
                 .setMethod(HttpMethod.GET)
                 .setUrl("http://someUrl")
                 .build();
@@ -54,7 +55,7 @@ public class OkHttpGatewayTest {
     }
 
     @Test
-    public void testDoRequestHappyPath() throws CommunicationException, MalformedURLException {
+    public void testDoRequestHappyPath() throws CommunicationException {
         when(okHttpResponse.isSuccessful()).thenReturn(true);
 
         GravitonResponse response = gateway.execute(request);
@@ -62,7 +63,7 @@ public class OkHttpGatewayTest {
     }
 
     @Test(expected = CommunicationException.class)
-    public void testDoRequestFailedCall() throws CommunicationException, MalformedURLException {
+    public void testDoRequestFailedCall() throws CommunicationException {
         try {
             when(call.execute()).thenThrow(new IOException("The call went wrong, but that's ok."));
         } catch (IOException e) {

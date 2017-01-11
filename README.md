@@ -8,7 +8,7 @@ The GDK is a base library which can be used for easily accessing a [Graviton](ht
 
 ## Modules
 The GDK for Java is split into two modules:
-* **gdk-core**: Contains all the magic
+* **gdk-core**: Contains all the magic to use the generated POJOs with the REST API. See also the [gdk-core documentation](gdk-core/README.md).
 * **gdk-maven-plugin**: Provides a maven plugin which allows you to generate Graviton POJOs during `mvn install`. See also the [maven plugin documentation](gdk-maven-plugin/README.md).
 
 ## API Doc

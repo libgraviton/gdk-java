@@ -13,9 +13,9 @@ import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
-public class GravitonTest {
+public class GravitonApiTest {
 
-    private Graviton graviton;
+    private GravitonApi gravitonApi;
 
     private GravitonResponse response;
 
@@ -37,15 +37,16 @@ public class GravitonTest {
         when(endpointManager.getEndpoint(anyString())).thenReturn(endpoint);
         when(gateway.execute(any(GravitonRequest.class))).thenReturn(response);
 
-        graviton = new Graviton(baseUrl, endpointManager);
-        graviton.setGateway(gateway);
+        gravitonApi = new GravitonApi(baseUrl, endpointManager);
+
+        gravitonApi.setGateway(gateway);
     }
 
     @Test
     public void testGet() throws Exception {
         SimpleClass resource = new SimpleClass();
         resource.setId("111");
-        GravitonResponse actualResponse = graviton.get(resource).execute();
+        GravitonResponse actualResponse = gravitonApi.get(resource).execute();
         assertEquals(response, actualResponse);
     }
 
@@ -53,7 +54,7 @@ public class GravitonTest {
     public void testPut() throws Exception {
         SimpleClass resource = new SimpleClass();
         resource.setId("111");
-        GravitonResponse actualResponse = graviton.put(resource).execute();
+        GravitonResponse actualResponse = gravitonApi.put(resource).execute();
         assertEquals(response, actualResponse);
     }
 
@@ -61,14 +62,14 @@ public class GravitonTest {
     public void testPatch() throws Exception {
         SimpleClass resource = new SimpleClass();
         resource.setId("111");
-        GravitonResponse actualResponse = graviton.patch(resource).execute();
+        GravitonResponse actualResponse = gravitonApi.patch(resource).execute();
         assertEquals(response, actualResponse);
     }
 
     @Test
     public void testPost() throws Exception {
         SimpleClass resource = new SimpleClass();
-        GravitonResponse actualResponse = graviton.post(resource).execute();
+        GravitonResponse actualResponse = gravitonApi.post(resource).execute();
         assertEquals(response, actualResponse);
     }
 
@@ -76,7 +77,7 @@ public class GravitonTest {
     public void testDelete() throws Exception {
         SimpleClass resource = new SimpleClass();
         resource.setId("111");
-        GravitonResponse actualResponse = graviton.delete(resource).execute();
+        GravitonResponse actualResponse = gravitonApi.delete(resource).execute();
         assertEquals(response, actualResponse);
     }
 
@@ -84,14 +85,14 @@ public class GravitonTest {
     public void testHead() throws Exception {
         SimpleClass resource = new SimpleClass();
         resource.setId("111");
-        GravitonResponse actualResponse = graviton.head(resource).execute();
+        GravitonResponse actualResponse = gravitonApi.head(resource).execute();
         assertEquals(response, actualResponse);
     }
 
     @Test
     public void testOptions() throws Exception {
         SimpleClass resource = new SimpleClass();
-        GravitonResponse actualResponse = graviton.options(resource).execute();
+        GravitonResponse actualResponse = gravitonApi.options(resource).execute();
         assertEquals(response, actualResponse);
     }
 
@@ -100,16 +101,17 @@ public class GravitonTest {
         NoopClass resourceWithoutId = new NoopClass();
         SimpleClass resource = new SimpleClass();
         resource.setId("111");
-        assertEquals("", graviton.extractId(resourceWithoutId));
-        assertEquals("111", graviton.extractId(resource));
+        assertEquals("", gravitonApi.extractId(resourceWithoutId));
+        assertEquals("111", gravitonApi.extractId(resource));
     }
 
     @Test(expected = CommunicationException.class)
     public void testExecuteFail() throws Exception {
         when(response.isSuccessful()).thenReturn(false);
+        when(response.getRequest()).thenReturn(mock(GravitonRequest.class));
 
         SimpleClass resource = new SimpleClass();
         resource.setId("111");
-        graviton.get(resource).execute();
+        gravitonApi.get(resource).execute();
     }
 }

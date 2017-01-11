@@ -1,12 +1,15 @@
 package com.github.libgraviton.gdk.api;
 
-import com.github.libgraviton.gdk.Graviton;
+import com.github.libgraviton.gdk.GravitonApi;
 import com.github.libgraviton.gdk.api.header.HeaderBag;
+import com.github.libgraviton.gdk.api.multipart.Part;
 import com.github.libgraviton.gdk.exception.CommunicationException;
 
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public final class GravitonRequest {
@@ -19,11 +22,14 @@ public final class GravitonRequest {
 
     private final String body;
 
-    protected GravitonRequest(Builder builder) throws MalformedURLException{
+    private final List<Part> parts;
+
+    protected GravitonRequest(Builder builder) {
         method = builder.method;
         url = builder.buildUrl();
         headers = builder.headerBuilder.build();
         body = builder.body;
+        parts = builder.parts;
     }
 
     public URL getUrl() {
@@ -42,6 +48,14 @@ public final class GravitonRequest {
         return body;
     }
 
+    public List<Part> getParts() {
+        return parts;
+    }
+
+    public boolean isMultipartRequest() {
+        return parts.size() > 0;
+    }
+
     public static class Builder {
 
         private String url;
@@ -54,7 +68,14 @@ public final class GravitonRequest {
 
         private String body;
 
-        public Builder(){}
+        private List<Part> parts = new ArrayList<>();
+
+        private GravitonApi gravitonApi;
+
+        public Builder(GravitonApi gravitonApi){
+            this.gravitonApi = gravitonApi;
+            setHeaders(getDefaultHeaders());
+        }
 
         public Builder setUrl(URL url) {
             return setUrl(url.toExternalForm());
@@ -99,6 +120,16 @@ public final class GravitonRequest {
             return this;
         }
 
+        public Builder setParts(List<Part> parts) {
+            this.parts = parts;
+            return this;
+        }
+
+        public Builder addPart(Part part) {
+            this.parts.add(part);
+            return this;
+        }
+
         public Builder head() {
             return setMethod(HttpMethod.HEAD);
         }
@@ -119,44 +150,64 @@ public final class GravitonRequest {
             return setMethod(HttpMethod.POST).setBody(data);
         }
 
+        // Multipart POST request
+        public Builder post(Part... parts) {
+            for (Part part : parts) {
+                addPart(part);
+            }
+            return setMethod(HttpMethod.POST);
+        }
+
         public Builder put(String data) {
             return setMethod(HttpMethod.PUT).setBody(data);
+        }
+
+        // Multipart PUT request
+        public Builder put(Part... parts) {
+            for (Part part : parts) {
+                addPart(part);
+            }
+            return setMethod(HttpMethod.PUT);
         }
 
         public Builder patch(String data) {
             return setMethod(HttpMethod.PATCH).setBody(data);
         }
 
-        public GravitonRequest build() throws MalformedURLException {
+        public GravitonRequest build() {
             return new GravitonRequest(this);
         }
 
-        protected URL buildUrl() throws MalformedURLException {
+        public GravitonResponse execute() throws CommunicationException {
+            return gravitonApi.execute(build());
+        }
+
+        // TODO make it configurable
+        protected HeaderBag getDefaultHeaders() {
+            return new HeaderBag.Builder()
+                    .set("Content-Type", "application/json")
+                    .set("Accept", "application/json")
+                    .build();
+        }
+
+        protected URL buildUrl() {
             String url = this.url;
             for (Map.Entry<String, String> param : params.entrySet()) {
                 url = url.replace(String.format("{%s}", param.getKey()), param.getValue());
             }
-            return new URL(url);
+
+            // TODO fix exception handling
+            try {
+                return new URL(url);
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            }
+            return  null;
         }
 
         protected Map<String, String> getParams() {
             return params;
         }
-    }
-
-    public static class ExecutableBuilder extends Builder {
-
-        private Graviton graviton;
-
-        public ExecutableBuilder(Graviton graviton) {
-            this.graviton = graviton;
-        }
-
-
-        public GravitonResponse execute() throws CommunicationException, MalformedURLException {
-            return graviton.execute(build());
-        }
-
     }
 
 }

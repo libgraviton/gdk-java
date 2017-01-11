@@ -4,6 +4,7 @@ import com.github.libgraviton.gdk.Endpoint;
 import com.github.libgraviton.gdk.EndpointManager;
 import com.github.libgraviton.gdk.generator.exception.UnableToLoadEndpointAssociationsException;
 import com.github.libgraviton.gdk.generator.exception.UnableToPersistEndpointAssociationsException;
+import com.github.libgraviton.gdk.util.PropertiesLoader;
 
 import java.io.*;
 import java.util.Map;
@@ -14,38 +15,58 @@ import java.util.Map;
  */
 public class GeneratedEndpointManager extends EndpointManager {
 
+    public enum Mode {
+        LOAD, CREATE;
+    }
+
+    private static String assocFilePath = PropertiesLoader.load("graviton.assoc.file.location");
+
     /**
      * The file holding the serialized service -> POJO class association.
      */
     private File serializationFile;
 
+
     /**
      * Constructor. Defines the serialization file.
      *
      * @param serializationFile The serialization file.
-     * @param loadExisting Whether to load the serialization file or not.
+     * @param mode Whether to load the serialization file or not.
      *
      * @throws UnableToLoadEndpointAssociationsException When the serialization file cannot be loaded.
      */
-    public GeneratedEndpointManager(
-            File serializationFile,
-            boolean loadExisting
-    ) throws UnableToLoadEndpointAssociationsException {
+    public GeneratedEndpointManager(File serializationFile, Mode mode) throws UnableToLoadEndpointAssociationsException {
         this.serializationFile = serializationFile;
-        if (loadExisting) {
+        if (Mode.LOAD.equals(mode)) {
             this.load();
+        } else {
+            serializationFile.getParentFile().mkdirs();
+            try {
+                serializationFile.createNewFile();
+            } catch (IOException e) {
+                throw new UnableToLoadEndpointAssociationsException("Unable to create new file at '" + assocFilePath + "'.");
+            }
         }
+    }
+
+    /**
+     * Constructor. Defines the serialization file.
+     *
+     * @param mode Whether to load the serialization file or not.
+     *
+     * @throws UnableToLoadEndpointAssociationsException When the serialization file cannot be loaded.
+     */
+    public GeneratedEndpointManager(Mode mode) throws UnableToLoadEndpointAssociationsException {
+        this(new File(assocFilePath), mode);
     }
 
     /**
      * Constructor. Defines the serialization file and tries to load it if it exists.
      *
-     * @param serializationFile The serialization file.
-     *
      * @throws UnableToLoadEndpointAssociationsException When the serialization file cannot be loaded.
      */
-    public GeneratedEndpointManager(File serializationFile) throws UnableToLoadEndpointAssociationsException {
-        this(serializationFile, serializationFile.exists());
+    public GeneratedEndpointManager() throws UnableToLoadEndpointAssociationsException {
+        this(Mode.LOAD);
     }
 
     /**
@@ -104,5 +125,4 @@ public class GeneratedEndpointManager extends EndpointManager {
         }
         return endpoints.size();
     }
-
 }

@@ -14,7 +14,6 @@ You can use this library in your project by including this in your `pom.xml`:
 			<artifactId>gdk-maven-plugin</artifactId>
 			<version>LATEST</version>
 			<configuration>
-				<pojoServiceAssocFile>/path/to/pojoServiceAssocFile</pojoServiceAssocFile>
 				<gravitonUrl>https://graviton.example.org</gravitonUrl>
 				<generatorConfig>
 				    <includeHashcodeAndEquals>false</includeHashcodeAndEquals>
@@ -41,6 +40,5 @@ IMPORTANT: To have working PATCH requests with GDK, `includeHashcodeAndEquals` w
 
 | config element         | description                                                                                                                                                                                                                                                           |
 |:-----------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
-| `pojoServiceAssocFile` | Specifies where the association of generated POJO classes and Graviton services is stored.                                                                                                                                                                            |
 | `gravitonUrl`          | The base url of the Graviton instance.                                                                                                                                                                                                                                |
 | `generatorConfig`      | Configuration for the underlying `joelittlejohn/jsonschema2pojo` generator. For further config options see the [maven plugin documentation of the jsonschema2pojo generator](https://github.com/joelittlejohn/jsonschema2pojo/wiki/Getting-Started#the-maven-plugin). |

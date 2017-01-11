@@ -35,7 +35,7 @@ public class HeaderBag {
             return null;
         }
 
-        Header links = this.get("Link");
+        Header links = this.get("link");
         if (links != null) {
             String linkHeaderSelfPattern = "(?<=<)((?!<).)*(?=>; *rel=\"" + rel + "\")";
             for (String link : links) {

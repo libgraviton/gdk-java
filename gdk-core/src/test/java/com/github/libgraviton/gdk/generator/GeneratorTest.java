@@ -4,7 +4,7 @@ import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
 import com.github.libgraviton.gdk.Endpoint;
-import com.github.libgraviton.gdk.Graviton;
+import com.github.libgraviton.gdk.GravitonApi;
 import com.github.libgraviton.gdk.generator.exception.GeneratorException;
 import com.sun.codemodel.JCodeModel;
 import com.tngtech.java.junit.dataprovider.DataProvider;
@@ -31,7 +31,7 @@ public class GeneratorTest {
     @Rule
     public ExpectedException thrown= ExpectedException.none();
 
-    private Graviton graviton;
+    private GravitonApi gravitonApi;
 
     private GeneratedEndpointManager serviceManager;
 
@@ -70,9 +70,9 @@ public class GeneratorTest {
         // Setup service manager mock
         serviceManager = mock(GeneratedEndpointManager.class);
 
-        // Setup graviton mock
-        graviton = mock(Graviton.class);
-        when(graviton.getEndpointManager()).thenReturn(serviceManager);
+        // Setup gravitonApi mock
+        gravitonApi = mock(GravitonApi.class);
+        when(gravitonApi.getEndpointManager()).thenReturn(serviceManager);
     }
 
     @DataProvider
@@ -104,7 +104,7 @@ public class GeneratorTest {
             }
         };
 
-        Generator generator = new Generator(config, graviton, instructionLoader, schemaMapper);
+        Generator generator = new Generator(config, gravitonApi, instructionLoader, schemaMapper);
         generator.generate();
 
         verify(schemaMapper, times(2)).generate(any(JCodeModel.class), anyString(), anyString(), anyString());
@@ -154,7 +154,7 @@ public class GeneratorTest {
             }
         };
 
-        Generator generator = new Generator(config, graviton, instructionLoader);
+        Generator generator = new Generator(config, gravitonApi, instructionLoader);
         generator.generate();
 
         assertTrue(new File(new File(targetDir, firstPackageName.replace('.', '/')), "SomeClass.java").exists());
@@ -170,7 +170,7 @@ public class GeneratorTest {
         when(schemaMapper.generate(any(JCodeModel.class), anyString(), anyString(), anyString()))
                 .thenThrow(new IOException());
 
-        Generator generator = new Generator(new DefaultGenerationConfig(), graviton, instructionLoader, schemaMapper);
+        Generator generator = new Generator(new DefaultGenerationConfig(), gravitonApi, instructionLoader, schemaMapper);
         generator.generate();
     }
 

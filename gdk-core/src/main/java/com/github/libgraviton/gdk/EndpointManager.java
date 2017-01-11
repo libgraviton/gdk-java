@@ -45,11 +45,8 @@ public class EndpointManager {
      * @param className The class name.
      *
      * @return The associated service.
-     *
-     * @throws NoCorrespondingEndpointException When the service manager is not aware of a service associated to
-     * the given POJO class.
      */
-    public Endpoint getEndpoint(String className) throws NoCorrespondingEndpointException {
+    public Endpoint getEndpoint(String className) {
         if (!hasEndpoint(className)) {
             throw new NoCorrespondingEndpointException(className);
         }

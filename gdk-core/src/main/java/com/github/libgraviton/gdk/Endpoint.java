@@ -1,5 +1,7 @@
 package com.github.libgraviton.gdk;
 
+import com.github.libgraviton.gdk.util.PropertiesLoader;
+
 import java.io.Serializable;
 
 /**
@@ -16,6 +18,12 @@ public class Endpoint implements Serializable {
      * The setUrl of the endpoint.
      */
     private String url;
+
+
+    /**
+     * Loads the base url once from the properties the first time an Endpoint class will be used.
+     */
+    private static transient String baseUrl = PropertiesLoader.load("graviton.base.url");
 
     /**
      * Constructor. Sets the endpoint itemUrl.
@@ -38,11 +46,11 @@ public class Endpoint implements Serializable {
     }
 
     public String getUrl() {
-        return url;
+        return url != null ? baseUrl + url : url;
     }
 
     public String getItemUrl() {
-        return itemUrl;
+        return itemUrl != null ? baseUrl + itemUrl : itemUrl;
     }
 
     @Override

@@ -1,7 +1,10 @@
 package com.github.libgraviton.gdk;
 
+import com.github.libgraviton.gdk.util.PropertiesLoader;
 import org.junit.Before;
 import org.junit.Test;
+
+import java.util.Properties;
 
 import static org.junit.Assert.*;
 
@@ -44,15 +47,18 @@ public class EndpointTest {
     }
 
     @Test
-    public void testEndpointUrls() {
-        String itemUrl = "endpoint://other/item";
-        String url = "endpoint://other/collection/";
+    public void testEndpointUrls() throws Exception {
+        Properties properties = PropertiesLoader.load();
+        String baseUrl = properties.getProperty("graviton.base.url");
+
+        String itemUrl = "/other/item";
+        String url = "/other/collection/";
         Endpoint endpoint = new Endpoint(itemUrl, url);
-        assertEquals(itemUrl, endpoint.getItemUrl());
-        assertEquals(url, endpoint.getUrl());
+        assertEquals(baseUrl + itemUrl, endpoint.getItemUrl());
+        assertEquals(baseUrl + url, endpoint.getUrl());
 
         endpoint = new Endpoint(itemUrl);
-        assertEquals(itemUrl, endpoint.getItemUrl());
+        assertEquals(baseUrl + itemUrl, endpoint.getItemUrl());
         assertNull(endpoint.getUrl());
     }
 }

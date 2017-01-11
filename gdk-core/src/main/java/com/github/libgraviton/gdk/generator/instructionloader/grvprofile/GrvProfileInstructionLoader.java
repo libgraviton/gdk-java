@@ -1,7 +1,7 @@
 package com.github.libgraviton.gdk.generator.instructionloader.grvprofile;
 
 import com.github.libgraviton.gdk.Endpoint;
-import com.github.libgraviton.gdk.Graviton;
+import com.github.libgraviton.gdk.GravitonApi;
 import com.github.libgraviton.gdk.api.GravitonResponse;
 import com.github.libgraviton.gdk.exception.CommunicationException;
 import com.github.libgraviton.gdk.exception.SerializationException;
@@ -13,6 +13,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,9 +25,9 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
     private final Logger LOG = LoggerFactory.getLogger(GrvProfileInstructionLoader.class);
 
     /**
-     * The Graviton instance where the endpoint definitions will be loaded from.
+     * The GravitonApi instance where the endpoint definitions will be loaded from.
      */
-    private Graviton graviton;
+    private GravitonApi gravitonApi;
 
     /**
      * Holds all loaded generator instructions.
@@ -34,12 +35,12 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
     private List<GeneratorInstruction> loadedInstructions;
 
     /**
-     * Constructor. Sets the Graviton instance which will be used.
+     * Constructor. Sets the GravitonApi instance which will be used.
      *
-     * @param graviton The Graviton instance which will be used.
+     * @param gravitonApi The GravitonApi instance which will be used.
      */
-    public GrvProfileInstructionLoader(Graviton graviton) {
-        this.graviton = graviton;
+    public GrvProfileInstructionLoader(GravitonApi gravitonApi) {
+        this.gravitonApi = gravitonApi;
     }
 
     /**
@@ -61,12 +62,12 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
      */
     public List<GeneratorInstruction> loadInstructions(boolean reload) {
         if (reload || null == this.loadedInstructions) {
-            LOG.info("Loading endpoint definitions and schema from '" + graviton.getBaseUrl() + "'.");
+            LOG.info("Loading endpoint definitions and schema from '" + gravitonApi.getBaseUrl() + "'.");
             loadedInstructions = new ArrayList<>();
             List<EndpointDefinition> endpointDefinitions;
             try {
                 endpointDefinitions = loadService().getEndpointDefinitions();
-            } catch (MalformedURLException | CommunicationException | SerializationException e) {
+            } catch (CommunicationException e) {
                 LOG.warn("Unable to load service. No instructions loaded.");
                 return loadedInstructions;
             }
@@ -74,18 +75,22 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
             for (EndpointDefinition endpointDefinition : endpointDefinitions) {
                 String profileJson = null;
                 try {
-                    GravitonResponse response = graviton.get(endpointDefinition.getProfile()).execute();
+                    GravitonResponse response = gravitonApi.get(endpointDefinition.getProfile()).execute();
                     profileJson = response.getBody();
-                } catch (MalformedURLException | CommunicationException e) {
+                } catch (CommunicationException e) {
                     LOG.warn("Unable to fetch profile from '" + endpointDefinition.getProfile() + "'. Skipping...");
                 }
                 JSONObject itemSchema = determineItemSchema(profileJson);
-                loadedInstructions.add(new GeneratorInstruction(
-                        determineClassName(itemSchema),
-                        determinePackageName(itemSchema),
-                        enrichSchema(itemSchema),
-                        generateEndpoint(endpointDefinition)
-                ));
+                try {
+                    loadedInstructions.add(new GeneratorInstruction(
+                            determineClassName(itemSchema),
+                            determinePackageName(itemSchema),
+                            enrichSchema(itemSchema),
+                            generateEndpoint(endpointDefinition)
+                    ));
+                } catch (MalformedURLException e) {
+                    LOG.warn("Skipping endpoint '" + endpointDefinition.getRef() + "' since it's a malformed Url.");
+                }
             }
             LOG.info("Loaded " + loadedInstructions.size() + " endpoint definitions.");
         }
@@ -116,15 +121,15 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
      *
      * @return The Graviton service.
      */
-    private Service loadService() throws CommunicationException, SerializationException, MalformedURLException {
-        GravitonResponse response = graviton.get(graviton.getBaseUrl()).execute();
-        return response.getBody(Service.class);
+    private Service loadService() throws CommunicationException, SerializationException {
+        GravitonResponse response = gravitonApi.get(gravitonApi.getBaseUrl()).execute();
+        return response.getBodyItem(Service.class);
     }
 
     /**
-     * Determines the classname for a given Graviton schema.
+     * Determines the classname for a given GravitonApi schema.
      *
-     * @param itemSchema The Graviton item schema.
+     * @param itemSchema The GravitonApi item schema.
      *
      * @return The determined class name. May be empty if no class name could be determined.
      */
@@ -182,11 +187,13 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
      *
      * @return The generated endpoint.
      */
-    private Endpoint generateEndpoint(EndpointDefinition endpointDefinition) {
+    private Endpoint generateEndpoint(EndpointDefinition endpointDefinition) throws MalformedURLException {
         String url = endpointDefinition.getRef();
-        if (url.length() > 0 && '/' == url.charAt(url.length() - 1)) {
-            return new Endpoint(url + "{id}", url);
+        String path = new URL(url).getPath();
+
+        if (path.length() > 0 && '/' == path.charAt(path.length() - 1)) {
+            return new Endpoint(path + "{id}", path);
         }
-        return new Endpoint(url);
+        return new Endpoint(path);
     }
 }
