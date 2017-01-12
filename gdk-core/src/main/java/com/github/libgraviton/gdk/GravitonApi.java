@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.libgraviton.gdk.api.GravitonRequest;
 import com.github.libgraviton.gdk.api.GravitonResponse;
+import com.github.libgraviton.gdk.api.endpoint.EndpointManager;
 import com.github.libgraviton.gdk.api.gateway.OkHttpGateway;
 import com.github.libgraviton.gdk.data.GravitonBase;
 import com.github.libgraviton.gdk.exception.CommunicationException;
@@ -68,8 +69,8 @@ public class GravitonApi {
 
     public GravitonApi(String baseUrl, EndpointManager endpointManager) {
         setup();
-        this.endpointManager = endpointManager;
         this.baseUrl = baseUrl;
+        this.endpointManager = endpointManager;
     }
 
     protected void setup() {

@@ -1,6 +1,8 @@
 package com.github.libgraviton.gdk;
 
 import com.github.libgraviton.gdk.api.GravitonRequest;
+import com.github.libgraviton.gdk.api.endpoint.Endpoint;
+import com.github.libgraviton.gdk.api.endpoint.EndpointManager;
 import com.github.libgraviton.gdk.api.multipart.Part;
 import com.github.libgraviton.gdk.data.GravitonBase;
 import com.github.libgraviton.gdk.data.SimpleClass;

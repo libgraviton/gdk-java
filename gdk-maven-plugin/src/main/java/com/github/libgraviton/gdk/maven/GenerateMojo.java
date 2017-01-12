@@ -2,6 +2,7 @@ package com.github.libgraviton.gdk.maven;
 
 
 import com.github.libgraviton.gdk.GravitonApi;
+import com.github.libgraviton.gdk.api.endpoint.EndpointInclusionStrategy;
 import com.github.libgraviton.gdk.generator.GeneratedEndpointManager;
 import com.github.libgraviton.gdk.generator.Generator;
 import com.github.libgraviton.gdk.generator.instructionloader.grvprofile.GrvProfileInstructionLoader;
@@ -21,6 +22,12 @@ public class GenerateMojo extends Jsonschema2PojoMojo {
     @Parameter(required = true)
     private String gravitonUrl;
 
+    @Parameter(required = false)
+    private String endpointBlacklistPath;
+
+    @Parameter(required = false)
+    private String endpointWhitelistPath;
+
     @Parameter
     private Jsonschema2PojoMojo generatorConfig = new Jsonschema2PojoMojo();
 
@@ -32,9 +39,11 @@ public class GenerateMojo extends Jsonschema2PojoMojo {
                 return;
             }
 
+            GeneratedEndpointManager endpointManager = new GeneratedEndpointManager(GeneratedEndpointManager.Mode.CREATE);
+            endpointManager.setEndpointInclusionStrategy(getEndpointInclusionStrategy());
             GravitonApi gravitonApi = new GravitonApi(
                     gravitonUrl,
-                    new GeneratedEndpointManager(GeneratedEndpointManager.Mode.CREATE)
+                    endpointManager
             );
             Generator generator = new Generator(
                     generatorConfig,
@@ -51,6 +60,25 @@ public class GenerateMojo extends Jsonschema2PojoMojo {
             );
         }
         getLog().info("POJO generation done.");
+    }
+
+    protected EndpointInclusionStrategy getEndpointInclusionStrategy() throws MojoExecutionException {
+        if (endpointBlacklistPath != null && endpointWhitelistPath != null) {
+            throw new MojoExecutionException("Configuring a 'blacklistPath' and a 'whitelistPath' is not allowed.");
+        }
+
+        EndpointInclusionStrategy endpointInclusionStrategy;
+        if (endpointBlacklistPath != null) {
+            endpointInclusionStrategy = EndpointInclusionStrategy
+                    .create(EndpointInclusionStrategy.Strategy.BLACKLIST, endpointBlacklistPath);
+        } else if (endpointWhitelistPath != null) {
+            endpointInclusionStrategy = EndpointInclusionStrategy
+                    .create(EndpointInclusionStrategy.Strategy.WHITELIST, endpointWhitelistPath);
+        } else {
+            endpointInclusionStrategy = EndpointInclusionStrategy
+                    .create(EndpointInclusionStrategy.Strategy.DEFAULT, null);
+        }
+        return endpointInclusionStrategy;
     }
 
 }

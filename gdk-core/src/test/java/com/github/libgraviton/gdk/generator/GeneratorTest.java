@@ -3,7 +3,7 @@ package com.github.libgraviton.gdk.generator;
 import static org.junit.Assert.*;
 import static org.mockito.Mockito.*;
 
-import com.github.libgraviton.gdk.Endpoint;
+import com.github.libgraviton.gdk.api.endpoint.Endpoint;
 import com.github.libgraviton.gdk.GravitonApi;
 import com.github.libgraviton.gdk.generator.exception.GeneratorException;
 import com.sun.codemodel.JCodeModel;

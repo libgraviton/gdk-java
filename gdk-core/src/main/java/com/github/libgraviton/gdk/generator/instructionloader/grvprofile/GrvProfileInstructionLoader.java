@@ -1,6 +1,6 @@
 package com.github.libgraviton.gdk.generator.instructionloader.grvprofile;
 
-import com.github.libgraviton.gdk.Endpoint;
+import com.github.libgraviton.gdk.api.endpoint.Endpoint;
 import com.github.libgraviton.gdk.GravitonApi;
 import com.github.libgraviton.gdk.api.GravitonResponse;
 import com.github.libgraviton.gdk.exception.CommunicationException;
