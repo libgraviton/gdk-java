@@ -1,5 +1,7 @@
 package com.github.libgraviton.gdk;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.libgraviton.gdk.api.GravitonRequest;
 import com.github.libgraviton.gdk.api.GravitonResponse;
 import com.github.libgraviton.gdk.api.endpoint.Endpoint;
@@ -8,6 +10,7 @@ import com.github.libgraviton.gdk.api.gateway.OkHttpGateway;
 import com.github.libgraviton.gdk.data.NoopClass;
 import com.github.libgraviton.gdk.data.SimpleClass;
 import com.github.libgraviton.gdk.exception.CommunicationException;
+import com.github.libgraviton.gdk.exception.SerializationException;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -39,8 +42,7 @@ public class GravitonApiTest {
         when(endpointManager.getEndpoint(anyString())).thenReturn(endpoint);
         when(gateway.execute(any(GravitonRequest.class))).thenReturn(response);
 
-        gravitonApi = new GravitonApi(baseUrl, endpointManager);
-
+        gravitonApi = spy(new GravitonApi(baseUrl, endpointManager));
         gravitonApi.setGateway(gateway);
     }
 
@@ -73,6 +75,16 @@ public class GravitonApiTest {
         SimpleClass resource = new SimpleClass();
         GravitonResponse actualResponse = gravitonApi.post(resource).execute();
         assertEquals(response, actualResponse);
+    }
+
+    @Test(expected = SerializationException.class)
+    public void testPostWithFailedSerialization() throws Exception {
+        ObjectMapper mapper = mock(ObjectMapper.class);
+        when(mapper.writeValueAsString(any(Object.class))).thenThrow(JsonProcessingException.class);
+        doReturn(mapper).when(gravitonApi).getObjectMapper();
+
+        SimpleClass resource = new SimpleClass();
+        gravitonApi.post(resource).execute();
     }
 
     @Test
