@@ -33,8 +33,20 @@ public class GravitonApiResponseTest {
     }
 
     @Test(expected = DeserializationException.class)
-    public void testDeserializeBodyWithException() throws DeserializationException {
+    public void testDeserializeBodyItemWithDeserializationException() throws DeserializationException {
         response.getBodyItem(NoopClass.class);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testDeserializeBodyItemWithMissingObjectMapper() throws DeserializationException {
+        response.setObjectMapper(null);
+        response.getBodyItem(NoopClass.class);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testDeserializeBodyItemsWithMissingObjectMapper() throws DeserializationException {
+        response.setObjectMapper(null);
+        response.getBodyItems(NoopClass.class);
     }
 
     @Test

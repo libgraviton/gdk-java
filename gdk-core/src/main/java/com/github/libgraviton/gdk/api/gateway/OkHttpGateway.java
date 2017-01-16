@@ -18,8 +18,6 @@ import java.util.concurrent.TimeUnit;
 
 public class OkHttpGateway implements GravitonGateway {
 
-    private static final Logger LOG = LoggerFactory.getLogger(OkHttpGateway.class);
-
     private OkHttpClient okHttp;
 
     public OkHttpGateway() {
