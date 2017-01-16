@@ -39,7 +39,7 @@ public class EndpointManagerTest {
     @Test
     public void testShouldSkipEndpointWithStrategy() throws Exception {
         Endpoint endpoint = new Endpoint("endpoint://item", "endpoint://collection/");
-        manager.shouldSkipEndpoint(endpoint);
+        manager.shouldIgnoreEndpoint(endpoint);
         verify(strategy, times(1)).shouldIgnoreEndpoint(endpoint);
     }
 }

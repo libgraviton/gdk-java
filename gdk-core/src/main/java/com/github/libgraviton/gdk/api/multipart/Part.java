@@ -1,5 +1,7 @@
 package com.github.libgraviton.gdk.api.multipart;
 
+import java.util.Arrays;
+
 /**
  * Represents a single part of a Multipart request.
  *
@@ -9,10 +11,14 @@ package com.github.libgraviton.gdk.api.multipart;
  */
 public class Part {
 
-    private String body;
+    private byte[] body;
     private String formName;
 
     public Part(String body) {
+        this(body.getBytes());
+    }
+
+    public Part(byte[] body) {
         this.body = body;
     }
 
@@ -21,11 +27,16 @@ public class Part {
         this.formName = formName;
     }
 
-    public String getBody() {
+    public Part(byte[] body, String formName) {
+        this(body);
+        this.formName = formName;
+    }
+
+    public byte[] getBody() {
         return body;
     }
 
-    public void setBody(String body) {
+    public void setBody(byte[] body) {
         this.body = body;
     }
 
@@ -35,5 +46,13 @@ public class Part {
 
     public void setFormName(String formName) {
         this.formName = formName;
+    }
+
+    @Override
+    public String toString() {
+        return "Part{" +
+                "formName='" + formName + '\'' +
+                ", body='" + (body.length <= 1000 ? new String(body) : new String(Arrays.copyOfRange(body, 0, 1000)) + " ... [body too big to display in its complete beauty]") + '\'' +
+                "}";
     }
 }

@@ -26,7 +26,7 @@ public class GravitonResponse {
 
     private HeaderBag headers;
 
-    private String body;
+    private byte[] body;
 
     private boolean isSuccessful;
 
@@ -45,6 +45,14 @@ public class GravitonResponse {
         return isSuccessful;
     }
 
+    /**
+     * Deserialize the response body into the requested POJO class.
+     *
+     * @param beanClass the requested POJO class
+     * @param <BeanClass> requested POJO must extend from this class
+     * @return serialized POJO
+     * @throws DeserializationException will be thrown on a failed deserialization / POJO mapping
+     */
     public <BeanClass> BeanClass getBodyItem(final Class<? extends BeanClass> beanClass) throws DeserializationException {
         if(objectMapper == null) {
             throw new IllegalStateException("'objectMapper' is not allowed to be null.");
@@ -63,6 +71,14 @@ public class GravitonResponse {
         }
     }
 
+    /**
+     * Deserialize the response body into a list with elements of the requested POJO class.
+     *
+     * @param beanClass the requested POJO class
+     * @param <BeanClass> requested POJO must extend from this class
+     * @return serialized list with POJO elements
+     * @throws DeserializationException will be thrown on a failed deserialization / POJO mapping
+     */
     public <BeanClass> List<BeanClass> getBodyItems(final Class<? extends BeanClass> beanClass) throws DeserializationException {
         if(objectMapper == null) {
             throw new IllegalStateException("'objectMapper' is not allowed to be null.");
@@ -85,7 +101,20 @@ public class GravitonResponse {
         }
     }
 
+    /**
+     * Deserialize the response body. Should only be used if no binary file is expected as response.
+     * @return response body as String
+     */
     public String getBody() {
+        return new String(body);
+    }
+
+    /**
+     * Deserialize the response body. Can also be used if binary file is expected as response.
+     *
+     * @return response body
+     */
+    public byte[] getBodyBytes() {
         return body;
     }
 
@@ -117,7 +146,7 @@ public class GravitonResponse {
 
         private GravitonRequest request;
 
-        private String body;
+        private byte[] body;
 
         private boolean isSuccessful;
 
@@ -143,7 +172,7 @@ public class GravitonResponse {
             return this;
         }
 
-        public Builder body(String body) {
+        public Builder body(byte[] body) {
             this.body = body;
             return this;
         }

@@ -24,7 +24,7 @@ public class GravitonApiResponseTest {
     public void setup() throws Exception {
         request = mock(GravitonRequest.class);
         response = new GravitonResponse.Builder(request)
-                .body("{\"code\":0}")
+                .body("{\"code\":0}".getBytes())
                 .successful(true)
                 .message("a message")
                 .code(200)
@@ -57,7 +57,7 @@ public class GravitonApiResponseTest {
         List<SerializationTestClass> testClasses = Arrays.asList(testClass1, testClass2);
 
         response = new GravitonResponse.Builder(request)
-                .body(new ObjectMapper().writeValueAsString(testClasses))
+                .body(new ObjectMapper().writeValueAsString(testClasses).getBytes())
                 .successful(true)
                 .message("a message")
                 .code(200)

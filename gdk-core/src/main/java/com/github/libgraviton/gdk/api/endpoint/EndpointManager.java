@@ -55,7 +55,12 @@ public class EndpointManager {
         return endpoints.get(className);
     }
 
-    public boolean shouldSkipEndpoint(Endpoint endpoint) {
+    /**
+     * Determines if the endpoint should be ignore.
+     * @param endpoint endpoint to check
+     * @return true if the endpoint should be ignored
+     */
+    public boolean shouldIgnoreEndpoint(Endpoint endpoint) {
         return strategy.shouldIgnoreEndpoint(endpoint);
     }
 

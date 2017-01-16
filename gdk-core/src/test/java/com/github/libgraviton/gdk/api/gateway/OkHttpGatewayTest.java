@@ -50,7 +50,7 @@ public class OkHttpGatewayTest {
 
         // mock okHttpResponse.setBody().string()
         body = mock(ResponseBody.class);
-        when(body.string()).thenReturn(responseBody);
+        when(body.bytes()).thenReturn(responseBody.getBytes());
         when(okHttpResponse.body()).thenReturn(body);
     }
 
@@ -76,7 +76,7 @@ public class OkHttpGatewayTest {
     @Test(expected = CommunicationException.class)
     public void testDoRequestCorruptResponseBody() throws CommunicationException {
         try {
-            when(body.string()).thenThrow(new IOException("Response setBody is corrupt!"));
+            when(body.bytes()).thenThrow(new IOException("Response body is corrupt!"));
         } catch (IOException e) {
             e.printStackTrace();
         }

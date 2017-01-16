@@ -1,10 +1,7 @@
 package com.github.libgraviton.gdk.generator;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-
-import com.github.libgraviton.gdk.api.endpoint.Endpoint;
 import com.github.libgraviton.gdk.GravitonApi;
+import com.github.libgraviton.gdk.api.endpoint.Endpoint;
 import com.github.libgraviton.gdk.generator.exception.GeneratorException;
 import com.sun.codemodel.JCodeModel;
 import com.tngtech.java.junit.dataprovider.DataProvider;
@@ -19,11 +16,15 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
+
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.*;
 
 @RunWith(DataProviderRunner.class)
 public class GeneratorTest {
@@ -172,6 +173,15 @@ public class GeneratorTest {
 
         Generator generator = new Generator(new DefaultGenerationConfig(), gravitonApi, instructionLoader, schemaMapper);
         generator.generate();
+    }
+
+    @Test
+    @UseDataProvider("packageNames")
+    public void testIgnoreEndpoint(
+            final String configTargetPackage, String firstPackageName, String secondPackageName
+    ) throws Exception {
+        // first method call returns 'false', the second call returns 'true'
+        when(serviceManager.shouldIgnoreEndpoint(any(Endpoint.class))).thenReturn(false).thenReturn(true);
     }
 
 }

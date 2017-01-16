@@ -12,7 +12,6 @@ import org.junit.Test;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.*;
 
 public class GravitonApiFileTest {
@@ -24,6 +23,8 @@ public class GravitonApiFileTest {
     private String url = "http://someUrl";
 
     private String itemUrl = "http://someUrl/{id}";
+
+    private SimpleClass resource;
 
     @Before
     public void setupService() throws Exception {
@@ -38,6 +39,9 @@ public class GravitonApiFileTest {
         when(gravitonApi.get(url)).thenCallRealMethod();
         when(gravitonApi.getEndpointManager()).thenReturn(endpointManager);
         when(gravitonApi.extractId(any(GravitonBase.class))).thenCallRealMethod();
+        when(gravitonApi.serializeResource(any(SimpleClass.class))).thenReturn("{ \"id\":\"111\"}");
+        resource = new SimpleClass();
+        resource.setId("111");
 
         gravitonFileEndpoint = new GravitonFileEndpoint(gravitonApi);
     }
@@ -57,40 +61,36 @@ public class GravitonApiFileTest {
 
     @Test
     public void testPost() throws Exception {
-        SimpleClass resource = new SimpleClass();
-        resource.setId("111");
         String data = "some real data";
 
-        GravitonRequest request = gravitonFileEndpoint.post(data, resource).build();
+        GravitonRequest request = gravitonFileEndpoint.post(data.getBytes(), resource).build();
         List<Part> parts = request.getParts();
         assertEquals(2, parts.size());
 
         Part part1 = parts.get(0);
         assertEquals("upload", part1.getFormName());
-        assertEquals(data, part1.getBody());
+        assertEquals(data, new String(part1.getBody()));
 
         Part part2 = parts.get(1);
-        assertNull(part2.getFormName());
-        assertEquals(gravitonApi.serializeResource(resource), part2.getBody());
+        assertEquals("metadata", part2.getFormName());
+        assertEquals("{ \"id\":\"111\"}", new String(part2.getBody()));
     }
 
     @Test
     public void testPut() throws Exception {
-        SimpleClass resource = new SimpleClass();
-        resource.setId("111");
         String data = "some real data";
 
-        GravitonRequest request = gravitonFileEndpoint.put(data, resource).build();
+        GravitonRequest request = gravitonFileEndpoint.put(data.getBytes(), resource).build();
         List<Part> parts = request.getParts();
         assertEquals(2, parts.size());
 
         Part part1 = parts.get(0);
         assertEquals("upload", part1.getFormName());
-        assertEquals(data, part1.getBody());
+        assertEquals(data, new String(part1.getBody()));
 
         Part part2 = parts.get(1);
-        assertNull(part2.getFormName());
-        assertEquals(gravitonApi.serializeResource(resource), part2.getBody());
+        assertEquals("metadata", part2.getFormName());
+        assertEquals("{ \"id\":\"111\"}", new String(part2.getBody()));
     }
 
     @Test

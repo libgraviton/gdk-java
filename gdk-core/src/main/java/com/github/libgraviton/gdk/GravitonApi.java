@@ -7,6 +7,7 @@ import com.github.libgraviton.gdk.api.GravitonRequest;
 import com.github.libgraviton.gdk.api.GravitonResponse;
 import com.github.libgraviton.gdk.api.endpoint.EndpointManager;
 import com.github.libgraviton.gdk.api.gateway.OkHttpGateway;
+import com.github.libgraviton.gdk.api.multipart.Part;
 import com.github.libgraviton.gdk.data.GravitonBase;
 import com.github.libgraviton.gdk.exception.CommunicationException;
 import com.github.libgraviton.gdk.exception.SerializationException;
@@ -196,6 +197,13 @@ public class GravitonApi {
         LOG.info(String.format("Starting '%s' to '%s'...", request.getMethod(), request.getUrl()));
         if (LOG.isDebugEnabled() && request.getBody() != null) {
             LOG.debug("with request body '" + request.getBody() + "'");
+        }
+        if (LOG.isDebugEnabled() && request.getParts() != null && request.getParts().size() > 0) {
+            StringBuilder builder = new StringBuilder();
+            for (Part part: request.getParts()) {
+                builder.append(part).append("\n");
+            }
+            LOG.debug("with multipart request body [\n" + builder.toString() + "]");
         }
 
         GravitonResponse response = gateway.execute(request);

@@ -25,7 +25,7 @@ public class GeneratedEndpointManager extends EndpointManager {
     /**
      * The file holding the serialized service -> POJO class association.
      */
-    private File serializationFile;
+    protected File serializationFile;
 
 
     /**

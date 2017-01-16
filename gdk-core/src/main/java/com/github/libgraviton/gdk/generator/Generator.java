@@ -1,7 +1,7 @@
 package com.github.libgraviton.gdk.generator;
 
-import com.github.libgraviton.gdk.api.endpoint.EndpointManager;
 import com.github.libgraviton.gdk.GravitonApi;
+import com.github.libgraviton.gdk.api.endpoint.EndpointManager;
 import com.github.libgraviton.gdk.generator.exception.GeneratorException;
 import com.github.libgraviton.gdk.generator.exception.UnableToPersistEndpointAssociationsException;
 import com.sun.codemodel.JCodeModel;
@@ -102,7 +102,7 @@ public class Generator {
                 continue;
             }
 
-            if(endpointManager.shouldSkipEndpoint(definition.getEndpoint())) {
+            if(endpointManager.shouldIgnoreEndpoint(definition.getEndpoint())) {
                 LOG.info(
                         "Ignoring endpoint '{}' because of white- / blacklist configuration.",
                         definition.getEndpoint().getItemUrl()

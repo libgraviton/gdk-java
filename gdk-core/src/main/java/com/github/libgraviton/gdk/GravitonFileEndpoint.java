@@ -57,22 +57,24 @@ public class GravitonFileEndpoint {
         return getMetadata(gravitonApi.getEndpointManager().getEndpoint(clazz.getName()).getItemUrl()).addParam("id", id);
     }
 
-    public GravitonRequest.Builder post(String data, GravitonBase resource) throws SerializationException {
+    public GravitonRequest.Builder post(byte[] data, GravitonBase resource) throws SerializationException {
         Part dataPart = new Part(data, "upload");
-        Part metadataPart = new Part(gravitonApi.serializeResource(resource));
+        Part metadataPart = new Part(gravitonApi.serializeResource(resource), "metadata");
 
         return gravitonApi.request()
                 .setUrl(gravitonApi.getEndpointManager().getEndpoint(resource.getClass().getName()).getUrl())
+                .setHeaders(new HeaderBag.Builder().build())
                 .post(dataPart, metadataPart);
     }
 
-    public GravitonRequest.Builder put(String data, GravitonBase resource) throws SerializationException {
+    public GravitonRequest.Builder put(byte[] data, GravitonBase resource) throws SerializationException {
         Part dataPart = new Part(data, "upload");
-        Part metadataPart = new Part(gravitonApi.serializeResource(resource));
+        Part metadataPart = new Part(gravitonApi.serializeResource(resource), "metadata");
 
         return gravitonApi.request()
                 .setUrl(gravitonApi.getEndpointManager().getEndpoint(resource.getClass().getName()).getUrl())
                 .addParam("id", gravitonApi.extractId(resource))
+                .setHeaders(new HeaderBag.Builder().build())
                 .put(dataPart, metadataPart);
     }
 
