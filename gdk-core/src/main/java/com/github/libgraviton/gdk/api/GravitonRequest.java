@@ -4,6 +4,7 @@ import com.github.libgraviton.gdk.GravitonApi;
 import com.github.libgraviton.gdk.api.header.HeaderBag;
 import com.github.libgraviton.gdk.api.multipart.Part;
 import com.github.libgraviton.gdk.exception.CommunicationException;
+import com.github.libgraviton.gdk.exception.UnsuccessfulRequestException;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -24,7 +25,7 @@ public final class GravitonRequest {
 
     private final List<Part> parts;
 
-    protected GravitonRequest(Builder builder) {
+    protected GravitonRequest(Builder builder) throws MalformedURLException {
         method = builder.method;
         url = builder.buildUrl();
         headers = builder.headerBuilder.build();
@@ -174,12 +175,17 @@ public final class GravitonRequest {
             return setMethod(HttpMethod.PATCH).setBody(data);
         }
 
-        public GravitonRequest build() {
+        public GravitonRequest build() throws MalformedURLException {
             return new GravitonRequest(this);
         }
 
         public GravitonResponse execute() throws CommunicationException {
-            return gravitonApi.execute(build());
+            try {
+                return gravitonApi.execute(build());
+            } catch (MalformedURLException e) {
+                throw new UnsuccessfulRequestException(String.format("'%s' to '%s' failed due to malformed url.", method, url),
+                        e);
+            }
         }
 
         // TODO make it configurable
@@ -190,19 +196,13 @@ public final class GravitonRequest {
                     .build();
         }
 
-        protected URL buildUrl() {
+        protected URL buildUrl() throws MalformedURLException {
             String url = this.url;
             for (Map.Entry<String, String> param : params.entrySet()) {
                 url = url.replace(String.format("{%s}", param.getKey()), param.getValue());
             }
 
-            // TODO fix exception handling
-            try {
-                return new URL(url);
-            } catch (MalformedURLException e) {
-                e.printStackTrace();
-            }
-            return  null;
+            return new URL(url);
         }
 
         protected Map<String, String> getParams() {

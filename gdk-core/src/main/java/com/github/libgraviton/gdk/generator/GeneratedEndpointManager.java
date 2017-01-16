@@ -1,7 +1,8 @@
 package com.github.libgraviton.gdk.generator;
 
-import com.github.libgraviton.gdk.Endpoint;
-import com.github.libgraviton.gdk.EndpointManager;
+import com.github.libgraviton.gdk.api.endpoint.Endpoint;
+import com.github.libgraviton.gdk.api.endpoint.EndpointInclusionStrategy;
+import com.github.libgraviton.gdk.api.endpoint.EndpointManager;
 import com.github.libgraviton.gdk.generator.exception.UnableToLoadEndpointAssociationsException;
 import com.github.libgraviton.gdk.generator.exception.UnableToPersistEndpointAssociationsException;
 import com.github.libgraviton.gdk.util.PropertiesLoader;
@@ -16,7 +17,7 @@ import java.util.Map;
 public class GeneratedEndpointManager extends EndpointManager {
 
     public enum Mode {
-        LOAD, CREATE;
+        LOAD, CREATE
     }
 
     private static String assocFilePath = PropertiesLoader.load("graviton.assoc.file.location");
@@ -24,7 +25,7 @@ public class GeneratedEndpointManager extends EndpointManager {
     /**
      * The file holding the serialized service -> POJO class association.
      */
-    private File serializationFile;
+    protected File serializationFile;
 
 
     /**
@@ -47,6 +48,8 @@ public class GeneratedEndpointManager extends EndpointManager {
                 throw new UnableToLoadEndpointAssociationsException("Unable to create new file at '" + assocFilePath + "'.");
             }
         }
+
+        this.strategy = EndpointInclusionStrategy.create(EndpointInclusionStrategy.Strategy.DEFAULT, null);
     }
 
     /**

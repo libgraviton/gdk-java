@@ -1,6 +1,6 @@
 package com.github.libgraviton.gdk.generator;
 
-import com.github.libgraviton.gdk.Endpoint;
+import com.github.libgraviton.gdk.api.endpoint.Endpoint;
 import com.github.libgraviton.gdk.exception.NoCorrespondingEndpointException;
 import com.github.libgraviton.gdk.generator.exception.UnableToLoadEndpointAssociationsException;
 import org.junit.Rule;
@@ -79,6 +79,24 @@ public class GeneratedEndpointManagerTest {
 
         GeneratedEndpointManager generatedServiceManager = new GeneratedEndpointManager(serializationFile, GeneratedEndpointManager.Mode.CREATE);
         generatedServiceManager.load();
+    }
+
+    @Test
+    public void testDefaultAssocPath() throws Exception {
+        String filePath = "target/generated-sources/gdk-java/assoc";
+        File serializationFile = new File(filePath);
+        GeneratedEndpointManager generatedServiceManager = new GeneratedEndpointManager(serializationFile, GeneratedEndpointManager.Mode.CREATE);
+
+        String className = "some.ClassName";
+        Endpoint endpoint = new Endpoint("endpoint://item", "endpoint://item/collection/");
+        generatedServiceManager.addEndpoint(className, endpoint);
+        generatedServiceManager.persist();
+
+        // new service initialized with default assoc path
+        generatedServiceManager = new GeneratedEndpointManager();
+        assertEquals(filePath,generatedServiceManager.serializationFile.getPath());
+
+        serializationFile.delete();
     }
 
 }

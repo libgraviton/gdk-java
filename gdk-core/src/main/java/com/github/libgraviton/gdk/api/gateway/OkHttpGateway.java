@@ -6,8 +6,10 @@ import com.github.libgraviton.gdk.api.header.Header;
 import com.github.libgraviton.gdk.api.header.HeaderBag;
 import com.github.libgraviton.gdk.api.multipart.Part;
 import com.github.libgraviton.gdk.exception.CommunicationException;
-import com.github.libgraviton.gdk.exception.DeserializationException;
+import com.github.libgraviton.gdk.exception.UnsuccessfulRequestException;
 import okhttp3.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
@@ -36,12 +38,12 @@ public class OkHttpGateway implements GravitonGateway {
         Request okHttpRequest = generateRequest(request);
 
         Response okHttpResponse;
-        String body;
+        byte[] body;
         try {
             okHttpResponse = okHttp.newCall(okHttpRequest).execute();
-            body = okHttpResponse.body().string();
+            body = okHttpResponse.body().bytes();
         } catch (IOException e) {
-            throw new DeserializationException(
+            throw new UnsuccessfulRequestException(
                     String.format("'%s' to '%s' failed.", request.getMethod(), request.getUrl()),
                     e
             );
@@ -70,10 +72,10 @@ public class OkHttpGateway implements GravitonGateway {
         MultipartBody.Builder builder = new MultipartBody.Builder();
         for (Part part : request.getParts()) {
             MultipartBody.Part bodyPart;
+            RequestBody requestBody = RequestBody.create(null, part.getBody());
             if (part.getFormName() != null) {
-                bodyPart = MultipartBody.Part.createFormData(part.getFormName(), part.getBody());
+                bodyPart = MultipartBody.Part.createFormData(part.getFormName(), null, requestBody);
             } else {
-                RequestBody requestBody = RequestBody.create(null, part.getBody());
                 bodyPart = MultipartBody.Part.create(null, requestBody);
             }
 
@@ -88,7 +90,7 @@ public class OkHttpGateway implements GravitonGateway {
                 RequestBody.create(MediaType.parse(request.getHeaders().get("Content-Type") + "; charset=utf-8"), request.getBody());
     }
 
-    private GravitonResponse generateResponse(GravitonRequest request, Response okHttpResponse, String body) {
+    private GravitonResponse generateResponse(GravitonRequest request, Response okHttpResponse, byte[] body) {
         GravitonResponse.Builder responseBuilder = new GravitonResponse.Builder(request);
         return responseBuilder
                 .code(okHttpResponse.code())

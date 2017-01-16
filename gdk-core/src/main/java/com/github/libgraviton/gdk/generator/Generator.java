@@ -1,7 +1,7 @@
 package com.github.libgraviton.gdk.generator;
 
-import com.github.libgraviton.gdk.EndpointManager;
 import com.github.libgraviton.gdk.GravitonApi;
+import com.github.libgraviton.gdk.api.endpoint.EndpointManager;
 import com.github.libgraviton.gdk.generator.exception.GeneratorException;
 import com.github.libgraviton.gdk.generator.exception.UnableToPersistEndpointAssociationsException;
 import com.sun.codemodel.JCodeModel;
@@ -90,16 +90,26 @@ public class Generator {
     public void generate() throws GeneratorException {
         List<GeneratorInstruction> generatorInstructions = instructionLoader.loadInstructions();
         EndpointManager endpointManager = gravitonApi.getEndpointManager();
+
         LOG.info("Generating POJO classes for Graviton '" + gravitonApi.getBaseUrl() + "'.");
         for (GeneratorInstruction definition : generatorInstructions) {
             String className = definition.getClassName();
             if (0 == className.length()) {
-                LOG.warn(
+                LOG.info(
                         "Ignoring endpoint '{}' because it does not define any class.",
                         definition.getEndpoint().getItemUrl()
                 );
                 continue;
             }
+
+            if(endpointManager.shouldIgnoreEndpoint(definition.getEndpoint())) {
+                LOG.info(
+                        "Ignoring endpoint '{}' because of white- / blacklist configuration.",
+                        definition.getEndpoint().getItemUrl()
+                );
+                continue;
+            }
+
             String packageName = generatePackageName(config.getTargetPackage(), definition.getPackageName());
             JCodeModel codeModel = new JCodeModel();
             try {

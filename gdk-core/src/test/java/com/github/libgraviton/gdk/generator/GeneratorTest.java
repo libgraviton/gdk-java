@@ -1,11 +1,9 @@
 package com.github.libgraviton.gdk.generator;
 
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.*;
-
-import com.github.libgraviton.gdk.Endpoint;
 import com.github.libgraviton.gdk.GravitonApi;
+import com.github.libgraviton.gdk.api.endpoint.Endpoint;
 import com.github.libgraviton.gdk.generator.exception.GeneratorException;
+import com.github.libgraviton.gdk.generator.exception.UnableToPersistEndpointAssociationsException;
 import com.sun.codemodel.JCodeModel;
 import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.DataProviderRunner;
@@ -19,11 +17,16 @@ import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.junit.runner.RunWith;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.Arrays;
 import java.util.List;
+
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.*;
 
 @RunWith(DataProviderRunner.class)
 public class GeneratorTest {
@@ -141,21 +144,8 @@ public class GeneratorTest {
     public void testClassGeneration(
             final String configTargetPackage, String firstPackageName, String secondPackageName
     ) throws Exception {
-        final File targetDir = Files.createTempDirectory("test-generator").toFile();
-        GenerationConfig config = new DefaultGenerationConfig() {
-            @Override
-            public String getTargetPackage() {
-                return configTargetPackage;
-            }
 
-            @Override
-            public File getTargetDirectory() {
-                return targetDir;
-            }
-        };
-
-        Generator generator = new Generator(config, gravitonApi, instructionLoader);
-        generator.generate();
+        final File targetDir = successfulGeneration(configTargetPackage);
 
         assertTrue(new File(new File(targetDir, firstPackageName.replace('.', '/')), "SomeClass.java").exists());
         assertTrue(new File(new File(targetDir, secondPackageName.replace('.', '/')), "AnotherClass.java").exists());
@@ -174,4 +164,46 @@ public class GeneratorTest {
         generator.generate();
     }
 
+    @Test
+    @UseDataProvider("packageNames")
+    public void testIgnoreEndpoint(
+            final String configTargetPackage, String firstPackageName, String secondPackageName
+    ) throws Exception {
+        // first method call returns 'false', the following calls returns 'true'
+        when(serviceManager.shouldIgnoreEndpoint(any(Endpoint.class))).thenReturn(false).thenReturn(true);
+
+        final File targetDir = successfulGeneration(configTargetPackage);
+
+        assertTrue(new File(new File(targetDir, firstPackageName.replace('.', '/')), "SomeClass.java").exists());
+        assertFalse(new File(new File(targetDir, secondPackageName.replace('.', '/')), "AnotherClass.java").exists());
+    }
+
+    @Test(expected = GeneratorException.class)
+    @UseDataProvider("packageNames")
+    public void testFailingAssociationsPersist(
+            final String configTargetPackage, String firstPackageName, String secondPackageName
+    ) throws Exception {
+        when(serviceManager.persist()).thenThrow(new UnableToPersistEndpointAssociationsException("bad stuff happened"));
+        successfulGeneration(configTargetPackage);
+    }
+
+    private File successfulGeneration(final String configTargetPackage) throws IOException, GeneratorException {
+
+        final File targetDir = Files.createTempDirectory("test-generator").toFile();
+        GenerationConfig config = new DefaultGenerationConfig() {
+            @Override
+            public String getTargetPackage() {
+                return configTargetPackage;
+            }
+
+            @Override
+            public File getTargetDirectory() {
+                return targetDir;
+            }
+        };
+
+        Generator generator = new Generator(config, gravitonApi, instructionLoader);
+        generator.generate();
+        return targetDir;
+    }
 }

@@ -1,4 +1,4 @@
-package com.github.libgraviton.gdk;
+package com.github.libgraviton.gdk.api.endpoint;
 
 import com.github.libgraviton.gdk.exception.NoCorrespondingEndpointException;
 
@@ -14,6 +14,8 @@ public class EndpointManager {
      * The POJO class -> endpoint association.
      */
     protected Map<String, Endpoint> endpoints = new HashMap<>();
+
+    protected EndpointInclusionStrategy strategy;
 
     /**
      * Adds a endpoint and associates it with a given POJO class.
@@ -53,4 +55,16 @@ public class EndpointManager {
         return endpoints.get(className);
     }
 
+    /**
+     * Determines if the endpoint should be ignore.
+     * @param endpoint endpoint to check
+     * @return true if the endpoint should be ignored
+     */
+    public boolean shouldIgnoreEndpoint(Endpoint endpoint) {
+        return strategy.shouldIgnoreEndpoint(endpoint);
+    }
+
+    public void setEndpointInclusionStrategy(EndpointInclusionStrategy strategy) {
+        this.strategy = strategy;
+    }
 }

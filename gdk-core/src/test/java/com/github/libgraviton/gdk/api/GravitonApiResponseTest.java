@@ -24,7 +24,7 @@ public class GravitonApiResponseTest {
     public void setup() throws Exception {
         request = mock(GravitonRequest.class);
         response = new GravitonResponse.Builder(request)
-                .body("{\"code\":0}")
+                .body("{\"code\":0}".getBytes())
                 .successful(true)
                 .message("a message")
                 .code(200)
@@ -33,8 +33,20 @@ public class GravitonApiResponseTest {
     }
 
     @Test(expected = DeserializationException.class)
-    public void testDeserializeBodyWithException() throws DeserializationException {
+    public void testDeserializeBodyItemWithDeserializationException() throws DeserializationException {
         response.getBodyItem(NoopClass.class);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testDeserializeBodyItemWithMissingObjectMapper() throws DeserializationException {
+        response.setObjectMapper(null);
+        response.getBodyItem(NoopClass.class);
+    }
+
+    @Test(expected = IllegalStateException.class)
+    public void testDeserializeBodyItemsWithMissingObjectMapper() throws DeserializationException {
+        response.setObjectMapper(null);
+        response.getBodyItems(NoopClass.class);
     }
 
     @Test
@@ -57,7 +69,7 @@ public class GravitonApiResponseTest {
         List<SerializationTestClass> testClasses = Arrays.asList(testClass1, testClass2);
 
         response = new GravitonResponse.Builder(request)
-                .body(new ObjectMapper().writeValueAsString(testClasses))
+                .body(new ObjectMapper().writeValueAsString(testClasses).getBytes())
                 .successful(true)
                 .message("a message")
                 .code(200)

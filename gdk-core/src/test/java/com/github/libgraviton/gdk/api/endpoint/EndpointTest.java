@@ -1,4 +1,4 @@
-package com.github.libgraviton.gdk;
+package com.github.libgraviton.gdk.api.endpoint;
 
 import com.github.libgraviton.gdk.util.PropertiesLoader;
 import org.junit.Before;
