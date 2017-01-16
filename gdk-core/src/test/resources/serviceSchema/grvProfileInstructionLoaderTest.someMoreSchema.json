@@ -1,0 +1,34 @@
+{
+  "title": "Some Service - Collection of demo items, but without x-documentClass",
+  "type": "array",
+  "items": {
+    "title": "Some Service Items",
+    "description": "This is a demo schema",
+    "type": "object",
+    "properties": {
+      "id": {
+        "title": "ID",
+        "description": "Unique identifier",
+        "type": "string",
+        "format": "custom_id"
+      },
+      "someField": {
+        "title": "Some Field",
+        "description": "This is a demo field",
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+    },
+    "x-documentClass": "",
+    "javaInterfaces" : ["com.github.libgraviton.gdk.data.GravitonBase"],
+    "x-recordOriginModifiable": true,
+    "additionalProperties": false,
+    "x-events": [
+      "document.demo.somemoreservice.create",
+      "document.demo.somemoreservice.update",
+      "document.demo.somemoreservice.delete"
+    ]
+  }
+}
