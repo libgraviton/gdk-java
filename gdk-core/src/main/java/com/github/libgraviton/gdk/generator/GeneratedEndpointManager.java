@@ -11,7 +11,7 @@ import java.io.*;
 import java.util.Map;
 
 /**
- * Endpoint manager for generated POJOs. This service manager is capable of serializing it's service -> POJO class
+ * Endpoint manager for generated POJOs. This service manager is capable of serializing it's service to POJO class
  * association to a file and deserialize it afterwards.
  */
 public class GeneratedEndpointManager extends EndpointManager {
@@ -23,7 +23,7 @@ public class GeneratedEndpointManager extends EndpointManager {
     private static String assocFilePath = PropertiesLoader.load("graviton.assoc.file.location");
 
     /**
-     * The file holding the serialized service -> POJO class association.
+     * The file holding the serialized service to POJO class association.
      */
     protected File serializationFile;
 
@@ -73,9 +73,9 @@ public class GeneratedEndpointManager extends EndpointManager {
     }
 
     /**
-     * Loads the service endpoints -> POJO class association from the serialization file.
+     * Loads the service endpoints to POJO class association from the serialization file.
      *
-     * @return The number of currently loaded service endpoints -> POJO class associations.
+     * @return The number of currently loaded service endpoints to POJO class associations.
      *
      * @throws UnableToLoadEndpointAssociationsException When service endpoints loading is not possible / failed.
      */
@@ -111,9 +111,10 @@ public class GeneratedEndpointManager extends EndpointManager {
     }
 
     /**
-     * Writes the service -> POJO class associations to the serialization file.
+     * Writes the service to POJO class associations to the serialization file.
      *
-     * @return The number of service -> POJO class associations written.
+     * @return The number of service to POJO class associations written.
+     * @throws UnableToPersistEndpointAssociationsException on persistence problems
      */
     public int persist() throws UnableToPersistEndpointAssociationsException {
         try {

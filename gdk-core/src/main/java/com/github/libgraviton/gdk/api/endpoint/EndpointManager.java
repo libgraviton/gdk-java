@@ -11,7 +11,7 @@ import java.util.Map;
 public class EndpointManager {
 
     /**
-     * The POJO class -> endpoint association.
+     * The POJO class to endpoint association.
      */
     protected Map<String, Endpoint> endpoints = new HashMap<>();
 

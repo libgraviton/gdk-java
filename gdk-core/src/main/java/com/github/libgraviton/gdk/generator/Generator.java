@@ -83,7 +83,7 @@ public class Generator {
     }
 
     /**
-     * Performs the POJO generation and persists a service -> class mapping.
+     * Performs the POJO generation and persists a service to class mapping.
      *
      * @throws GeneratorException If the POJO generation failed
      */
