@@ -1,45 +1,152 @@
 package org.jsonschema2pojo.rules;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.sun.codemodel.JClassContainer;
-import com.sun.codemodel.JType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.sun.codemodel.JClass;
+import com.sun.codemodel.JCodeModel;
+import com.sun.codemodel.JPackage;
+import org.jsonschema2pojo.GenerationConfig;
+import org.jsonschema2pojo.NoopAnnotator;
 import org.jsonschema2pojo.Schema;
-import org.junit.Before;
+import org.jsonschema2pojo.SchemaStore;
 import org.junit.Test;
-import org.mockito.ArgumentMatchers;
 
+import java.net.URI;
+import java.util.List;
+import java.util.Set;
+
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsNull.notNullValue;
+import static org.junit.Assert.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 public class NonSingularArrayRuleTest {
 
-    NonSingularArrayRule rule;
+    private GenerationConfig config = mock(GenerationConfig.class);
 
-    SchemaRule schemaRule;
+    private RuleFactory ruleFactory = spy(new RuleFactory(config, new NoopAnnotator(), new SchemaStore()));
 
-    @Before
-    public void setup() {
-        JType jType = mock(JType.class);
-        schemaRule = mock(SchemaRule.class);
-        when(schemaRule.apply(any(String.class), any(JsonNode.class), any(JClassContainer.class), any(Schema.class)))
-                .thenReturn(jType);
-        RuleFactory factory = mock(RuleFactory.class);
-        when(factory.getSchemaRule()).thenReturn(schemaRule);
-
-        rule = new NonSingularArrayRule(factory);
-    }
+    private NonSingularArrayRule rule = new NonSingularArrayRule(ruleFactory);
 
     @Test
     public void testAppliedNodeName() {
         String nodeName = "EventStatus";
-        JsonNode node = mock(JsonNode.class);
-        when(node.has("items")).thenReturn(true);
+
+        JCodeModel codeModel = new JCodeModel();
+        JPackage jpackage = codeModel._package(getClass().getPackage().getName());
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        ObjectNode itemsNode = mapper.createObjectNode();
+        itemsNode.put("type", "boolean");
+
+        ObjectNode propertyNode = mapper.createObjectNode();
+        propertyNode.put("uniqueItems", false);
+        propertyNode.put("items", itemsNode);
+
         Schema schema = mock(Schema.class);
 
-        //rule.apply(nodeName, node, null, schema);
-        rule.determineItemType(nodeName, node, null, schema);
+        doReturn(spy(new SchemaRule(ruleFactory))).when(ruleFactory).getSchemaRule();
 
-        verify(schemaRule, times(1))
-                .apply(eq(nodeName), ArgumentMatchers.<JsonNode>isNull(), ArgumentMatchers.<JClassContainer>isNull(), eq(schema));
+        rule.apply(nodeName, propertyNode, jpackage, schema);
+
+        verify(ruleFactory.getSchemaRule(), times(1))
+                .apply(eq(nodeName), any(JsonNode.class), eq(jpackage), eq(schema));
+    }
+
+    @Test
+    public void arrayWithUniqueItemsProducesSet() {
+        JCodeModel codeModel = new JCodeModel();
+        JPackage jpackage = codeModel._package(getClass().getPackage().getName());
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        ObjectNode itemsNode = mapper.createObjectNode();
+        itemsNode.put("type", "integer");
+
+        ObjectNode propertyNode = mapper.createObjectNode();
+        propertyNode.put("uniqueItems", true);
+        propertyNode.put("items", itemsNode);
+
+        JClass propertyType = rule.apply("fooBars", propertyNode, jpackage, mock(Schema.class));
+
+        assertThat(propertyType, notNullValue());
+        assertThat(propertyType.erasure(), is(codeModel.ref(Set.class)));
+        assertThat(propertyType.getTypeParameters().get(0).fullName(), is(Integer.class.getName()));
+    }
+
+    @Test
+    public void arrayWithNonUniqueItemsProducesList() {
+        JCodeModel codeModel = new JCodeModel();
+        JPackage jpackage = codeModel._package(getClass().getPackage().getName());
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        ObjectNode itemsNode = mapper.createObjectNode();
+        itemsNode.put("type", "number");
+
+        ObjectNode propertyNode = mapper.createObjectNode();
+        propertyNode.put("uniqueItems", false);
+        propertyNode.put("items", itemsNode);
+
+        Schema schema = mock(Schema.class);
+        when(schema.getId()).thenReturn(URI.create("http://example/nonUniqueArray"));
+        when(config.isUseDoubleNumbers()).thenReturn(true);
+
+        JClass propertyType = rule.apply("fooBars", propertyNode, jpackage, schema);
+
+        assertThat(propertyType, notNullValue());
+        assertThat(propertyType.erasure(), is(codeModel.ref(List.class)));
+        assertThat(propertyType.getTypeParameters().get(0).fullName(), is(Double.class.getName()));
+    }
+
+    @Test
+    public void arrayOfPrimitivesProducesCollectionOfWrapperTypes() {
+        JCodeModel codeModel = new JCodeModel();
+        JPackage jpackage = codeModel._package(getClass().getPackage().getName());
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        ObjectNode itemsNode = mapper.createObjectNode();
+        itemsNode.put("type", "number");
+
+        ObjectNode propertyNode = mapper.createObjectNode();
+        propertyNode.put("uniqueItems", false);
+        propertyNode.put("items", itemsNode);
+
+        Schema schema = mock(Schema.class);
+        when(schema.getId()).thenReturn(URI.create("http://example/nonUniqueArray"));
+        when(config.isUsePrimitives()).thenReturn(true);
+        when(config.isUseDoubleNumbers()).thenReturn(true);
+
+        JClass propertyType = rule.apply("fooBars", propertyNode, jpackage, schema);
+
+        assertThat(propertyType, notNullValue());
+        assertThat(propertyType.erasure(), is(codeModel.ref(List.class)));
+        assertThat(propertyType.getTypeParameters().get(0).fullName(), is(Double.class.getName()));
+    }
+
+    @Test
+    public void arrayDefaultsToNonUnique() {
+        JCodeModel codeModel = new JCodeModel();
+        JPackage jpackage = codeModel._package(getClass().getPackage().getName());
+
+        ObjectMapper mapper = new ObjectMapper();
+
+        ObjectNode itemsNode = mapper.createObjectNode();
+        itemsNode.put("type", "boolean");
+
+        ObjectNode propertyNode = mapper.createObjectNode();
+        propertyNode.put("uniqueItems", false);
+        propertyNode.put("items", itemsNode);
+
+        Schema schema = mock(Schema.class);
+        when(schema.getId()).thenReturn(URI.create("http://example/defaultArray"));
+
+        JClass propertyType = rule.apply("fooBars", propertyNode, jpackage, schema);
+
+        assertThat(propertyType.erasure(), is(codeModel.ref(List.class)));
     }
 }
