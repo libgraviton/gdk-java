@@ -10,7 +10,8 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * Array rule that doesn't change the nodeName.
+ * Array rule that doesn't change the nodeName but else behaves the same as ArrayRule.
+ * Since the makeSingular method within ArrayRule is private, this class here is copy & own.
  */
 public class NonSingularArrayRule implements Rule<JPackage, JClass> {
 
