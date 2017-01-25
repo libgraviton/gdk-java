@@ -32,6 +32,9 @@ public class GravitonResponse {
 
     private ObjectMapper objectMapper;
 
+    protected GravitonResponse() {
+    }
+
     protected GravitonResponse(GravitonResponse.Builder builder) {
         request = builder.request;
         code = builder.code;
