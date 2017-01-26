@@ -39,7 +39,7 @@ public class GeneratedEndpointManager extends EndpointManager {
     public GeneratedEndpointManager(File serializationFile, Mode mode) throws UnableToLoadEndpointAssociationsException {
         this.serializationFile = serializationFile;
         if (Mode.LOAD.equals(mode)) {
-            this.load();
+            load();
         } else {
             serializationFile.getParentFile().mkdirs();
             try {
@@ -80,34 +80,52 @@ public class GeneratedEndpointManager extends EndpointManager {
      * @throws UnableToLoadEndpointAssociationsException When service endpoints loading is not possible / failed.
      */
     public int load() throws UnableToLoadEndpointAssociationsException {
-        if (!serializationFile.exists()) {
-            throw new UnableToLoadEndpointAssociationsException(
-                    "Unable to load from file '" + serializationFile.getAbsolutePath() + "'. File does not exist."
-            );
-        }
         try {
-            FileInputStream streamIn = new FileInputStream(serializationFile);
-            ObjectInputStream objectinputstream = new ObjectInputStream(streamIn);
+            ObjectInputStream objectinputstream = new ObjectInputStream(loadInputStream());
             endpoints = (Map<String, Endpoint>) objectinputstream.readObject();
+            objectinputstream.close();
         } catch (IOException e) {
             throw new UnableToLoadEndpointAssociationsException(
-                    "Unable to deserialize file '" + serializationFile.getAbsolutePath() + "'.",
+                    "Unable to deserialize '" + assocFilePath + "'.",
                     e
             );
         } catch (ClassNotFoundException e) {
             throw new UnableToLoadEndpointAssociationsException(
-                    "Cannot deserialize from file '" + serializationFile.getAbsolutePath() +
+                    "Cannot deserialize from '" + assocFilePath +
                             "' because one ore multiple destination classes do not exist.",
                     e
             );
         } catch (ClassCastException e) {
             throw new UnableToLoadEndpointAssociationsException(
-                    "Failed to load from file '" + serializationFile.getAbsolutePath() +
+                    "Failed to load from '" + assocFilePath +
                             "'. File content is incompatible.",
                     e
             );
         }
         return endpoints.size();
+    }
+
+    protected InputStream loadInputStream() throws UnableToLoadEndpointAssociationsException {
+        // try to load as resource first
+        InputStream inputStream = GeneratedEndpointManager.class.getClassLoader().getResourceAsStream(assocFilePath);
+
+        if(inputStream == null && serializationFile.exists()) {
+            try {
+                // resource not found? Try to load as file
+                inputStream = new FileInputStream(serializationFile);
+            } catch (FileNotFoundException e) {
+                throw new UnableToLoadEndpointAssociationsException(
+                        "Resource / file '" + assocFilePath + "' does not exist."
+                );
+            }
+        }
+
+        if (inputStream == null) {
+            throw new UnableToLoadEndpointAssociationsException(
+                    "Resource  '" + assocFilePath + "' does not exist."
+            );
+        }
+        return inputStream;
     }
 
     /**
@@ -121,6 +139,8 @@ public class GeneratedEndpointManager extends EndpointManager {
             FileOutputStream fout = new FileOutputStream(serializationFile);
             ObjectOutputStream oos = new ObjectOutputStream(fout);
             oos.writeObject(endpoints);
+            fout.close();
+            oos.close();
         } catch (IOException e) {
             throw new UnableToPersistEndpointAssociationsException(
                     "Cannot persist to file '" + serializationFile.getAbsolutePath() + "'. An IO error occurred.",
