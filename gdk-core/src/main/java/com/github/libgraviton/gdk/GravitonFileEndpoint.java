@@ -5,6 +5,8 @@ import com.github.libgraviton.gdk.api.header.HeaderBag;
 import com.github.libgraviton.gdk.api.multipart.Part;
 import com.github.libgraviton.gdk.data.GravitonBase;
 import com.github.libgraviton.gdk.exception.SerializationException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Extra Graviton API functionality for /file endpoint calls.
@@ -14,6 +16,8 @@ import com.github.libgraviton.gdk.exception.SerializationException;
  * @version $Id: $Id
  */
 public class GravitonFileEndpoint {
+
+    private static final Logger LOG = LoggerFactory.getLogger(GravitonFileEndpoint.class);
 
     private GravitonApi gravitonApi;
 
@@ -26,6 +30,8 @@ public class GravitonFileEndpoint {
     }
 
     public GravitonRequest.Builder getFile(String url) {
+        LOG.debug("Requesting file");
+
         // without the 'Accept' - 'application/json' header, we get the file instead of the metadata
         HeaderBag headers = new HeaderBag.Builder()
                 .set("Content-Type", "application/json")
@@ -46,6 +52,7 @@ public class GravitonFileEndpoint {
     }
 
     public GravitonRequest.Builder getMetadata(String url) {
+        LOG.debug("Requesting file metadata");
         return gravitonApi.get(url);
     }
 

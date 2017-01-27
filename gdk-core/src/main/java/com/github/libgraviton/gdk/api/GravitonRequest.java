@@ -13,17 +13,20 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public final class GravitonRequest {
+public class GravitonRequest {
 
-    private final URL url;
+    private URL url;
 
-    private final HttpMethod method;
+    private HttpMethod method;
 
-    private final HeaderBag headers;
+    private HeaderBag headers;
 
-    private final String body;
+    private String body;
 
-    private final List<Part> parts;
+    private List<Part> parts;
+
+    protected GravitonRequest() {
+    }
 
     protected GravitonRequest(Builder builder) throws MalformedURLException {
         method = builder.method;
