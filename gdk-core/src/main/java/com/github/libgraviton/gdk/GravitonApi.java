@@ -106,10 +106,6 @@ public class GravitonApi {
         return baseUrl;
     }
 
-    public String getEndpointUrl() {
-        return baseUrl;
-    }
-
     /**
      * Creates a new executable request builder to build and perform a new request.
      *
