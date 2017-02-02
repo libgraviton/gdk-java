@@ -3,21 +3,15 @@ package com.github.libgraviton.gdk;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.libgraviton.gdk.api.GravitonRequest;
-import com.github.libgraviton.gdk.api.GravitonResponse;
+import com.github.libgraviton.gdk.api.Request;
 import com.github.libgraviton.gdk.api.endpoint.EndpointManager;
-import com.github.libgraviton.gdk.api.gateway.OkHttpGateway;
-import com.github.libgraviton.gdk.api.multipart.Part;
+import com.github.libgraviton.gdk.api.header.HeaderBag;
 import com.github.libgraviton.gdk.data.GravitonBase;
-import com.github.libgraviton.gdk.exception.CommunicationException;
 import com.github.libgraviton.gdk.exception.SerializationException;
-import com.github.libgraviton.gdk.exception.UnsuccessfulResponseException;
 import com.github.libgraviton.gdk.generator.GeneratedEndpointManager;
 import com.github.libgraviton.gdk.generator.exception.UnableToLoadEndpointAssociationsException;
 import com.github.libgraviton.gdk.serialization.JsonPatcher;
 import com.github.libgraviton.gdk.util.PropertiesLoader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -32,8 +26,6 @@ import java.util.TimeZone;
  * @version $Id: $Id
  */
 public class GravitonApi {
-
-    private static final Logger LOG = LoggerFactory.getLogger(GravitonApi.class);
 
     /**
      * Defines the base setUrl of the Graviton server
@@ -50,12 +42,9 @@ public class GravitonApi {
      */
     private EndpointManager endpointManager;
 
-    /**
-     * The http client for making http calls.
-     */
-    private OkHttpGateway gateway;
-
     private Properties properties;
+
+    private RequestExecutor executor;
 
     public GravitonApi() {
         setup();
@@ -80,8 +69,8 @@ public class GravitonApi {
         } catch (IOException e) {
             throw new IllegalStateException("Unable to load properties files.", e);
         }
-        this.gateway = new OkHttpGateway();
         this.objectMapper = initObjectMapper();
+        this.executor = new RequestExecutor(objectMapper);
     }
 
     protected GeneratedEndpointManager initEndpointManager() throws UnableToLoadEndpointAssociationsException {
@@ -111,70 +100,71 @@ public class GravitonApi {
      *
      * @return A new executable request builder
      */
-    public GravitonRequest.Builder request() {
-        return new GravitonRequest.Builder(this);
+    public Request.Builder request() {
+        return new Request.Builder(executor)
+                .setHeaders(getDefaultHeaders());
     }
 
-    public GravitonRequest.Builder head(String url) {
+    public Request.Builder head(String url) {
         return request().setUrl(url).head();
     }
 
-    public GravitonRequest.Builder head(GravitonBase resource) {
+    public Request.Builder head(GravitonBase resource) {
         return head(extractId(resource), resource.getClass());
     }
 
-    public GravitonRequest.Builder head(String id, Class clazz) {
+    public Request.Builder head(String id, Class clazz) {
         return head(endpointManager.getEndpoint(clazz.getName()).getUrl())
                 .addParam("id", id);
     }
 
-    public GravitonRequest.Builder options(String url) {
+    public Request.Builder options(String url) {
         return request().setUrl(url).options();
     }
 
-    public GravitonRequest.Builder options(GravitonBase resource) {
+    public Request.Builder options(GravitonBase resource) {
         return options(extractId(resource), resource.getClass());
     }
 
-    public GravitonRequest.Builder options(String id, Class clazz) {
+    public Request.Builder options(String id, Class clazz) {
         return options(endpointManager.getEndpoint(clazz.getName()).getUrl())
                 .addParam("id", id);
     }
 
-    public GravitonRequest.Builder get(String url) {
+    public Request.Builder get(String url) {
         return request().setUrl(url).get();
     }
 
-    public GravitonRequest.Builder get(GravitonBase resource) {
+    public Request.Builder get(GravitonBase resource) {
         return get(extractId(resource), resource.getClass());
     }
 
-    public GravitonRequest.Builder get(String id, Class clazz) {
+    public Request.Builder get(String id, Class clazz) {
         return get(endpointManager.getEndpoint(clazz.getName()).getItemUrl())
                 .addParam("id", id);
     }
 
-    public GravitonRequest.Builder delete(String url) {
+    public Request.Builder delete(String url) {
         return request().setUrl(url).delete();
     }
 
-    public GravitonRequest.Builder delete(GravitonBase resource) {
+    public Request.Builder delete(GravitonBase resource) {
         return delete(extractId(resource), resource.getClass());
     }
 
-    public GravitonRequest.Builder delete(String id, Class clazz) {
+    public Request.Builder delete(String id, Class clazz) {
         return delete(endpointManager.getEndpoint(clazz.getName()).getItemUrl())
                 .addParam("id", id);
     }
 
-    public GravitonRequest.Builder put(GravitonBase resource) throws SerializationException {
+    public Request.Builder put(GravitonBase resource) throws SerializationException {
         return request()
                 .setUrl(endpointManager.getEndpoint(resource.getClass().getName()).getItemUrl())
                 .addParam("id", extractId(resource))
                 .put(serializeResource(resource));
     }
 
-    public GravitonRequest.Builder patch(GravitonBase resource) throws SerializationException {
+    public Request.Builder patch(GravitonBase resource) throws SerializationException {
         JsonNode jsonNode = getObjectMapper().convertValue(resource, JsonNode.class);
         return request()
                 .setUrl(endpointManager.getEndpoint(resource.getClass().getName()).getItemUrl())
@@ -182,58 +172,10 @@ public class GravitonApi {
                 .patch(serializeResource(JsonPatcher.getPatch(resource, jsonNode)));
     }
 
-    public GravitonRequest.Builder post(GravitonBase resource) throws SerializationException {
+    public Request.Builder post(GravitonBase resource) throws SerializationException {
         return request()
                 .setUrl(endpointManager.getEndpoint(resource.getClass().getName()).getUrl())
                 .post(serializeResource(resource));
-    }
-
-    /**
-     * Executes a given Graviton request.
-     *
-     * @param request The Graviton request
-     *
-     * @return The corresponding Graviton response
-     *
-     * @throws CommunicationException If the request was not successful
-     */
-    public GravitonResponse execute(GravitonRequest request) throws CommunicationException {
-        LOG.info(String.format("Starting '%s' to '%s'...", request.getMethod(), request.getUrl()));
-        if(LOG.isDebugEnabled()) {
-            logBody(request);
-        }
-
-        GravitonResponse response = gateway.execute(request);
-        response.setObjectMapper(getObjectMapper());
-
-        if(response.isSuccessful()) {
-            LOG.info(String.format(
-                    "Successful '%s' to '%s'. Response was '%d' - '%s'.",
-                    request.getMethod(),
-                    request.getUrl(),
-                    response.getCode(),
-                    response.getMessage()
-            ));
-        } else {
-            throw new UnsuccessfulResponseException(response);
-        }
-        return response;
-    }
-
-    protected void logBody(GravitonRequest request) {
-        // log standard request
-        if (request.getBody() != null) {
-            LOG.debug("with request body '" + request.getBody() + "'");
-        }
-
-        // log multipart request
-        if (request.getParts() != null && request.getParts().size() > 0) {
-            StringBuilder builder = new StringBuilder();
-            for (Part part: request.getParts()) {
-                builder.append(part).append("\n");
-            }
-            LOG.debug("with multipart request body [\n" + builder.toString() + "]");
-        }
     }
 
     /**
@@ -246,10 +188,6 @@ public class GravitonApi {
     protected String extractId(GravitonBase data) {
         String id = data.getId();
         return id != null ? id : "";
-    }
-
-    protected void setGateway(OkHttpGateway gateway) {
-        this.gateway = gateway;
     }
 
     protected String serializeResource(Object data) throws SerializationException {
@@ -269,7 +207,19 @@ public class GravitonApi {
         return new ObjectMapper().setDateFormat(dateFormat);
     }
 
-    protected ObjectMapper getObjectMapper() {
+    public ObjectMapper getObjectMapper() {
         return objectMapper;
+    }
+
+    // TODO make it configurable
+    protected HeaderBag getDefaultHeaders() {
+        return new HeaderBag.Builder()
+                .set("Content-Type", "application/json")
+                .set("Accept", "application/json")
+                .build();
+    }
+
+    public void setRequestExecutor(RequestExecutor executor) {
+        this.executor = executor;
     }
 }

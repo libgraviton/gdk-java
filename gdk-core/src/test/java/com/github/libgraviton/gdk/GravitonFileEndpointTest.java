@@ -1,8 +1,9 @@
 package com.github.libgraviton.gdk;
 
-import com.github.libgraviton.gdk.api.GravitonRequest;
+import com.github.libgraviton.gdk.api.Request;
 import com.github.libgraviton.gdk.api.endpoint.Endpoint;
 import com.github.libgraviton.gdk.api.endpoint.EndpointManager;
+import com.github.libgraviton.gdk.api.header.HeaderBag;
 import com.github.libgraviton.gdk.api.multipart.Part;
 import com.github.libgraviton.gdk.data.GravitonBase;
 import com.github.libgraviton.gdk.data.SimpleClass;
@@ -40,6 +41,11 @@ public class GravitonFileEndpointTest {
         when(gravitonApi.getEndpointManager()).thenReturn(endpointManager);
         when(gravitonApi.extractId(any(GravitonBase.class))).thenCallRealMethod();
         when(gravitonApi.serializeResource(any(SimpleClass.class))).thenReturn("{ \"id\":\"111\"}");
+        HeaderBag headers = new HeaderBag.Builder()
+                .set("whatever", "something")
+                .build();
+
+        when(gravitonApi.getDefaultHeaders()).thenReturn(headers);
         resource = new SimpleClass();
         resource.setId("111");
 
@@ -48,14 +54,15 @@ public class GravitonFileEndpointTest {
 
     @Test
     public void testGetFile() throws Exception {
-        GravitonRequest request = gravitonFileEndpoint.getFile(url).build();
+        Request request = gravitonFileEndpoint.getFile(url).build();
         assertEquals(0, request.getHeaders().get("Accept").all().size());
+        assertEquals(1, request.getHeaders().get("Content-Type").all().size());
     }
 
     @Test
     public void testGetMetadata() throws Exception {
-        GravitonRequest request = gravitonFileEndpoint.getMetadata(url).build();
-        assertEquals(1, request.getHeaders().get("Accept").all().size());
+        Request request = gravitonFileEndpoint.getMetadata(url).build();
+        assertEquals(1, request.getHeaders().get("whatever").all().size());
         verify(gravitonApi, times(1)).get(url);
     }
 
@@ -63,7 +70,7 @@ public class GravitonFileEndpointTest {
     public void testPost() throws Exception {
         String data = "some real data";
 
-        GravitonRequest request = gravitonFileEndpoint.post(data.getBytes(), resource).build();
+        Request request = gravitonFileEndpoint.post(data.getBytes(), resource).build();
         List<Part> parts = request.getParts();
         assertEquals(2, parts.size());
 
@@ -80,7 +87,7 @@ public class GravitonFileEndpointTest {
     public void testPut() throws Exception {
         String data = "some real data";
 
-        GravitonRequest request = gravitonFileEndpoint.put(data.getBytes(), resource).build();
+        Request request = gravitonFileEndpoint.put(data.getBytes(), resource).build();
         List<Part> parts = request.getParts();
         assertEquals(2, parts.size());
 
