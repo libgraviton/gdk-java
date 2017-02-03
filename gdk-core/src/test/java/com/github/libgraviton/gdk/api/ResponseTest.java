@@ -14,16 +14,16 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
-public class GravitonApiResponseTest {
+public class ResponseTest {
 
-    private GravitonResponse response;
+    private Response response;
 
-    private GravitonRequest request;
+    private Request request;
 
     @Before
     public void setup() throws Exception {
-        request = mock(GravitonRequest.class);
-        response = new GravitonResponse.Builder(request)
+        request = mock(Request.class);
+        response = new Response.Builder(request)
                 .body("{\"code\":0}".getBytes())
                 .successful(true)
                 .message("a message")
@@ -68,7 +68,7 @@ public class GravitonApiResponseTest {
         testClass2.setCode(2);
         List<SerializationTestClass> testClasses = Arrays.asList(testClass1, testClass2);
 
-        response = new GravitonResponse.Builder(request)
+        response = new Response.Builder(request)
                 .body(new ObjectMapper().writeValueAsString(testClasses).getBytes())
                 .successful(true)
                 .message("a message")

@@ -5,10 +5,6 @@ package com.github.libgraviton.gdk.exception;
  */
 public class UnsuccessfulRequestException extends CommunicationException {
 
-    public UnsuccessfulRequestException(String message) {
-        super(message);
-    }
-
     public UnsuccessfulRequestException(String message, Throwable cause) {
         super(message, cause);
     }

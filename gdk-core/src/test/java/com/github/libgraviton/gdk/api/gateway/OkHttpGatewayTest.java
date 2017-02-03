@@ -1,12 +1,15 @@
 package com.github.libgraviton.gdk.api.gateway;
 
 
-import com.github.libgraviton.gdk.GravitonApi;
-import com.github.libgraviton.gdk.api.GravitonRequest;
-import com.github.libgraviton.gdk.api.GravitonResponse;
+import com.github.libgraviton.gdk.RequestExecutor;
 import com.github.libgraviton.gdk.api.HttpMethod;
+import com.github.libgraviton.gdk.api.Request;
+import com.github.libgraviton.gdk.api.header.HeaderBag;
 import com.github.libgraviton.gdk.exception.CommunicationException;
-import okhttp3.*;
+import okhttp3.Call;
+import okhttp3.Headers;
+import okhttp3.OkHttpClient;
+import okhttp3.ResponseBody;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -21,9 +24,9 @@ public class OkHttpGatewayTest {
 
     private OkHttpGateway gateway;
 
-    private GravitonRequest request;
+    private Request request;
 
-    private Response okHttpResponse;
+    private okhttp3.Response okHttpResponse;
 
     private Call call;
 
@@ -35,10 +38,10 @@ public class OkHttpGatewayTest {
     public void setup() throws Exception {
         OkHttpClient client = mock(OkHttpClient.class);
         gateway = new OkHttpGateway(client);
-        okHttpResponse = mock(Response.class);
+        okHttpResponse = mock(okhttp3.Response.class);
         when(okHttpResponse.headers()).thenReturn(new Headers.Builder().build());
-        GravitonApi gravitonApi = mock(GravitonApi.class);
-        request = new GravitonRequest.Builder(gravitonApi)
+        RequestExecutor executor = mock(RequestExecutor.class);
+        request = new Request.Builder(executor)
                 .setMethod(HttpMethod.GET)
                 .setUrl("http://someUrl")
                 .build();
@@ -46,7 +49,7 @@ public class OkHttpGatewayTest {
         // mock client.newCall()
         call = mock(Call.class);
         when(call.execute()).thenReturn(okHttpResponse);
-        when(client.newCall(any(Request.class))).thenReturn(call);
+        when(client.newCall(any(okhttp3.Request.class))).thenReturn(call);
 
         // mock okHttpResponse.setBody().string()
         body = mock(ResponseBody.class);
@@ -58,7 +61,7 @@ public class OkHttpGatewayTest {
     public void testDoRequestHappyPath() throws CommunicationException {
         when(okHttpResponse.isSuccessful()).thenReturn(true);
 
-        GravitonResponse response = gateway.execute(request);
+        com.github.libgraviton.gdk.api.Response response = gateway.execute(request);
         assertEquals(responseBody, response.getBody());
     }
 
@@ -82,6 +85,43 @@ public class OkHttpGatewayTest {
         }
 
         gateway.execute(request);
+    }
+
+    @Test
+    public void testCreateRequestHeaders() {
+        String header1 = "header1";
+        String header2 = "header2";
+        String value1 = "value1";
+        String value2 = "value2";
+
+        HeaderBag headers = new HeaderBag.Builder()
+                .set(header1, value1)
+                .set(header2, value2)
+                .build();
+
+        Headers requestHeaders = gateway.createRequestHeaders(headers);
+        assertEquals(2, requestHeaders.size());
+        assertEquals(value1, requestHeaders.get(header1));
+        assertEquals(value2, requestHeaders.get(header2));
+    }
+
+    @Test
+    public void testCreateResponseHeaders() {
+        String header1 = "header1";
+        String header2 = "header2";
+        String value1 = "value1";
+        String value2 = "value2";
+
+        Headers headers = new Headers.Builder()
+                .set(header1, value1)
+                .set(header2, value2)
+                .build();
+
+        HeaderBag responseHeaders = gateway.createResponseHeaders(headers)
+                .build();
+        assertEquals(2, responseHeaders.all().size());
+        assertEquals(value1, responseHeaders.get(header1).get(0));
+        assertEquals(value2, responseHeaders.get(header2).get(0));
     }
 
 }

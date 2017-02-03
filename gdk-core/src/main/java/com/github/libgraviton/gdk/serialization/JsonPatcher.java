@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.WeakHashMap;
 
 /**
- * Keeps track of POJOs there were deserialized via GravitonResponse (with its JsonNode in its original form),
+ * Keeps track of POJOs there were deserialized via Response (with its JsonNode in its original form),
  * so that the JSON Patch Diff can be calculated between the original and the current object state.
  *
  * @author List of contributors {@literal <https://github.com/libgraviton/gdk-java/graphs/contributors>}

@@ -16,9 +16,9 @@ import java.util.List;
  * @see <a href="http://swisscom.ch">http://swisscom.ch</a>
  * @version $Id: $Id
  */
-public class GravitonResponse {
+public class Response {
 
-    private GravitonRequest request;
+    private Request request;
 
     private int code;
 
@@ -32,7 +32,10 @@ public class GravitonResponse {
 
     private ObjectMapper objectMapper;
 
-    protected GravitonResponse(GravitonResponse.Builder builder) {
+    protected Response() {
+    }
+
+    protected Response(Response.Builder builder) {
         request = builder.request;
         code = builder.code;
         isSuccessful = builder.isSuccessful;
@@ -54,18 +57,18 @@ public class GravitonResponse {
      * @throws DeserializationException will be thrown on a failed deserialization / POJO mapping
      */
     public <BeanClass> BeanClass getBodyItem(final Class<? extends BeanClass> beanClass) throws DeserializationException {
-        if(objectMapper == null) {
+        if(getObjectMapper() == null) {
             throw new IllegalStateException("'objectMapper' is not allowed to be null.");
         }
 
         try {
-            BeanClass pojoValue = objectMapper.readValue(getBody(), beanClass);
-            JsonPatcher.add(pojoValue, objectMapper.valueToTree(pojoValue));
+            BeanClass pojoValue = getObjectMapper().readValue(getBody(), beanClass);
+            JsonPatcher.add(pojoValue, getObjectMapper().valueToTree(pojoValue));
             return pojoValue;
         } catch (IOException e) {
             throw new DeserializationException(String.format(
                     "Unable to deserialize response body from '%s' to class '%s'.",
-                    request.getUrl(),
+                    getRequest().getUrl(),
                     beanClass.getName()
             ), e);
         }
@@ -80,22 +83,22 @@ public class GravitonResponse {
      * @throws DeserializationException will be thrown on a failed deserialization / POJO mapping
      */
     public <BeanClass> List<BeanClass> getBodyItems(final Class<? extends BeanClass> beanClass) throws DeserializationException {
-        if(objectMapper == null) {
+        if(getObjectMapper() == null) {
             throw new IllegalStateException("'objectMapper' is not allowed to be null.");
         }
 
         try {
             final CollectionType javaType =
-                    objectMapper.getTypeFactory().constructCollectionType(List.class, beanClass);
-            List<BeanClass> pojoValues = objectMapper.readValue(getBody(), javaType);
+                    getObjectMapper().getTypeFactory().constructCollectionType(List.class, beanClass);
+            List<BeanClass> pojoValues = getObjectMapper().readValue(getBody(), javaType);
             for (BeanClass pojoValue : pojoValues) {
-                JsonPatcher.add(pojoValue, objectMapper.valueToTree(pojoValue));
+                JsonPatcher.add(pojoValue, getObjectMapper().valueToTree(pojoValue));
             }
             return pojoValues;
         } catch (IOException e) {
             throw new DeserializationException(String.format(
                     "Unable to deserialize response body from '%s' to class '%s'.",
-                    request.getUrl(),
+                    getRequest().getUrl(),
                     beanClass.getName()
             ), e);
         }
@@ -106,7 +109,7 @@ public class GravitonResponse {
      * @return response body as String
      */
     public String getBody() {
-        return new String(body);
+        return body != null ? new String(body) : null;
     }
 
     /**
@@ -122,10 +125,14 @@ public class GravitonResponse {
         return headers;
     }
 
-    public GravitonRequest getRequest() {
+    public Request getRequest() {
         return request;
     }
 
+
+    public ObjectMapper getObjectMapper() {
+        return objectMapper;
+    }
     public void setObjectMapper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }
@@ -144,7 +151,7 @@ public class GravitonResponse {
 
         private String message;
 
-        private GravitonRequest request;
+        private Request request;
 
         private byte[] body;
 
@@ -152,7 +159,7 @@ public class GravitonResponse {
 
         private HeaderBag.Builder headerBuilder;
 
-        public Builder(GravitonRequest request) {
+        public Builder(Request request) {
             this.request = request;
             headerBuilder = new HeaderBag.Builder();
         }
@@ -182,8 +189,8 @@ public class GravitonResponse {
             return this;
         }
 
-        public GravitonResponse build() {
-            return new GravitonResponse(this);
+        public Response build() {
+            return new Response(this);
         }
 
     }

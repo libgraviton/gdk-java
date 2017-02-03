@@ -1,32 +1,24 @@
 package com.github.libgraviton.gdk.exception;
 
-import com.github.libgraviton.gdk.api.GravitonResponse;
+import com.github.libgraviton.gdk.api.Response;
 
 /**
  * Whenever a received response code is not within 200 - 299.
  */
 public class UnsuccessfulResponseException extends CommunicationException {
 
-    private GravitonResponse response;
+    private Response response;
 
-    public UnsuccessfulResponseException(GravitonResponse response) {
+    public UnsuccessfulResponseException(Response response) {
         super(generateMessage(response));
         this.response = response;
     }
 
-    public UnsuccessfulResponseException(String message) {
-        super(message);
-    }
-
-    public UnsuccessfulResponseException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    public GravitonResponse getResponse() {
+    public Response getResponse() {
         return response;
     }
 
-    private static String generateMessage(GravitonResponse response) {
+    private static String generateMessage(Response response) {
         return String.format(
                 "Failed '%s' to '%s'. Response was '%d' - '%s' with body '%s'.",
                 response.getRequest().getMethod(),
