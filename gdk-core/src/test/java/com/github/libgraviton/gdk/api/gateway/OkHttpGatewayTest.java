@@ -4,6 +4,7 @@ package com.github.libgraviton.gdk.api.gateway;
 import com.github.libgraviton.gdk.RequestExecutor;
 import com.github.libgraviton.gdk.api.HttpMethod;
 import com.github.libgraviton.gdk.api.Request;
+import com.github.libgraviton.gdk.api.header.HeaderBag;
 import com.github.libgraviton.gdk.exception.CommunicationException;
 import okhttp3.Call;
 import okhttp3.Headers;
@@ -84,6 +85,43 @@ public class OkHttpGatewayTest {
         }
 
         gateway.execute(request);
+    }
+
+    @Test
+    public void testCreateRequestHeaders() {
+        String header1 = "header1";
+        String header2 = "header2";
+        String value1 = "value1";
+        String value2 = "value2";
+
+        HeaderBag headers = new HeaderBag.Builder()
+                .set(header1, value1)
+                .set(header2, value2)
+                .build();
+
+        Headers requestHeaders = gateway.createRequestHeaders(headers);
+        assertEquals(2, requestHeaders.size());
+        assertEquals(value1, requestHeaders.get(header1));
+        assertEquals(value2, requestHeaders.get(header2));
+    }
+
+    @Test
+    public void testCreateResponseHeaders() {
+        String header1 = "header1";
+        String header2 = "header2";
+        String value1 = "value1";
+        String value2 = "value2";
+
+        Headers headers = new Headers.Builder()
+                .set(header1, value1)
+                .set(header2, value2)
+                .build();
+
+        HeaderBag responseHeaders = gateway.createResponseHeaders(headers)
+                .build();
+        assertEquals(2, responseHeaders.all().size());
+        assertEquals(value1, responseHeaders.get(header1).get(0));
+        assertEquals(value2, responseHeaders.get(header2).get(0));
     }
 
 }

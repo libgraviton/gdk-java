@@ -62,7 +62,7 @@ public class OkHttpGateway implements GravitonGateway {
         return requestBuilder
                 .method(request.getMethod().asString(), okHttpBody)
                 .url(request.getUrl())
-                .headers(createHeaders(request.getHeaders()))
+                .headers(createRequestHeaders(request.getHeaders()))
                 .build();
     }
 
@@ -92,14 +92,14 @@ public class OkHttpGateway implements GravitonGateway {
         com.github.libgraviton.gdk.api.Response.Builder responseBuilder = new com.github.libgraviton.gdk.api.Response.Builder(request);
         return responseBuilder
                 .code(okHttpResponse.code())
-                .headers(createHeaders(okHttpResponse.headers()))
+                .headers(createResponseHeaders(okHttpResponse.headers()))
                 .message(okHttpResponse.message())
                 .successful(okHttpResponse.isSuccessful())
                 .body(body)
                 .build();
     }
 
-    private Headers createHeaders(HeaderBag headerBag) {
+    protected Headers createRequestHeaders(HeaderBag headerBag) {
         Headers.Builder builder = new Headers.Builder();
         for (Map.Entry<String, Header> header : headerBag.all().entrySet()) {
             for (String value : header.getValue()) {
@@ -109,7 +109,7 @@ public class OkHttpGateway implements GravitonGateway {
         return builder.build();
     }
 
-    private HeaderBag.Builder createHeaders(Headers okhttpHeaders) {
+    protected HeaderBag.Builder createResponseHeaders(Headers okhttpHeaders) {
         HeaderBag.Builder builder = new HeaderBag.Builder();
         for (Map.Entry<String, List<String>> header : okhttpHeaders.toMultimap().entrySet()) {
             builder.set(header.getKey(), header.getValue());
