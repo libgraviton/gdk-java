@@ -1,8 +1,8 @@
 package com.github.libgraviton.gdk.generator.instructionloader.grvprofile;
 
-import com.github.libgraviton.gdk.api.endpoint.Endpoint;
 import com.github.libgraviton.gdk.GravitonApi;
-import com.github.libgraviton.gdk.api.GravitonResponse;
+import com.github.libgraviton.gdk.api.Response;
+import com.github.libgraviton.gdk.api.endpoint.Endpoint;
 import com.github.libgraviton.gdk.exception.CommunicationException;
 import com.github.libgraviton.gdk.exception.SerializationException;
 import com.github.libgraviton.gdk.generator.GeneratorInstruction;
@@ -75,7 +75,7 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
             for (EndpointDefinition endpointDefinition : endpointDefinitions) {
                 String profileJson = null;
                 try {
-                    GravitonResponse response = gravitonApi.get(endpointDefinition.getProfile()).execute();
+                    Response response = gravitonApi.get(endpointDefinition.getProfile()).execute();
                     profileJson = response.getBody();
                 } catch (CommunicationException e) {
                     LOG.warn("Unable to fetch profile from '" + endpointDefinition.getProfile() + "'. Skipping...");
@@ -122,7 +122,7 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
      * @return The Graviton service.
      */
     private Service loadService() throws CommunicationException, SerializationException {
-        GravitonResponse response = gravitonApi.get(gravitonApi.getBaseUrl()).execute();
+        Response response = gravitonApi.get(gravitonApi.getBaseUrl()).execute();
         return response.getBodyItem(Service.class);
     }
 

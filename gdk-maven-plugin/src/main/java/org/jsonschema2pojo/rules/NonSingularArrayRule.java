@@ -11,7 +11,7 @@ import java.util.Set;
 
 /**
  * Array rule that doesn't change the nodeName but else behaves the same as ArrayRule.
- * Since the makeSingular method within ArrayRule is private, this class here is copy & own.
+ * Since the makeSingular method within ArrayRule is private, this class here is copy and own.
  */
 public class NonSingularArrayRule implements Rule<JPackage, JClass> {
 
