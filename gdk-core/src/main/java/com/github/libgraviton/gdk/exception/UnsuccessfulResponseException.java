@@ -14,14 +14,6 @@ public class UnsuccessfulResponseException extends CommunicationException {
         this.response = response;
     }
 
-    public UnsuccessfulResponseException(String message) {
-        super(message);
-    }
-
-    public UnsuccessfulResponseException(String message, Throwable cause) {
-        super(message, cause);
-    }
-
     public Response getResponse() {
         return response;
     }
