@@ -21,7 +21,7 @@
         <dependency>
             <groupId>com.github.libgraviton</groupId>
             <artifactId>gdk-core</artifactId>
-            <version>0.1.1-SNAPSHOT</version>
+            <version>${gdkVersion}</version>
         </dependency>
         <dependency>
             <groupId>org.jsonschema2pojo</groupId>
