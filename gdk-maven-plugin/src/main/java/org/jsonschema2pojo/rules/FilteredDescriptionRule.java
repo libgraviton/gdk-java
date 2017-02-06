@@ -28,7 +28,7 @@ public class FilteredDescriptionRule extends DescriptionRule {
 
         String text = node.asText();
         if (text != null) {
-            javadoc.add(0, text.replaceAll("@", ""));
+            javadoc.add(text.replaceAll("@", ""));
         }
 
         return javadoc;
