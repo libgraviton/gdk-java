@@ -7,7 +7,7 @@ import static org.junit.Assert.assertTrue;
 
 public class GravitonRuleFactoryTest {
 
-    GravitonRuleFactory ruleFactory;
+    private GravitonRuleFactory ruleFactory;
 
     @Before
     public void setup() {
@@ -17,5 +17,15 @@ public class GravitonRuleFactoryTest {
     @Test
     public void testGetArrayRule() {
         assertTrue(ruleFactory.getArrayRule() instanceof NonSingularArrayRule);
+    }
+
+    @Test
+    public void testGetTitleRule() {
+        assertTrue(ruleFactory.getTitleRule() instanceof FilteredTitleRule);
+    }
+
+    @Test
+    public void testGetDescriptionRule() {
+        assertTrue(ruleFactory.getDescriptionRule() instanceof FilteredDescriptionRule);
     }
 }
