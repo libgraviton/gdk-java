@@ -6,7 +6,7 @@
     <parent>
         <groupId>com.github.libgraviton</groupId>
         <artifactId>gdk</artifactId>
-        <version>0.1.1-SNAPSHOT</version>
+        <version>0.2.1</version>
     </parent>
     <artifactId>gdk-maven-plugin</artifactId>
     <packaging>maven-plugin</packaging>
@@ -21,7 +21,7 @@
         <dependency>
             <groupId>com.github.libgraviton</groupId>
             <artifactId>gdk-core</artifactId>
-            <version>0.1.1-SNAPSHOT</version>
+            <version>0.2.1</version>
         </dependency>
         <dependency>
             <groupId>org.jsonschema2pojo</groupId>
