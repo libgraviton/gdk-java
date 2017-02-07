@@ -1,6 +1,6 @@
 # Graviton Development Kit for Java
 
-[![Build Status](https://travis-ci.org/libgraviton/gdk-java.svg?branch=develop)](https://travis-ci.org/libgraviton/gdk-java) [![Coverage Status](https://coveralls.io/repos/github/libgraviton/gdk-java/badge.svg?branch=develop)](https://coveralls.io/github/libgraviton/gdk-java?branch=develop) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.libgraviton/gdk/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.libgraviton/gdk) [![javadoc.io](https://javadocio-badges.herokuapp.com/com.github.libgraviton/gdk/badge.svg)](https://javadocio-badges.herokuapp.com/com.github.libgraviton/gdk)
+[![Build Status](https://travis-ci.org/libgraviton/gdk-java.svg?branch=develop)](https://travis-ci.org/libgraviton/gdk-java) [![Coverage Status](https://coveralls.io/repos/github/libgraviton/gdk-java/badge.svg?branch=develop)](https://coveralls.io/github/libgraviton/gdk-java?branch=develop) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.libgraviton/gdk/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.libgraviton/gdk) [![javadoc.io](https://javadocio-badges.herokuapp.com/com.github.libgraviton/gdk-core/badge.svg)](https://javadocio-badges.herokuapp.com/com.github.libgraviton/gdk-core)
 
 ## What is it
 
@@ -13,7 +13,7 @@ The GDK for Java is split into two modules:
 
 ## API Doc
 
-Please see the [apidoc.io apidoc](http://www.javadoc.io/doc/com.github.libgraviton/gdk) ;-)
+Please see the [gdk-core javadoc](http://www.javadoc.io/doc/com.github.libgraviton/gdk-core)
 
 ## Using the library
 
