@@ -50,15 +50,21 @@ public class EndpointTest {
     public void testEndpointUrls() throws Exception {
         Properties properties = PropertiesLoader.load();
         String baseUrl = properties.getProperty("graviton.base.url");
+        assertEquals(baseUrl, Endpoint.getBaseUrl());
 
-        String itemUrl = "/other/item";
-        String url = "/other/collection/";
-        Endpoint endpoint = new Endpoint(itemUrl, url);
-        assertEquals(baseUrl + itemUrl, endpoint.getItemUrl());
-        assertEquals(baseUrl + url, endpoint.getUrl());
+        String itemPath = "/other/item";
+        String path = "/other/collection/";
+        Endpoint endpoint = new Endpoint(itemPath, path);
 
-        endpoint = new Endpoint(itemUrl);
-        assertEquals(baseUrl + itemUrl, endpoint.getItemUrl());
+        assertEquals(baseUrl + itemPath, endpoint.getItemUrl());
+        assertEquals(baseUrl + path, endpoint.getUrl());
+        assertEquals(path, endpoint.getPath());
+        assertEquals(itemPath, endpoint.getItemPath());
+
+        endpoint = new Endpoint(itemPath);
+        assertEquals(baseUrl + itemPath, endpoint.getItemUrl());
+        assertEquals(itemPath, endpoint.getItemPath());
         assertNull(endpoint.getUrl());
+        assertNull(endpoint.getPath());
     }
 }
