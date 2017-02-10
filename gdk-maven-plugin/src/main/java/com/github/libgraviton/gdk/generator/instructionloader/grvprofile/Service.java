@@ -3,7 +3,6 @@ package com.github.libgraviton.gdk.generator.instructionloader.grvprofile;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.github.libgraviton.gdk.generator.instructionloader.grvprofile.EndpointDefinition;
 
 import java.util.List;
 

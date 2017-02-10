@@ -4,11 +4,8 @@ import com.github.libgraviton.gdk.GravitonApi;
 import com.github.libgraviton.gdk.api.Response;
 import com.github.libgraviton.gdk.api.endpoint.Endpoint;
 import com.github.libgraviton.gdk.exception.CommunicationException;
-import com.github.libgraviton.gdk.exception.SerializationException;
 import com.github.libgraviton.gdk.generator.GeneratorInstruction;
 import com.github.libgraviton.gdk.generator.GeneratorInstructionLoader;
-import com.github.libgraviton.gdk.generator.instructionloader.grvprofile.EndpointDefinition;
-import com.github.libgraviton.gdk.generator.instructionloader.grvprofile.Service;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -24,7 +21,7 @@ import java.util.List;
  */
 public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
 
-    private final Logger LOG = LoggerFactory.getLogger(com.github.libgraviton.gdk.generator.instructionloader.grvprofile.GrvProfileInstructionLoader.class);
+    private final Logger LOG = LoggerFactory.getLogger(GrvProfileInstructionLoader.class);
 
     /**
      * The GravitonApi instance where the endpoint definitions will be loaded from.
@@ -123,7 +120,7 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
      *
      * @return The Graviton service.
      */
-    private Service loadService() throws CommunicationException, SerializationException {
+    private Service loadService() throws CommunicationException {
         Response response = gravitonApi.get(gravitonApi.getBaseUrl()).execute();
         return response.getBodyItem(Service.class);
     }

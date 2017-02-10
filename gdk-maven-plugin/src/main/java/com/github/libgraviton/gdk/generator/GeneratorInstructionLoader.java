@@ -1,7 +1,5 @@
 package com.github.libgraviton.gdk.generator;
 
-import com.github.libgraviton.gdk.generator.GeneratorInstruction;
-
 import java.util.List;
 
 /**

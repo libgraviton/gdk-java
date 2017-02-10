@@ -1,7 +1,5 @@
 package com.github.libgraviton.gdk.api.endpoint;
 
-import com.google.common.io.ByteStreams;
-import com.google.common.io.Files;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;

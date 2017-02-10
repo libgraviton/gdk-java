@@ -1,11 +1,9 @@
 package org.jsonschema2pojo.rules;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.sun.codemodel.*;
+import com.sun.codemodel.JDocComment;
+import com.sun.codemodel.JDocCommentable;
 import org.jsonschema2pojo.Schema;
-
-import java.util.List;
-import java.util.Set;
 
 /**
  * Same as TitleRule, but without the 'p' tag and removes all '@' characters to avoid the generation of corrupt javadoc.
