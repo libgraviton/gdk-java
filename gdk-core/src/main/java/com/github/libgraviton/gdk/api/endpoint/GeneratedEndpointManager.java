@@ -1,10 +1,7 @@
-package com.github.libgraviton.gdk.generator;
+package com.github.libgraviton.gdk.api.endpoint;
 
-import com.github.libgraviton.gdk.api.endpoint.Endpoint;
-import com.github.libgraviton.gdk.api.endpoint.EndpointInclusionStrategy;
-import com.github.libgraviton.gdk.api.endpoint.EndpointManager;
-import com.github.libgraviton.gdk.generator.exception.UnableToLoadEndpointAssociationsException;
-import com.github.libgraviton.gdk.generator.exception.UnableToPersistEndpointAssociationsException;
+import com.github.libgraviton.gdk.api.endpoint.exception.UnableToLoadEndpointAssociationsException;
+import com.github.libgraviton.gdk.api.endpoint.exception.UnableToPersistEndpointAssociationsException;
 import com.github.libgraviton.gdk.util.PropertiesLoader;
 
 import java.io.*;

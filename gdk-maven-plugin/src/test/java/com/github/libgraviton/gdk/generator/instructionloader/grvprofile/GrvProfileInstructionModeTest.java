@@ -17,6 +17,7 @@ import org.mockito.Mock;
 
 import java.io.File;
 import java.net.URL;
+import java.nio.charset.Charset;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -38,13 +39,13 @@ public class GrvProfileInstructionModeTest {
     @Before
     public void setup() throws Exception {
         String service = FileUtils.readFileToString(
-                new File("src/test/resources/service/grvProfileInstructionLoaderTest.json"));
+                new File("src/test/resources/service/grvProfileInstructionLoaderTest.json"), Charset.defaultCharset());
         String someSchema = FileUtils.readFileToString(
-                new File("src/test/resources/serviceSchema/grvProfileInstructionLoaderTest.someSchema.json"));
+                new File("src/test/resources/serviceSchema/grvProfileInstructionLoaderTest.someSchema.json"), Charset.defaultCharset());
         String anotherSchema = FileUtils.readFileToString(
-                new File("src/test/resources/serviceSchema/grvProfileInstructionLoaderTest.anotherSchema.json"));
+                new File("src/test/resources/serviceSchema/grvProfileInstructionLoaderTest.anotherSchema.json"), Charset.defaultCharset());
         String someMoreSchema = FileUtils.readFileToString(
-                new File("src/test/resources/serviceSchema/grvProfileInstructionLoaderTest.someMoreSchema.json"));
+                new File("src/test/resources/serviceSchema/grvProfileInstructionLoaderTest.someMoreSchema.json"), Charset.defaultCharset());
 
         gravitonApi = mock(GravitonApi.class, withSettings());
         when(gravitonApi.getBaseUrl()).thenReturn("http://gravitonApi");
@@ -124,7 +125,7 @@ public class GrvProfileInstructionModeTest {
             String expectedPackageName,
             int instructionIndex
     ) throws Exception{
-        String schema = FileUtils.readFileToString(new File("src/test/resources/" + schemaFile));
+        String schema = FileUtils.readFileToString(new File("src/test/resources/" + schemaFile), Charset.defaultCharset());
         Response response = mock(Response.class);
         doReturn(schema).when(response).getBody();
         Request.Builder builder = mock(Request.Builder.class);

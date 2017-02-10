@@ -3,11 +3,11 @@ package com.github.libgraviton.gdk.maven;
 
 import com.github.libgraviton.gdk.GravitonApi;
 import com.github.libgraviton.gdk.api.endpoint.EndpointInclusionStrategy;
-import com.github.libgraviton.gdk.generator.GeneratedEndpointManager;
+import com.github.libgraviton.gdk.api.endpoint.GeneratedEndpointManager;
+import com.github.libgraviton.gdk.api.endpoint.exception.UnableToLoadEndpointAssociationsException;
 import com.github.libgraviton.gdk.generator.Generator;
 import com.github.libgraviton.gdk.generator.instructionloader.grvprofile.GrvProfileInstructionLoader;
 import com.github.libgraviton.gdk.generator.exception.GeneratorException;
-import com.github.libgraviton.gdk.generator.exception.UnableToLoadEndpointAssociationsException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Execute;
 import org.apache.maven.plugins.annotations.LifecyclePhase;

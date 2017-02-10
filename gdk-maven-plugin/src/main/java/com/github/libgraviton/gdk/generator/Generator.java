@@ -2,8 +2,9 @@ package com.github.libgraviton.gdk.generator;
 
 import com.github.libgraviton.gdk.GravitonApi;
 import com.github.libgraviton.gdk.api.endpoint.EndpointManager;
+import com.github.libgraviton.gdk.api.endpoint.GeneratedEndpointManager;
+import com.github.libgraviton.gdk.api.endpoint.exception.UnableToPersistEndpointAssociationsException;
 import com.github.libgraviton.gdk.generator.exception.GeneratorException;
-import com.github.libgraviton.gdk.generator.exception.UnableToPersistEndpointAssociationsException;
 import com.sun.codemodel.JCodeModel;
 import org.jsonschema2pojo.*;
 import org.jsonschema2pojo.rules.RuleFactory;
@@ -18,7 +19,7 @@ import java.util.List;
  */
 public class Generator {
 
-    private final Logger LOG = LoggerFactory.getLogger(Generator.class);
+    private final Logger LOG = LoggerFactory.getLogger(com.github.libgraviton.gdk.generator.Generator.class);
 
     /**
      * The schema mapper which creates POJOs by given schemas
@@ -38,7 +39,7 @@ public class Generator {
     /**
      * The generator instruction loader providing all endpoints
      */
-    private GeneratorInstructionLoader instructionLoader;
+    private com.github.libgraviton.gdk.generator.GeneratorInstructionLoader instructionLoader;
 
     /**
      * Constructor
@@ -52,7 +53,7 @@ public class Generator {
     public Generator(
             GenerationConfig config,
             GravitonApi gravitonApi,
-            GeneratorInstructionLoader instructionLoader
+            com.github.libgraviton.gdk.generator.GeneratorInstructionLoader instructionLoader
     ) throws GeneratorException {
         this(
                 config,
