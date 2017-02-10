@@ -39,7 +39,7 @@ public class Generator {
     /**
      * The generator instruction loader providing all endpoints
      */
-    private com.github.libgraviton.gdk.generator.GeneratorInstructionLoader instructionLoader;
+    private GeneratorInstructionLoader instructionLoader;
 
     /**
      * Constructor
@@ -53,7 +53,7 @@ public class Generator {
     public Generator(
             GenerationConfig config,
             GravitonApi gravitonApi,
-            com.github.libgraviton.gdk.generator.GeneratorInstructionLoader instructionLoader
+            GeneratorInstructionLoader instructionLoader
     ) throws GeneratorException {
         this(
                 config,
