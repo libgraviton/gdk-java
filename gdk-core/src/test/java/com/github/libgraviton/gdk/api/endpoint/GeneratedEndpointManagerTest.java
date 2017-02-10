@@ -1,8 +1,7 @@
-package com.github.libgraviton.gdk.generator;
+package com.github.libgraviton.gdk.api.endpoint;
 
-import com.github.libgraviton.gdk.api.endpoint.Endpoint;
+import com.github.libgraviton.gdk.api.endpoint.exception.UnableToLoadEndpointAssociationsException;
 import com.github.libgraviton.gdk.exception.NoCorrespondingEndpointException;
-import com.github.libgraviton.gdk.generator.exception.UnableToLoadEndpointAssociationsException;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;

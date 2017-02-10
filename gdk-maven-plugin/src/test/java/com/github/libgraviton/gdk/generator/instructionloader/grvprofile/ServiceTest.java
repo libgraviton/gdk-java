@@ -5,6 +5,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.Test;
 
 import java.io.File;
+import java.nio.charset.Charset;
 
 import static org.junit.Assert.assertEquals;
 
@@ -15,7 +16,7 @@ public class ServiceTest {
         ObjectMapper objectMapper = new ObjectMapper();
 
         String serviceJson = FileUtils.readFileToString(
-                new File("src/test/resources/service/serviceTest.json"));
+                new File("src/test/resources/service/serviceTest.json"), Charset.defaultCharset());
         Service service = objectMapper.readValue(serviceJson, Service.class);
 
         assertEquals(2, service.getEndpointDefinitions().size());

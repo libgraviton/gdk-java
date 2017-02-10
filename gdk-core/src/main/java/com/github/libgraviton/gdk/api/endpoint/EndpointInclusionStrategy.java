@@ -1,10 +1,10 @@
 package com.github.libgraviton.gdk.api.endpoint;
 
-import org.apache.commons.io.IOUtils;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -27,7 +27,7 @@ public class EndpointInclusionStrategy {
         }
 
         try {
-            List<String> endpoints = IOUtils.readLines(new FileInputStream(new File(path)));
+            List<String> endpoints = FileUtils.readLines(new File(path), Charset.defaultCharset());
             endpointPaths = new HashSet<>(endpoints);
         } catch (IOException e) {
             endpointPaths = new HashSet<>();

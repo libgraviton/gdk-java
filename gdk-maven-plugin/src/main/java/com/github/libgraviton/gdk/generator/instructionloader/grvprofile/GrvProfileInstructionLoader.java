@@ -4,7 +4,6 @@ import com.github.libgraviton.gdk.GravitonApi;
 import com.github.libgraviton.gdk.api.Response;
 import com.github.libgraviton.gdk.api.endpoint.Endpoint;
 import com.github.libgraviton.gdk.exception.CommunicationException;
-import com.github.libgraviton.gdk.exception.SerializationException;
 import com.github.libgraviton.gdk.generator.GeneratorInstruction;
 import com.github.libgraviton.gdk.generator.GeneratorInstructionLoader;
 import org.json.JSONArray;
@@ -121,7 +120,7 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
      *
      * @return The Graviton service.
      */
-    private Service loadService() throws CommunicationException, SerializationException {
+    private Service loadService() throws CommunicationException {
         Response response = gravitonApi.get(gravitonApi.getBaseUrl()).execute();
         return response.getBodyItem(Service.class);
     }
