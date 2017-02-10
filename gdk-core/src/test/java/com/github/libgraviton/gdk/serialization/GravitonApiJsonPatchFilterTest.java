@@ -7,6 +7,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.nio.charset.Charset;
 
 import static org.junit.Assert.assertEquals;
 
@@ -24,8 +25,8 @@ public class GravitonApiJsonPatchFilterTest {
 
     @Test
     public void testFilter() throws Exception {
-        String patchJson = FileUtils.readFileToString(new File("src/test/resources/serialization/patch1.json"));
-        String expectedPatchJson = FileUtils.readFileToString(new File("src/test/resources/serialization//filteredPatch1.json"));
+        String patchJson = FileUtils.readFileToString(new File("src/test/resources/serialization/patch1.json"), Charset.defaultCharset());
+        String expectedPatchJson = FileUtils.readFileToString(new File("src/test/resources/serialization//filteredPatch1.json"), Charset.defaultCharset());
 
         JsonNode patchNode = mapper.readTree(patchJson);
         JsonNode filteredPatchNode = this.filter.filter(patchNode);

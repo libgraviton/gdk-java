@@ -5,11 +5,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.libgraviton.gdk.api.Request;
 import com.github.libgraviton.gdk.api.endpoint.EndpointManager;
+import com.github.libgraviton.gdk.api.endpoint.GeneratedEndpointManager;
+import com.github.libgraviton.gdk.api.endpoint.exception.UnableToLoadEndpointAssociationsException;
 import com.github.libgraviton.gdk.api.header.HeaderBag;
 import com.github.libgraviton.gdk.data.GravitonBase;
 import com.github.libgraviton.gdk.exception.SerializationException;
-import com.github.libgraviton.gdk.generator.GeneratedEndpointManager;
-import com.github.libgraviton.gdk.generator.exception.UnableToLoadEndpointAssociationsException;
 import com.github.libgraviton.gdk.serialization.JsonPatcher;
 import com.github.libgraviton.gdk.util.PropertiesLoader;
 

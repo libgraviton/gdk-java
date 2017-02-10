@@ -40,16 +40,8 @@
     </scm>
 
     <properties>
-        <jsonschema2PojoVersion>0.4.28-SNAPSHOT</jsonschema2PojoVersion>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
-    <repositories>
-        <repository>
-            <!-- TODO Needs to be removed as soon as https://github.com/joelittlejohn/jsonschema2pojo/pull/622/files is merged and released -->
-            <id>org.jsonschema2pojo</id>
-            <url>file://${basedir}/lib</url>
-        </repository>
-    </repositories>
     <modules>
         <module>gdk-core</module>
         <module>gdk-maven-plugin</module>

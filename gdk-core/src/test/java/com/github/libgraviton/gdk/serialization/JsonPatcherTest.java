@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 import java.io.File;
+import java.nio.charset.Charset;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
@@ -33,12 +34,12 @@ public class JsonPatcherTest {
     @Test
     public void testGetPatch() throws Exception {
         NoopClass object = new NoopClass();
-        String jsonBefore = FileUtils.readFileToString(new File("src/test/resources/serialization/patch2.json"));
+        String jsonBefore = FileUtils.readFileToString(new File("src/test/resources/serialization/patch2.json"), Charset.defaultCharset());
         JsonPatcher.add(object, mapper.readTree(jsonBefore));
         assertEquals(1,JsonPatcher.getMemory().size());
-        String jsonAfter = FileUtils.readFileToString(new File("src/test/resources/serialization/patch3.json"));
+        String jsonAfter = FileUtils.readFileToString(new File("src/test/resources/serialization/patch3.json"), Charset.defaultCharset());
         JsonNode patch = JsonPatcher.getPatch(object, mapper.readTree(jsonAfter));
-        String jsonPatch = FileUtils.readFileToString(new File("src/test/resources/serialization/patch4.json"));
+        String jsonPatch = FileUtils.readFileToString(new File("src/test/resources/serialization/patch4.json"), Charset.defaultCharset());
         assertEquals(jsonPatch, mapper.writeValueAsString(patch));
     }
 
@@ -46,7 +47,7 @@ public class JsonPatcherTest {
     public void testGetPatchNullValue() throws Exception {
         NoopClass object = new NoopClass();
         assertEquals(0,JsonPatcher.getMemory().size());
-        String json = FileUtils.readFileToString(new File("src/test/resources/serialization/patch3.json"));
+        String json = FileUtils.readFileToString(new File("src/test/resources/serialization/patch3.json"), Charset.defaultCharset());
         JsonNode patch = JsonPatcher.getPatch(object, mapper.readTree(json));
         assertNull(patch);
     }

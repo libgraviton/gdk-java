@@ -1,4 +1,4 @@
-package com.github.libgraviton.gdk.generator.exception;
+package com.github.libgraviton.gdk.api.endpoint.exception;
 
 public class UnableToLoadEndpointAssociationsException extends Exception {
 

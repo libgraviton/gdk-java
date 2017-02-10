@@ -36,7 +36,7 @@ You can use this library in your project by including this in your `pom.xml`:
 ```
 
 Make sure that `version` points to the latest GDK version on maven central.
-IMPORTANT: To have working PATCH requests with GDK, `includeHashcodeAndEquals` within generatorConfig needs to be configured false!
+IMPORTANT: To have working PATCH requests with GDK, `includeHashcodeAndEquals` and `includeToString` within generatorConfig needs to be configured false!
 
 | config element         | description                                                                                                                                                                                                                                                           |
 |:-----------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
