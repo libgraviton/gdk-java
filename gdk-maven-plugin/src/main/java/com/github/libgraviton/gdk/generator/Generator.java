@@ -19,7 +19,7 @@ import java.util.List;
  */
 public class Generator {
 
-    private final Logger LOG = LoggerFactory.getLogger(com.github.libgraviton.gdk.generator.Generator.class);
+    private final Logger LOG = LoggerFactory.getLogger(Generator.class);
 
     /**
      * The schema mapper which creates POJOs by given schemas
