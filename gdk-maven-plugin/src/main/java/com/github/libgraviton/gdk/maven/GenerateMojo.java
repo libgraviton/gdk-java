@@ -6,8 +6,10 @@ import com.github.libgraviton.gdk.api.endpoint.EndpointInclusionStrategy;
 import com.github.libgraviton.gdk.api.endpoint.GeneratedEndpointManager;
 import com.github.libgraviton.gdk.api.endpoint.exception.UnableToLoadEndpointAssociationsException;
 import com.github.libgraviton.gdk.generator.Generator;
+import com.github.libgraviton.gdk.generator.GeneratorInstructionLoader;
 import com.github.libgraviton.gdk.generator.exception.GeneratorException;
 import com.github.libgraviton.gdk.generator.instructionloader.grvprofile.GrvProfileInstructionLoader;
+import com.github.libgraviton.gdk.generator.instructionloader.swagger.SwaggerInstructionLoader;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Execute;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -28,15 +30,21 @@ public class GenerateMojo extends Jsonschema2PojoMojo {
     @Parameter(required = false)
     private String endpointWhitelistPath;
 
+    @Parameter(required = false)
+    private String instructionLoader = GrvProfileInstructionLoader.ID;
+
     @Parameter
     private Jsonschema2PojoMojo generatorConfig = new Jsonschema2PojoMojo();
+
+    @Parameter(required = false)
+    private String swaggerLocation;
 
     public void execute() throws MojoExecutionException
     {
         try {
             if(!generatorConfig.getTargetDirectory().mkdirs()) {
                 getLog().info("Target directory '" + generatorConfig.getTargetDirectory() + "' already exists. Skipping POJO generation.");
-                return;
+                //return;
             }
 
             GeneratedEndpointManager endpointManager = new GeneratedEndpointManager(GeneratedEndpointManager.Mode.CREATE);
@@ -48,7 +56,7 @@ public class GenerateMojo extends Jsonschema2PojoMojo {
             Generator generator = new Generator(
                     generatorConfig,
                     gravitonApi,
-                    new GrvProfileInstructionLoader(gravitonApi)
+                    getInstructionLoader(gravitonApi)
             );
             generator.generate();
         } catch (GeneratorException e) {
@@ -79,6 +87,19 @@ public class GenerateMojo extends Jsonschema2PojoMojo {
                     .create(EndpointInclusionStrategy.Strategy.DEFAULT, null);
         }
         return endpointInclusionStrategy;
+    }
+
+    private GeneratorInstructionLoader getInstructionLoader(GravitonApi gravitonApi) throws MojoExecutionException {
+        switch (instructionLoader) {
+            case GrvProfileInstructionLoader.ID:
+                return new GrvProfileInstructionLoader(gravitonApi);
+            case SwaggerInstructionLoader.ID:
+                return new SwaggerInstructionLoader(swaggerLocation);
+        }
+        throw new MojoExecutionException(String.format(
+                "Unknown generator instruction loader: '%s'",
+                instructionLoader
+        ));
     }
 
 }
