@@ -3,6 +3,7 @@ package com.github.libgraviton.gdk.api;
 import com.github.libgraviton.gdk.RequestExecutor;
 import com.github.libgraviton.gdk.api.header.HeaderBag;
 import com.github.libgraviton.gdk.api.multipart.Part;
+import com.github.libgraviton.gdk.api.query.Query;
 import com.github.libgraviton.gdk.exception.CommunicationException;
 import com.github.libgraviton.gdk.exception.UnsuccessfulRequestException;
 
@@ -74,6 +75,8 @@ public class Request {
 
         private HeaderBag.Builder headerBuilder = new HeaderBag.Builder();
 
+        private Query query;
+
         private byte[] body;
 
         private List<Part> parts = new ArrayList<>();
@@ -123,6 +126,16 @@ public class Request {
 
         public Builder setHeaders(HeaderBag headerBag) {
             headerBuilder = new HeaderBag.Builder(headerBag);
+            return this;
+        }
+
+        public Builder setQuery(Query query) {
+            if(this.query == null) {
+                this.query = query;
+            } else {
+                this.query.addStatements(query.getStatements());
+            }
+
             return this;
         }
 
@@ -204,7 +217,8 @@ public class Request {
         }
 
         protected URL buildUrl() throws MalformedURLException {
-            String url = this.url;
+            String generatedQuery = query != null ? query.generate() : "";
+            String url = this.url + generatedQuery;
             for (Map.Entry<String, String> param : params.entrySet()) {
                 url = url.replace(String.format("{%s}", param.getKey()), param.getValue());
             }

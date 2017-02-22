@@ -8,6 +8,7 @@ import com.github.libgraviton.gdk.api.endpoint.EndpointManager;
 import com.github.libgraviton.gdk.api.endpoint.GeneratedEndpointManager;
 import com.github.libgraviton.gdk.api.endpoint.exception.UnableToLoadEndpointAssociationsException;
 import com.github.libgraviton.gdk.api.header.HeaderBag;
+import com.github.libgraviton.gdk.api.query.rql.Rql;
 import com.github.libgraviton.gdk.data.GravitonBase;
 import com.github.libgraviton.gdk.exception.SerializationException;
 import com.github.libgraviton.gdk.serialization.JsonPatcher;
@@ -136,7 +137,8 @@ public class GravitonApi {
     }
 
     public Request.Builder get(GravitonBase resource) {
-        return get(extractId(resource), resource.getClass());
+        return get(extractId(resource), resource.getClass())
+                .setQuery(new Rql.Builder().setResource(resource, getObjectMapper()).build());
     }
 
     public Request.Builder get(String id, Class clazz) {
