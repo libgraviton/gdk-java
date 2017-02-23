@@ -21,6 +21,8 @@ import java.util.List;
  */
 public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
 
+    public static final String ID = "grv-profile";
+
     private final Logger LOG = LoggerFactory.getLogger(GrvProfileInstructionLoader.class);
 
     /**

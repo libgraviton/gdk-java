@@ -6,8 +6,10 @@ import com.github.libgraviton.gdk.api.endpoint.EndpointInclusionStrategy;
 import com.github.libgraviton.gdk.api.endpoint.GeneratedEndpointManager;
 import com.github.libgraviton.gdk.api.endpoint.exception.UnableToLoadEndpointAssociationsException;
 import com.github.libgraviton.gdk.generator.Generator;
-import com.github.libgraviton.gdk.generator.exception.GeneratorException;
+import com.github.libgraviton.gdk.generator.GeneratorInstructionLoader;
 import com.github.libgraviton.gdk.generator.instructionloader.grvprofile.GrvProfileInstructionLoader;
+import com.github.libgraviton.gdk.generator.instructionloader.swagger.SwaggerInstructionLoader;
+import com.github.libgraviton.gdk.generator.exception.GeneratorException;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Execute;
 import org.apache.maven.plugins.annotations.LifecyclePhase;
@@ -31,6 +33,12 @@ public class GenerateMojo extends Jsonschema2PojoMojo {
     @Parameter
     private Jsonschema2PojoMojo generatorConfig = new Jsonschema2PojoMojo();
 
+    @Parameter(defaultValue = GrvProfileInstructionLoader.ID)
+    private String instructionLoader;
+
+    @Parameter
+    private SwaggerConfig swaggerConfig = new SwaggerConfig();
+
     public void execute() throws MojoExecutionException
     {
         try {
@@ -48,7 +56,7 @@ public class GenerateMojo extends Jsonschema2PojoMojo {
             Generator generator = new Generator(
                     generatorConfig,
                     gravitonApi,
-                    new GrvProfileInstructionLoader(gravitonApi)
+                    createInstructionLoader(gravitonApi)
             );
             generator.generate();
         } catch (GeneratorException e) {
@@ -79,6 +87,21 @@ public class GenerateMojo extends Jsonschema2PojoMojo {
                     .create(EndpointInclusionStrategy.Strategy.DEFAULT, null);
         }
         return endpointInclusionStrategy;
+    }
+
+    private GeneratorInstructionLoader createInstructionLoader(GravitonApi graviton) throws MojoExecutionException {
+        switch (instructionLoader) {
+            case GrvProfileInstructionLoader.ID:
+                return new GrvProfileInstructionLoader(graviton);
+            case SwaggerInstructionLoader.ID:
+                return new SwaggerInstructionLoader(swaggerConfig.getLocation());
+        }
+        throw new MojoExecutionException(String.format(
+                "Unsupported generator instruction loader: '%s'. Supported loaders: '%s', '%s'.",
+                instructionLoader,
+                GrvProfileInstructionLoader.ID,
+                SwaggerInstructionLoader.ID
+        ));
     }
 
 }
