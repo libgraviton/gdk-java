@@ -13,7 +13,6 @@ import com.github.libgraviton.gdk.data.GravitonBase;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.StringJoiner;
 
 /**
  * Together with the enclosed Builder, it allows to generate RQL queries that can be used for GET requests.
@@ -26,18 +25,6 @@ public class Rql extends Query {
 
     private Rql(List<QueryStatement> statements) {
         this.statements = statements;
-    }
-
-    /**
-     * Generate the RQL query (starting with '?') from the statements it contains.
-     *
-     * @return RQL query
-     */
-    @Override
-    public String generate() {
-        StringJoiner joiner = new StringJoiner("&");
-        statements.forEach( statement -> joiner.add(statement.build()));
-        return statements.isEmpty() ? "" : "?" + joiner.toString();
     }
 
     public static class Builder {

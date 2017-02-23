@@ -2,6 +2,7 @@ package com.github.libgraviton.gdk.api.query;
 
 
 import java.util.List;
+import java.util.StringJoiner;
 
 /**
  * Support typed URL queries with the help of query statements.
@@ -10,7 +11,7 @@ import java.util.List;
  * @see <a href="http://swisscom.ch">http://swisscom.ch</a>
  * @version $Id: $Id
  */
-public abstract class Query {
+public class Query {
 
     protected List<QueryStatement> statements;
 
@@ -19,7 +20,11 @@ public abstract class Query {
      *
      * @return query as String
      */
-    public abstract String generate();
+    public String generate() {
+        StringJoiner joiner = new StringJoiner("&");
+        statements.forEach( statement -> joiner.add(statement.build()));
+        return statements.isEmpty() ? "" : "?" + joiner.toString();
+    }
 
     /**
      * All the QueryStatement elements for this query.
