@@ -137,13 +137,24 @@ public class GravitonApi {
     }
 
     public Request.Builder get(GravitonBase resource) {
-        return get(extractId(resource), resource.getClass())
-                .setQuery(new Rql.Builder().setResource(resource, getObjectMapper()).build());
+        return get(extractId(resource), resource.getClass());
     }
 
     public Request.Builder get(String id, Class clazz) {
         return get(endpointManager.getEndpoint(clazz.getName()).getItemUrl())
                 .addParam("id", id);
+    }
+
+    /**
+     * GET request with a URL query. The response will result in a list of items,
+     * even if there is only 1 matching item to the query.
+     *
+     * @param resource
+     * @return
+     */
+    public Request.Builder query(GravitonBase resource) {
+        return get(endpointManager.getEndpoint(resource.getClass().getName()).getUrl())
+                .setQuery(new Rql.Builder().setResource(resource, getObjectMapper()).build());
     }
 
     public Request.Builder delete(String url) {
