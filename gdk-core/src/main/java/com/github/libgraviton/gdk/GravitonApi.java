@@ -231,8 +231,4 @@ public class GravitonApi {
                 .set("Accept", "application/json")
                 .build();
     }
-
-    public void setRequestExecutor(RequestExecutor executor) {
-        this.executor = executor;
-    }
 }

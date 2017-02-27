@@ -6,6 +6,7 @@ import com.github.libgraviton.gdk.api.HttpMethod;
 import com.github.libgraviton.gdk.api.Request;
 import com.github.libgraviton.gdk.api.endpoint.Endpoint;
 import com.github.libgraviton.gdk.api.endpoint.EndpointManager;
+import com.github.libgraviton.gdk.api.query.rql.Rql;
 import com.github.libgraviton.gdk.data.NoopClass;
 import com.github.libgraviton.gdk.data.SimpleClass;
 import com.github.libgraviton.gdk.exception.SerializationException;
@@ -51,8 +52,11 @@ public class GravitonApiTest {
     public void testQuery() throws Exception {
         SimpleClass resource = new SimpleClass();
         resource.setId("111");
-        Request request = gravitonApi.query(resource).build();
-        assertEquals("http://someUrl/?eq(id,string:111)", request.getUrl().toString());
+        Request request = gravitonApi
+                .query(resource)
+                .setQuery(new Rql.Builder().setLimit(1).build())
+                .build();
+        assertEquals("http://someUrl/?eq(id,string:111)&limit(1)", request.getUrl().toString());
         assertEquals(HttpMethod.GET, request.getMethod());
     }
 
