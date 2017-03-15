@@ -150,8 +150,8 @@ public class GravitonApi {
      * GET request with a URL query. The response will result in a list of items,
      * even if there is only 1 matching item to the query.
      *
-     * @param resource
-     * @return
+     * @param resource payload
+     * @return request builder
      */
     public Request.Builder query(GravitonBase resource) {
         return get(endpointManager.getEndpoint(resource.getClass().getName()).getUrl())
