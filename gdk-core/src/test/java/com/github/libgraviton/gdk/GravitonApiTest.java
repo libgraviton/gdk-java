@@ -3,6 +3,7 @@ package com.github.libgraviton.gdk;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.libgraviton.gdk.api.HttpMethod;
+import com.github.libgraviton.gdk.api.NoopRequest;
 import com.github.libgraviton.gdk.api.Request;
 import com.github.libgraviton.gdk.api.endpoint.Endpoint;
 import com.github.libgraviton.gdk.api.endpoint.EndpointManager;
@@ -10,11 +11,11 @@ import com.github.libgraviton.gdk.api.query.rql.Rql;
 import com.github.libgraviton.gdk.data.NoopClass;
 import com.github.libgraviton.gdk.data.SimpleClass;
 import com.github.libgraviton.gdk.exception.SerializationException;
+import com.github.libgraviton.gdk.serialization.JsonPatcher;
 import org.junit.Before;
 import org.junit.Test;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
 
@@ -74,7 +75,14 @@ public class GravitonApiTest {
     public void testPatch() throws Exception {
         SimpleClass resource = new SimpleClass();
         resource.setId("111");
+        JsonPatcher.add(resource, gravitonApi.getObjectMapper().valueToTree(resource));
+
         Request request = gravitonApi.patch(resource).build();
+        assertTrue(request instanceof NoopRequest);
+
+        resource.setName("aName");
+        request = gravitonApi.patch(resource).build();
+        assertFalse(request instanceof NoopRequest);
         assertEquals(itemUrl, request.getUrl().toString());
         assertEquals(HttpMethod.PATCH, request.getMethod());
         assertNotNull(request.getBody());

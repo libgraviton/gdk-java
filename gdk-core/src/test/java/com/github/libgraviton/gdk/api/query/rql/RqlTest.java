@@ -1,35 +1,43 @@
 package com.github.libgraviton.gdk.api.query.rql;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.libgraviton.gdk.data.ComplexClass;
+import com.github.libgraviton.gdk.serialization.mapper.RqlObjectMapper;
+import com.github.libgraviton.gdk.util.PropertiesLoader;
 import org.junit.Test;
 
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Properties;
 
 import static org.junit.Assert.assertEquals;
 
 public class RqlTest {
 
     @Test
-    public void testGenerateWithAllStatements() {
+    public void testGenerateWithAllStatements() throws Exception {
         ComplexClass aClass1 = new ComplexClass();
         aClass1.setName("name1");
         ComplexClass aClass2 = new ComplexClass();
         aClass2.setName("name2");
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2001, 10, 20, 9, 8, 7);
+        aClass2.setDate(calendar.getTime());
 
         ComplexClass complexClass = new ComplexClass();
         complexClass.setName("aName");
         complexClass.setaClass(aClass1);
         complexClass.setClasses(Arrays.asList(aClass1, aClass2));
 
+        Properties properties = PropertiesLoader.load();
+
         Rql rql = new Rql.Builder()
                 .setLimit(1)
                 .addSelect("zip")
                 .addSelect("city")
-                .setResource(complexClass, new ObjectMapper())
+                .setResource(complexClass, new RqlObjectMapper(properties))
                 .build();
 
-        String expectedRql = "?and(eq(name,string:aName),eq(aClass.name,string:name1),eq(classes..name,string:name1),eq(classes..name,string:name2))&limit(1)&select(zip,city)";
+        String expectedRql = "?and(eq(name,string:aName),eq(aClass.name,string:name1),eq(classes..name,string:name1),eq(classes..name,string:name2),eq(classes..date,2001-11-20T09:08:07Z))&limit(1)&select(zip,city)";
 
         assertEquals(expectedRql, rql.generate());
     }

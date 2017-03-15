@@ -2,6 +2,7 @@ package com.github.libgraviton.gdk.data;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -13,6 +14,8 @@ public class ComplexClass implements GravitonBase {
     private String id;
 
     private String name;
+
+    private Date date;
 
     private ComplexClass aClass;
 
@@ -32,6 +35,14 @@ public class ComplexClass implements GravitonBase {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
     }
 
     public ComplexClass getaClass() {

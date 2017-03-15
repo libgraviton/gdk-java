@@ -3,6 +3,7 @@ package com.github.libgraviton.gdk;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.libgraviton.gdk.api.NoopRequest;
 import com.github.libgraviton.gdk.api.Request;
 import com.github.libgraviton.gdk.api.endpoint.EndpointManager;
 import com.github.libgraviton.gdk.api.endpoint.GeneratedEndpointManager;
@@ -12,12 +13,12 @@ import com.github.libgraviton.gdk.api.query.rql.Rql;
 import com.github.libgraviton.gdk.data.GravitonBase;
 import com.github.libgraviton.gdk.exception.SerializationException;
 import com.github.libgraviton.gdk.serialization.JsonPatcher;
+import com.github.libgraviton.gdk.serialization.mapper.GravitonObjectMapper;
+import com.github.libgraviton.gdk.serialization.mapper.RqlObjectMapper;
 import com.github.libgraviton.gdk.util.PropertiesLoader;
 
 import java.io.IOException;
-import java.text.SimpleDateFormat;
 import java.util.Properties;
-import java.util.TimeZone;
 
 /**
  * This is the base class used for Graviton API calls.
@@ -70,7 +71,7 @@ public class GravitonApi {
         } catch (IOException e) {
             throw new IllegalStateException("Unable to load properties files.", e);
         }
-        this.objectMapper = initObjectMapper();
+        this.objectMapper = new GravitonObjectMapper(properties);
         this.executor = new RequestExecutor(objectMapper);
     }
 
@@ -154,7 +155,7 @@ public class GravitonApi {
      */
     public Request.Builder query(GravitonBase resource) {
         return get(endpointManager.getEndpoint(resource.getClass().getName()).getUrl())
-                .setQuery(new Rql.Builder().setResource(resource, getObjectMapper()).build());
+                .setQuery(new Rql.Builder().setResource(resource, new RqlObjectMapper(properties)).build());
     }
 
     public Request.Builder delete(String url) {
@@ -179,10 +180,19 @@ public class GravitonApi {
 
     public Request.Builder patch(GravitonBase resource) throws SerializationException {
         JsonNode jsonNode = getObjectMapper().convertValue(resource, JsonNode.class);
-        return request()
+        String data = serializeResource(JsonPatcher.getPatch(resource, jsonNode));
+
+        Request.Builder builder;
+        if(data == null || data.isEmpty() || "[]".equals(data)) {
+            builder = new NoopRequest.Builder("PATCH body is empty. Nothing changed.");
+        } else {
+            builder = request();
+        }
+
+        return builder
                 .setUrl(endpointManager.getEndpoint(resource.getClass().getName()).getItemUrl())
                 .addParam("id", extractId(resource))
-                .patch(serializeResource(JsonPatcher.getPatch(resource, jsonNode)));
+                .patch(data);
     }
 
     public Request.Builder post(GravitonBase resource) throws SerializationException {
@@ -204,6 +214,10 @@ public class GravitonApi {
     }
 
     protected String serializeResource(Object data) throws SerializationException {
+        if (data == null) {
+            return "";
+        }
+
         try {
             return getObjectMapper().writeValueAsString(data);
         } catch (JsonProcessingException e) {
@@ -212,12 +226,6 @@ public class GravitonApi {
                     e
             );
         }
-    }
-
-    protected ObjectMapper initObjectMapper() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat(properties.getProperty("graviton.date.format"));
-        dateFormat.setTimeZone(TimeZone.getTimeZone(properties.getProperty("graviton.timezone")));
-        return new ObjectMapper().setDateFormat(dateFormat);
     }
 
     public ObjectMapper getObjectMapper() {

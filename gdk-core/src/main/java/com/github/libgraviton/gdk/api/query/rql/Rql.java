@@ -10,6 +10,8 @@ import com.github.libgraviton.gdk.api.query.rql.statements.Limit;
 import com.github.libgraviton.gdk.api.query.rql.statements.Select;
 import com.github.libgraviton.gdk.data.GravitonBase;
 
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -66,17 +68,17 @@ public class Rql extends Query {
         public Rql.Builder setResource(GravitonBase resource, ObjectMapper mapper) {
             JsonNode node = mapper.valueToTree(resource);
 
-            List<QueryStatement> QueryStatements = getQueryStatementsFromNode(node, null);
-            switch (QueryStatements.size()) {
+            List<QueryStatement> queryStatements = getQueryStatementsFromNode(node, mapper.getDateFormat(), null);
+            switch (queryStatements.size()) {
                 case 0:
                     resourceStatement = null;
                     break;
                 case 1:
-                    resourceStatement = QueryStatements.get(0);
+                    resourceStatement = queryStatements.get(0);
                     break;
                 default:
                     AndOperator andOperator = new AndOperator();
-                    andOperator.addStatements(QueryStatements);
+                    andOperator.addStatements(queryStatements);
                     resourceStatement = andOperator;
                     break;
             }
@@ -98,7 +100,7 @@ public class Rql extends Query {
             return new Rql(statements);
         }
 
-        protected List<QueryStatement> getQueryStatementsFromNode(JsonNode node, String path) {
+        protected List<QueryStatement> getQueryStatementsFromNode(JsonNode node, DateFormat dateFormat, String path) {
             List<QueryStatement> statements = new ArrayList<>();
             Iterator<String> fieldNames = node.fieldNames();
             while (fieldNames.hasNext()) {
@@ -107,12 +109,21 @@ public class Rql extends Query {
                 JsonNode currentNode = node.get(fieldName);
                 if (currentNode.isArray()) {
                     for (JsonNode nodeEntry : currentNode) {
-                        statements.addAll(getQueryStatementsFromNode(nodeEntry, currentPath + "."));
+                        statements.addAll(getQueryStatementsFromNode(nodeEntry, dateFormat, currentPath + "."));
                     }
                 } else if (currentNode.isObject()) {
-                    statements.addAll(getQueryStatementsFromNode(currentNode, currentPath));
+                    statements.addAll(getQueryStatementsFromNode(currentNode, dateFormat, currentPath));
                 } else {
-                    Eq eq = new Eq(currentPath, "string:" + currentNode.textValue());
+                    String value = currentNode.textValue();
+                    // whenever the value is a parsable date, the 'string:' prefix needs to be omitted because
+                    // searching date fields as 'string:' will not result in a match when used in a RQL query.
+                    try {
+                        dateFormat.parse(value);
+                    } catch (ParseException e) {
+                        value = "string:" + value;
+                    }
+
+                    Eq eq = new Eq(currentPath, value);
                     statements.add(eq);
                 }
             }

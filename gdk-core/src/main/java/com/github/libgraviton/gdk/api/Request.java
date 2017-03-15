@@ -16,15 +16,15 @@ import java.util.Map;
 
 public class Request {
 
-    private URL url;
+    protected URL url;
 
-    private HttpMethod method;
+    protected HttpMethod method;
 
-    private HeaderBag headers;
+    protected HeaderBag headers;
 
-    private byte[] body;
+    protected byte[] body;
 
-    private List<Part> parts;
+    protected List<Part> parts;
 
     protected Request() {
     }
@@ -67,21 +67,21 @@ public class Request {
 
     public static class Builder {
 
-        private String url;
+        protected String url;
 
-        private Map<String, String> params = new HashMap<>();
+        protected Map<String, String> params = new HashMap<>();
 
-        private HttpMethod method = HttpMethod.GET;
+        protected HttpMethod method = HttpMethod.GET;
 
-        private HeaderBag.Builder headerBuilder = new HeaderBag.Builder();
+        protected HeaderBag.Builder headerBuilder = new HeaderBag.Builder();
 
-        private Query query;
+        protected Query query;
 
-        private byte[] body;
+        protected byte[] body;
 
-        private List<Part> parts = new ArrayList<>();
+        protected List<Part> parts = new ArrayList<>();
 
-        private RequestExecutor executor;
+        protected RequestExecutor executor;
 
         public Builder() {
             this.executor = new RequestExecutor();
