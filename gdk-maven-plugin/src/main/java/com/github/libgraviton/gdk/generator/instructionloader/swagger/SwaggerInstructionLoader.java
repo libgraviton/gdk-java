@@ -10,6 +10,7 @@ import io.swagger.parser.SwaggerParser;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,12 +28,13 @@ public class SwaggerInstructionLoader implements GeneratorInstructionLoader {
 
     @Override
     public List<GeneratorInstruction> loadInstructions() {
-        List<GeneratorInstruction> instructions = new ArrayList<>();
+        Map<String, GeneratorInstruction> instructions = new HashMap<>();
+
         for ( Map.Entry<String, Path> entry: swagger.getPaths().entrySet()) {
             Path path = entry.getValue();
             Model model = extractModel(path);
             if (null != model) {
-                instructions.add(new GeneratorInstruction(
+                instructions.put(model.getTitle(), new GeneratorInstruction(
                         model.getTitle(),
                         "",
                         new JSONObject(model),
@@ -41,7 +43,18 @@ public class SwaggerInstructionLoader implements GeneratorInstructionLoader {
             }
         }
 
-        return instructions;
+        for (Map.Entry<String, Model> modelEntry : swagger.getDefinitions().entrySet()) {
+            Model model = modelEntry.getValue();
+            String className = null == model.getTitle() ? modelEntry.getKey() : model.getTitle();
+            instructions.put(className, new GeneratorInstruction(
+                    className,
+                    "",
+                    new JSONObject(model),
+                    new Endpoint(null)
+            ));
+        }
+
+        return new ArrayList<>(instructions.values());
     }
 
     @Override

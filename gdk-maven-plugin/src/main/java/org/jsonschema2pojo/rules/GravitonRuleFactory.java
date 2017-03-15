@@ -1,9 +1,6 @@
 package org.jsonschema2pojo.rules;
 
-import com.sun.codemodel.JClass;
-import com.sun.codemodel.JDocComment;
-import com.sun.codemodel.JDocCommentable;
-import com.sun.codemodel.JPackage;
+import com.sun.codemodel.*;
 
 /**
  * Extended rule factory to match Graviton needs.
@@ -23,5 +20,10 @@ public class GravitonRuleFactory extends RuleFactory {
     @Override
     public Rule<JDocCommentable, JDocComment> getDescriptionRule() {
         return new FilteredDescriptionRule();
+    }
+
+    @Override
+    public Rule<JPackage, JType> getObjectRule() {
+        return super.getObjectRule();
     }
 }
