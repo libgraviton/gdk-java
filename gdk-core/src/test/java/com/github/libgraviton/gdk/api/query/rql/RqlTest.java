@@ -8,6 +8,7 @@ import org.junit.Test;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Properties;
+import java.util.TimeZone;
 
 import static org.junit.Assert.assertEquals;
 
@@ -19,7 +20,7 @@ public class RqlTest {
         aClass1.setName("name1");
         ComplexClass aClass2 = new ComplexClass();
         aClass2.setName("name2");
-        Calendar calendar = Calendar.getInstance();
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("UTC"));
         calendar.set(2001, 10, 20, 9, 8, 7);
         aClass2.setDate(calendar.getTime());
 
@@ -37,7 +38,7 @@ public class RqlTest {
                 .setResource(complexClass, new RqlObjectMapper(properties))
                 .build();
 
-        String expectedRql = "?and(eq(name,string:aName),eq(aClass.name,string:name1),eq(classes..name,string:name1),eq(classes..name,string:name2),eq(classes..date,2001-11-20T09:08:07Z))&limit(1)&select(zip,city)";
+        String expectedRql = "?and(eq(name,string:aName),eq(aClass.name,string:name1),eq(classes..name,string:name1),eq(classes..name,string:name2),eq(classes..date,2001-11-20T10:08:07Z))&limit(1)&select(zip,city)";
 
         assertEquals(expectedRql, rql.generate());
     }
