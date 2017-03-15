@@ -24,7 +24,7 @@ public class RqlObjectMapperTest {
         calendar.set(2001, 10, 20, 9, 8, 7);
         Date date = calendar.getTime();
         JsonNode jsonNode = mapper.valueToTree(date);
-        assertEquals("2001-11-20T10:08:07Z", jsonNode.textValue());
+        assertEquals("2001-11-20T09:08:07Z", jsonNode.textValue());
     }
 
     @Test

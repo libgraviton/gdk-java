@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.text.SimpleDateFormat;
 import java.util.Properties;
+import java.util.TimeZone;
 
 /**
  * Created by taawemi6 on 14.03.17.
@@ -15,6 +16,7 @@ public class RqlObjectMapper extends ObjectMapper {
         super();
 
         SimpleDateFormat dateFormat = new SimpleDateFormat(properties.getProperty("graviton.rql.date.format"));
+        dateFormat.setTimeZone(TimeZone.getTimeZone(properties.getProperty("graviton.timezone")));
         setDateFormat(dateFormat);
         setSerializationInclusion(JsonInclude.Include.NON_NULL);
     }

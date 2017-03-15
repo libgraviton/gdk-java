@@ -38,7 +38,7 @@ public class RqlTest {
                 .setResource(complexClass, new RqlObjectMapper(properties))
                 .build();
 
-        String expectedRql = "?and(eq(name,string:aName),eq(aClass.name,string:name1),eq(classes..name,string:name1),eq(classes..name,string:name2),eq(classes..date,2001-11-20T10:08:07Z))&limit(1)&select(zip,city)";
+        String expectedRql = "?and(eq(name,string:aName),eq(aClass.name,string:name1),eq(classes..name,string:name1),eq(classes..name,string:name2),eq(classes..date,2001-11-20T09:08:07Z))&limit(1)&select(zip,city)";
 
         assertEquals(expectedRql, rql.generate());
     }
