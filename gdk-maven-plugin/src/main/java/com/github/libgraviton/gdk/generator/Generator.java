@@ -95,7 +95,7 @@ public class Generator {
         LOG.info("Generating POJO classes for Graviton '" + gravitonApi.getBaseUrl() + "'.");
         for (GeneratorInstruction definition : generatorInstructions) {
             String className = definition.getClassName();
-            if (0 == className.length()) {
+            if (null == className || 0 == className.length()) {
                 LOG.info(
                         "Ignoring endpoint '{}' because it does not define any class.",
                         definition.getEndpoint().getItemUrl()

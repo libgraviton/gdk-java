@@ -4,14 +4,17 @@ import com.github.libgraviton.gdk.api.endpoint.Endpoint;
 import com.github.libgraviton.gdk.generator.GeneratorInstruction;
 import com.github.libgraviton.gdk.generator.GeneratorInstructionLoader;
 import io.swagger.models.*;
+import io.swagger.models.parameters.BodyParameter;
+import io.swagger.models.parameters.FormParameter;
+import io.swagger.models.parameters.Parameter;
+import io.swagger.models.properties.ArrayProperty;
+import io.swagger.models.properties.MapProperty;
 import io.swagger.models.properties.Property;
 import io.swagger.models.properties.RefProperty;
 import io.swagger.parser.SwaggerParser;
-import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -27,53 +30,36 @@ public class SwaggerInstructionLoader implements GeneratorInstructionLoader {
         swagger = parser.read(swaggerLocation);
     }
 
-    private HashMap<String, JSONObject> types = new HashMap<>();
 
     @Override
     public List<GeneratorInstruction> loadInstructions() {
-        Map<String, GeneratorInstruction> instructions = new HashMap<>();
+        Map<String, Model> definitions = swagger.getDefinitions();
+        List<GeneratorInstruction> instructions = new ArrayList<>();
+        for (Map.Entry<String, Path> entry: swagger.getPaths().entrySet()) {
+            Path path = entry.getValue();
+            Model model = extractModel(path.getParameters());
 
-        for (Map.Entry<String, Model> modelEntry : swagger.getDefinitions().entrySet()) {
-            Model model = modelEntry.getValue();
-            String name = modelEntry.getKey();
-            String className = null == model.getTitle() ? name : model.getTitle();
-            JSONObject schema = new JSONObject(model);
-            schema.put("javaType", toClassName(className));
-            types.put(toClassName(name), schema);
-        }
+            if (null == model) {
+                continue;
+            }
 
-        for (Map.Entry<String, JSONObject> schemaEntry : types.entrySet()) {
-            enrichSchema(schemaEntry.getValue());
-        }
-
-        for (Map.Entry<String, Model> modelEntry : swagger.getDefinitions().entrySet()) {
-            Model model = modelEntry.getValue();
-            String className = null == model.getTitle() ? modelEntry.getKey() : model.getTitle();
-            JSONObject schema = new JSONObject(model);
-            enrichSchema(schema);
-            instructions.put(className, new GeneratorInstruction(
-                    className,
+            JSONObject schema;
+            if (model instanceof RefModel) {
+                schema = new JSONObject();
+                schema.put("$ref", ((RefModel) model).get$ref());
+            } else {
+                schema = new JSONObject(model);
+            }
+            schema.put("definitions", definitions);
+            instructions.add(new GeneratorInstruction(
+                    null == model.getTitle() ? ,
                     "",
                     schema,
-                    new Endpoint(null)
+                    new Endpoint(entry.getKey())
             ));
         }
 
-        for ( Map.Entry<String, Path> entry: swagger.getPaths().entrySet()) {
-            Path path = entry.getValue();
-            JSONObject schema = determineSchema(path);
-            enrichSchema(schema);
-            if (null != schema) {
-                instructions.put(schema.getString("javaType"), new GeneratorInstruction(
-                        schema.getString("javaType"),
-                        "",
-                        schema,
-                        new Endpoint(entry.getKey())
-                ));
-            }
-        }
-
-        return new ArrayList<>(instructions.values());
+        return instructions;
     }
 
     @Override
@@ -81,61 +67,37 @@ public class SwaggerInstructionLoader implements GeneratorInstructionLoader {
         return null;
     }
 
-    private JSONObject determineSchema(Path path) {
-        JSONObject schema = null;
-        if (null != path.getGet()) {
-            schema = determineSchema(path.getGet());
-        }
-        if (null == schema && null != path.getPut()) {
-            schema = determineSchema(path.getPut());
-        }
-        if (null == schema && null != path.getPost()) {
-            schema = determineSchema(path.getPost());
-        }
-        return schema;
-    }
-
-    private JSONObject determineSchema(Operation operation) {
-        for (Map.Entry<String, Response> entry : operation.getResponses().entrySet()) {
+    private Model extractModel(Map<String, Response> responses) {
+        for (Map.Entry<String, Response> entry : responses.entrySet()) {
             String statusCode = entry.getKey();
             Response response = entry.getValue();
-            if ('2' == statusCode.charAt(0)) {
-                if (null != response.getSchema()) {
-                    return determineSchema(response.getSchema());
-                }
+            if ('2' == statusCode.charAt(0) && null != response && null != response.getSchema()) {
+                return extractModel(response.getSchema());
             }
         }
         return null;
     }
 
-    private JSONObject determineSchema(Property property) {
+    private Model extractModel(List<Parameter> parameters) {
+        for (Parameter parameter : parameters) {
+            if (parameter instanceof BodyParameter) {
+                return ((BodyParameter) parameter).getSchema();
+            } else if (parameter instanceof FormParameter) {
+                // @todo: support form parameters & file uploads
+            }
+        }
+        return null;
+    }
+
+    private Model extractModel(Property property) {
+        property = property instanceof ArrayProperty ? ((ArrayProperty) property).getItems() : property;
+
         if (property instanceof RefProperty) {
-            RefProperty refProperty = (RefProperty) property;
-            String definitionId = refProperty.getSimpleRef();
-            if (types.containsKey(toClassName(definitionId))) {
-                return types.get(toClassName(definitionId));
-            }
-            Model model =  swagger.getDefinitions().get(definitionId);
-            if (null != model && null == model.getTitle()) {
-                model.setTitle(definitionId);
-            }
-            return new JSONObject(model);
+            return new RefModel(((RefProperty) property).getSimpleRef());
+        } else if (property instanceof MapProperty) {
+            // todo: support non-ref properties.
         }
         return null;
     }
 
-    private void enrichSchema(JSONObject json) {
-        if (json.has("simpleRef")) {
-            json.put("javaType", types.get(toClassName(json.getString("simpleRef"))).getString("javaType"));
-        } else if (json.has("properties") && json.has("type") && "object".equals(json.get("type"))) {
-            JSONObject properties = json.getJSONObject("properties");
-            for (String property : properties.keySet()) {
-                enrichSchema(properties.getJSONObject(property));
-            }
-        }
-    }
-
-    private String toClassName(String name) {
-        return StringUtils.capitalize(name);
-    }
 }
