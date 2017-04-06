@@ -18,19 +18,19 @@ import java.util.List;
  */
 public class Response {
 
-    private Request request;
+    protected Request request;
 
-    private int code;
+    protected int code;
 
-    private  String message;
+    protected String message;
 
-    private HeaderBag headers;
+    protected HeaderBag headers;
 
-    private byte[] body;
+    protected byte[] body;
 
-    private boolean isSuccessful;
+    protected boolean isSuccessful;
 
-    private ObjectMapper objectMapper;
+    protected ObjectMapper objectMapper;
 
     protected Response() {
     }
@@ -147,17 +147,17 @@ public class Response {
 
     public static class Builder {
 
-        private int code;
+        protected int code;
 
-        private String message;
+        protected String message;
 
-        private Request request;
+        protected Request request;
 
-        private byte[] body;
+        protected byte[] body;
 
-        private boolean isSuccessful;
+        protected boolean isSuccessful;
 
-        private HeaderBag.Builder headerBuilder;
+        protected HeaderBag.Builder headerBuilder;
 
         public Builder(Request request) {
             this.request = request;

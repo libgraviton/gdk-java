@@ -2,25 +2,35 @@ package com.github.libgraviton.gdk.api;
 
 import com.github.libgraviton.gdk.RequestExecutor;
 import com.github.libgraviton.gdk.api.multipart.Part;
+import com.github.libgraviton.gdk.exception.UnsuccessfulRequestException;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static junit.framework.TestCase.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class RequestTest {
 
     private Request.Builder builder;
 
+    private Response response;
+
     @Before
     public void setup() throws Exception {
+        response = mock(Response.class);
+
         RequestExecutor executor = mock(RequestExecutor.class);
-        builder = new Request.Builder(executor).setUrl("http://aRandomUrl");
+        when(executor.execute(any(Request.class))).thenReturn(response);
+        URL url = new URL("http://aRandomUrl");
+        builder = new Request.Builder(executor).setUrl(url);
     }
 
     @Test
@@ -149,5 +159,18 @@ public class RequestTest {
 
         request = builder.setHeaders(null).build();
         assertEquals(0, request.getHeaders().all().size());
+    }
+
+    @Test
+    public void testExecuteSuccess() throws Exception {
+        Response actualResponse = builder.get().execute();
+        assertEquals(response, actualResponse);
+    }
+
+    @Test(expected = UnsuccessfulRequestException.class)
+    public void testExecuteFail() throws Exception {
+        builder.setUrl("malformed-url");
+        Response actualResponse = builder.get().execute();
+        assertEquals(response, actualResponse);
     }
 }

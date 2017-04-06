@@ -3,6 +3,7 @@ package com.github.libgraviton.gdk.api;
 import com.github.libgraviton.gdk.RequestExecutor;
 import com.github.libgraviton.gdk.api.header.HeaderBag;
 import com.github.libgraviton.gdk.api.multipart.Part;
+import com.github.libgraviton.gdk.api.query.Query;
 import com.github.libgraviton.gdk.exception.CommunicationException;
 import com.github.libgraviton.gdk.exception.UnsuccessfulRequestException;
 
@@ -15,15 +16,15 @@ import java.util.Map;
 
 public class Request {
 
-    private URL url;
+    protected URL url;
 
-    private HttpMethod method;
+    protected HttpMethod method;
 
-    private HeaderBag headers;
+    protected HeaderBag headers;
 
-    private byte[] body;
+    protected byte[] body;
 
-    private List<Part> parts;
+    protected List<Part> parts;
 
     protected Request() {
     }
@@ -66,19 +67,21 @@ public class Request {
 
     public static class Builder {
 
-        private String url;
+        protected String url;
 
-        private Map<String, String> params = new HashMap<>();
+        protected Map<String, String> params = new HashMap<>();
 
-        private HttpMethod method = HttpMethod.GET;
+        protected HttpMethod method = HttpMethod.GET;
 
-        private HeaderBag.Builder headerBuilder = new HeaderBag.Builder();
+        protected HeaderBag.Builder headerBuilder = new HeaderBag.Builder();
 
-        private byte[] body;
+        protected Query query;
 
-        private List<Part> parts = new ArrayList<>();
+        protected byte[] body;
 
-        private RequestExecutor executor;
+        protected List<Part> parts = new ArrayList<>();
+
+        protected RequestExecutor executor;
 
         public Builder() {
             this.executor = new RequestExecutor();
@@ -123,6 +126,16 @@ public class Request {
 
         public Builder setHeaders(HeaderBag headerBag) {
             headerBuilder = new HeaderBag.Builder(headerBag);
+            return this;
+        }
+
+        public Builder setQuery(Query query) {
+            if(this.query == null) {
+                this.query = query;
+            } else {
+                this.query.addStatements(query.getStatements());
+            }
+
             return this;
         }
 
@@ -204,7 +217,8 @@ public class Request {
         }
 
         protected URL buildUrl() throws MalformedURLException {
-            String url = this.url;
+            String generatedQuery = query != null ? query.generate() : "";
+            String url = this.url + generatedQuery;
             for (Map.Entry<String, String> param : params.entrySet()) {
                 url = url.replace(String.format("{%s}", param.getKey()), param.getValue());
             }
