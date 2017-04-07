@@ -11,6 +11,8 @@ import com.github.libgraviton.gdk.exception.UnsuccessfulResponseException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Arrays;
+
 /**
  * This is the base class used for Graviton API calls.
  *
@@ -74,19 +76,41 @@ public class RequestExecutor {
     }
 
     protected void logBody(Request request) {
-        // log standard request
+        int maxBodySize = 1000;
+        String truncatePostfix = "... [body too big to display in its complete beauty]";
+
         if (request.getBody() != null) {
-            LOG.debug("with request body '" + request.getBody() + "'");
+            logStandardRequest(request, maxBodySize, truncatePostfix);
         }
 
-        // log multipart request
         if (request.getParts() != null && request.getParts().size() > 0) {
-            StringBuilder builder = new StringBuilder();
-            for (Part part: request.getParts()) {
-                builder.append(part).append("\n");
-            }
-            LOG.debug("with multipart request body [\n" + builder.toString() + "]");
+            logMultipartRequest(request, maxBodySize, truncatePostfix);
         }
+    }
+
+    private void logStandardRequest(Request request, int maxBodySize, String truncatePostfix) {
+        String body = request.getBody();
+        body = body.length() <= maxBodySize
+                ? body
+                : body.substring(0, maxBodySize) + truncatePostfix;
+        LOG.debug("with request body '" + body + "'");
+    }
+
+    private void logMultipartRequest(Request request, int maxBodySize, String truncatePostfix) {
+        StringBuilder builder = new StringBuilder();
+        for (Part part: request.getParts()) {
+            byte[] body = part.getBody();
+            String loggablePart = "Part{" +
+                    "formName='" + part.getFormName() + '\'' +
+                    ", body='" +
+                    (body.length <= maxBodySize
+                            ? new String(body)
+                            : new String(Arrays.copyOfRange(body, 0, maxBodySize)) + truncatePostfix) +
+                    '\'' +
+                    "}";
+            builder.append(loggablePart).append("\n");
+        }
+        LOG.debug("with multipart request body [\n" + builder.toString() + "]");
     }
 
     public void setGateway(GravitonGateway gateway) {
