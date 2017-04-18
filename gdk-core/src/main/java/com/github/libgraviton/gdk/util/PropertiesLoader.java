@@ -13,6 +13,21 @@ public class PropertiesLoader {
 
     private static final String OVERWRITE_PROPERTIES_PATH = "app.properties";
 
+    /**
+     * Loads the Properties in the following order (if a property entry ia already loaded, it will be overridden with the new value).
+     * 1.) Default Properties
+     *     Minimal needed properties for the gdk
+     *
+     * 2.) Overwrite Properties
+     *     Usually projects that make use of the gdk library will define these properties.
+     *
+     * 3.) System Properties
+     *     Projects that use the gdk library could be deployed to several environments that require different property values.
+     *     The easiest way at this point is to just redefine those properties as system properties.
+     *
+     * @return loaded Properties
+     * @throws IOException whenever the properties from a given path could not be loaded
+     */
     public static Properties load() throws IOException {
         Properties properties = new Properties();
 
@@ -25,6 +40,8 @@ public class PropertiesLoader {
                 properties.load(overwriteProperties);
             }
         }
+
+        properties.putAll(System.getProperties());
 
         return properties;
     }
