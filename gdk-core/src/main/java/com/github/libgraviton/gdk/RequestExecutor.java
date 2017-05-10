@@ -76,36 +76,28 @@ public class RequestExecutor {
     }
 
     protected void logBody(Request request) {
-        int maxBodySize = 1000;
-        String truncatePostfix = "... [body too big to display in its complete beauty]";
-
         if (request.getBody() != null) {
-            logStandardRequest(request, maxBodySize, truncatePostfix);
+            logStandardRequest(request);
         }
 
         if (request.getParts() != null && request.getParts().size() > 0) {
-            logMultipartRequest(request, maxBodySize, truncatePostfix);
+            logMultipartRequest(request);
         }
     }
 
-    private void logStandardRequest(Request request, int maxBodySize, String truncatePostfix) {
+    private void logStandardRequest(Request request) {
         String body = request.getBody();
-        body = body.length() <= maxBodySize
-                ? body
-                : body.substring(0, maxBodySize) + truncatePostfix;
         LOG.debug("with request body '" + body + "'");
     }
 
-    private void logMultipartRequest(Request request, int maxBodySize, String truncatePostfix) {
+    private void logMultipartRequest(Request request) {
         StringBuilder builder = new StringBuilder();
         for (Part part: request.getParts()) {
             byte[] body = part.getBody();
             String loggablePart = "Part{" +
                     "formName='" + part.getFormName() + '\'' +
                     ", body='" +
-                    (body.length <= maxBodySize
-                            ? new String(body)
-                            : new String(Arrays.copyOfRange(body, 0, maxBodySize)) + truncatePostfix) +
+                    new String(body) +
                     '\'' +
                     "}";
             builder.append(loggablePart).append("\n");
