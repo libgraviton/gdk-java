@@ -3,8 +3,11 @@ package com.github.libgraviton.gdk.api.endpoint;
 import com.github.libgraviton.gdk.api.endpoint.exception.UnableToLoadEndpointAssociationsException;
 import com.github.libgraviton.gdk.api.endpoint.exception.UnableToPersistEndpointAssociationsException;
 import com.github.libgraviton.gdk.util.PropertiesLoader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.util.Iterator;
 import java.util.Map;
 
 /**
@@ -12,6 +15,8 @@ import java.util.Map;
  * association to a file and deserialize it afterwards.
  */
 public class GeneratedEndpointManager extends EndpointManager {
+
+    private static final Logger LOG = LoggerFactory.getLogger(GeneratedEndpointManager.class);
 
     public enum Mode {
         LOAD, CREATE
@@ -81,6 +86,7 @@ public class GeneratedEndpointManager extends EndpointManager {
             ObjectInputStream objectinputstream = new ObjectInputStream(loadInputStream());
             endpoints = (Map<String, Endpoint>) objectinputstream.readObject();
             objectinputstream.close();
+            LOG.debug(endpoints.size() + " endpoints loaded");
         } catch (IOException e) {
             throw new UnableToLoadEndpointAssociationsException(
                     "Unable to deserialize '" + assocFilePath + "'.",
@@ -104,9 +110,11 @@ public class GeneratedEndpointManager extends EndpointManager {
 
     protected InputStream loadInputStream() throws UnableToLoadEndpointAssociationsException {
         // try to load as resource first
+        LOG.debug("Load resource as stream from '" + assocFilePath + "'.");
         InputStream inputStream = GeneratedEndpointManager.class.getClassLoader().getResourceAsStream(assocFilePath);
 
         if(inputStream == null && serializationFile.exists()) {
+            LOG.debug("Resource not found. Fallback to serialization file '" + serializationFile.getAbsolutePath() + "'.");
             try {
                 // resource not found? Try to load as file
                 inputStream = new FileInputStream(serializationFile);
