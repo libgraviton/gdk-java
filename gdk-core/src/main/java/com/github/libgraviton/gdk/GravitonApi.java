@@ -34,6 +34,11 @@ public class GravitonApi {
      */
     private String baseUrl;
 
+    /** Workers id to be used in each request for subnet authentication to api */
+    private String workerId;
+    /** Header authentication name */
+    private String authHeaderName;
+
     /**
      * The object mapper used to serialize / deserialize to / from JSON
      */
@@ -51,6 +56,8 @@ public class GravitonApi {
     public GravitonApi() {
         setup();
         this.baseUrl = properties.getProperty("graviton.base.url");
+        this.workerId = properties.getProperty("graviton.workerId");
+        this.authHeaderName = properties.getProperty("graviton.authentication.header.name");
 
         try {
             this.endpointManager = initEndpointManager();
@@ -61,6 +68,8 @@ public class GravitonApi {
 
     public GravitonApi(String baseUrl, EndpointManager endpointManager) {
         setup();
+        this.workerId = "subnet-base";
+        this.authHeaderName = "x-graviton";
         this.baseUrl = baseUrl;
         this.endpointManager = endpointManager;
     }
@@ -234,9 +243,11 @@ public class GravitonApi {
 
     // TODO make it configurable
     protected HeaderBag getDefaultHeaders() {
+        String subnetName = "subnet-" + workerId;
         return new HeaderBag.Builder()
                 .set("Content-Type", "application/json")
                 .set("Accept", "application/json")
+                .set(authHeaderName, subnetName)
                 .build();
     }
 }
