@@ -33,13 +33,12 @@ public class GravitonFileEndpoint {
         LOG.debug("Requesting file");
 
         // without the 'Accept' - 'application/json' header, we get the file instead of the metadata
-        HeaderBag headers = new HeaderBag.Builder()
-                .set("Content-Type", "application/json")
-                .build();
+        HeaderBag.Builder headers = gravitonApi.getDefaultHeaders()
+                .unset("Accept");
 
         return gravitonApi.request()
                 .setUrl(url)
-                .setHeaders(headers)
+                .setHeaders(headers.build())
                 .get();
     }
 
@@ -68,9 +67,13 @@ public class GravitonFileEndpoint {
         Part dataPart = new Part(data, "upload");
         Part metadataPart = new Part(gravitonApi.serializeResource(resource), "metadata");
 
+        HeaderBag.Builder headers = gravitonApi.getDefaultHeaders()
+                .unset("Accept")
+                .unset("Content-Type");
+
         return gravitonApi.request()
                 .setUrl(gravitonApi.getEndpointManager().getEndpoint(resource.getClass().getName()).getUrl())
-                .setHeaders(new HeaderBag.Builder().build())
+                .setHeaders(headers.build())
                 .post(dataPart, metadataPart);
     }
 
@@ -78,10 +81,14 @@ public class GravitonFileEndpoint {
         Part dataPart = new Part(data, "upload");
         Part metadataPart = new Part(gravitonApi.serializeResource(resource), "metadata");
 
+        HeaderBag.Builder headers = gravitonApi.getDefaultHeaders()
+                .unset("Accept")
+                .unset("Content-Type");
+
         return gravitonApi.request()
                 .setUrl(gravitonApi.getEndpointManager().getEndpoint(resource.getClass().getName()).getItemUrl())
                 .addParam("id", gravitonApi.extractId(resource))
-                .setHeaders(new HeaderBag.Builder().build())
+                .setHeaders(headers.build())
                 .put(dataPart, metadataPart);
     }
 
