@@ -41,9 +41,9 @@ public class GravitonFileEndpointTest {
         when(gravitonApi.getEndpointManager()).thenReturn(endpointManager);
         when(gravitonApi.extractId(any(GravitonBase.class))).thenCallRealMethod();
         when(gravitonApi.serializeResource(any(SimpleClass.class))).thenReturn("{ \"id\":\"111\"}");
-        HeaderBag headers = new HeaderBag.Builder()
+        HeaderBag.Builder headers = new HeaderBag.Builder()
                 .set("whatever", "something")
-                .build();
+                .set("Accept", "almost-everything");
 
         when(gravitonApi.getDefaultHeaders()).thenReturn(headers);
         resource = new SimpleClass();
@@ -56,7 +56,7 @@ public class GravitonFileEndpointTest {
     public void testGetFile() throws Exception {
         Request request = gravitonFileEndpoint.getFile(url).build();
         assertEquals(0, request.getHeaders().get("Accept").all().size());
-        assertEquals(1, request.getHeaders().get("Content-Type").all().size());
+        assertEquals(1, request.getHeaders().get("whatever").all().size());
     }
 
     @Test

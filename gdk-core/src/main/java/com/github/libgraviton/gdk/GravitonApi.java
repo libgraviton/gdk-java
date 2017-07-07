@@ -104,7 +104,7 @@ public class GravitonApi {
      */
     public Request.Builder request() {
         return new Request.Builder(executor)
-                .setHeaders(getDefaultHeaders());
+                .setHeaders(getDefaultHeaders().build());
     }
 
     public Request.Builder head(String url) {
@@ -233,10 +233,9 @@ public class GravitonApi {
     }
 
     // TODO make it configurable
-    protected HeaderBag getDefaultHeaders() {
+    protected HeaderBag.Builder getDefaultHeaders() {
         return new HeaderBag.Builder()
                 .set("Content-Type", "application/json")
-                .set("Accept", "application/json")
-                .build();
+                .set("Accept", "application/json");
     }
 }
