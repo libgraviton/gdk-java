@@ -41,7 +41,9 @@ public class Rql extends Query {
      * RQL encoding string according to https://github.com/xiag-ag/rql-parser
      *
      * @param input string to encode
+     * @param encoding encoding
      * @return RQL encoded string
+     * @throws UnsupportedEncodingException if the named encoding is not supported
      */
     public static String encode(String input, String encoding) throws UnsupportedEncodingException {
         return URLEncoder.encode(input, encoding)
