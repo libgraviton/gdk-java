@@ -5,6 +5,7 @@ import com.github.libgraviton.gdk.serialization.mapper.RqlObjectMapper;
 import com.github.libgraviton.gdk.util.PropertiesLoader;
 import org.junit.Test;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Properties;
@@ -64,5 +65,23 @@ public class RqlTest {
 
         String expectedRql = "?limit(2,3)&select(attribute1)";
         assertEquals(expectedRql, rql1.generate());
+    }
+
+    @Test
+    public void testEncodeSuccessfully() throws UnsupportedEncodingException {
+        String unencoded = "http://a-host/endpoint?query=123_5.6~7";
+        String encoded = "http%3A%2F%2Fa%2Dhost%2Fendpoint%3Fquery%3D123%5F5%2E6%7E7";
+        assertEquals(encoded, Rql.encode(unencoded, Rql.DEFAULT_ENCODING));
+    }
+
+    @Test
+    public void testEncodeUnchanged() throws UnsupportedEncodingException {
+        String unencoded = "asdf123";
+        assertEquals(unencoded, Rql.encode(unencoded, Rql.DEFAULT_ENCODING));
+    }
+
+    @Test(expected = UnsupportedEncodingException.class)
+    public void testEncodeUnsupportedEncoding() throws UnsupportedEncodingException {
+        Rql.encode("asdf123", "non-existing-encoding");
     }
 }

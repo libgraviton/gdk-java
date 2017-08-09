@@ -9,7 +9,11 @@ import com.github.libgraviton.gdk.api.query.rql.statements.Eq;
 import com.github.libgraviton.gdk.api.query.rql.statements.Limit;
 import com.github.libgraviton.gdk.api.query.rql.statements.Select;
 import com.github.libgraviton.gdk.data.GravitonBase;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -25,8 +29,26 @@ import java.util.List;
  */
 public class Rql extends Query {
 
+    private static final Logger LOG = LoggerFactory.getLogger(Rql.class);
+
+    public static final String DEFAULT_ENCODING = "UTF-8";
+
     private Rql(List<QueryStatement> statements) {
         this.statements = statements;
+    }
+
+    /**
+     * RQL encoding string according to https://github.com/xiag-ag/rql-parser
+     *
+     * @param input string to encode
+     * @return RQL encoded string
+     */
+    public static String encode(String input, String encoding) throws UnsupportedEncodingException {
+        return URLEncoder.encode(input, encoding)
+                .replace("-", "%2D")
+                .replace("_", "%5F")
+                .replace(".", "%2E")
+                .replace("~", "%7E");
     }
 
     public static class Builder {
@@ -120,6 +142,11 @@ public class Rql extends Query {
                     try {
                         dateFormat.parse(value);
                     } catch (ParseException e) {
+                        try {
+                            value = encode(value, DEFAULT_ENCODING);
+                        } catch (UnsupportedEncodingException uee) {
+                            LOG.warn("Unsupported encoding '" + DEFAULT_ENCODING + "', using unencoded value '" + value + "'.");
+                        }
                         value = "string:" + value;
                     }
 
