@@ -10,6 +10,8 @@ import com.github.libgraviton.gdk.api.endpoint.GeneratedEndpointManager;
 import com.github.libgraviton.gdk.api.endpoint.exception.UnableToLoadEndpointAssociationsException;
 import com.github.libgraviton.gdk.api.header.HeaderBag;
 import com.github.libgraviton.gdk.api.query.rql.Rql;
+import com.github.libgraviton.gdk.auth.HeaderAuth;
+import com.github.libgraviton.gdk.auth.NoAuth;
 import com.github.libgraviton.gdk.data.GravitonBase;
 import com.github.libgraviton.gdk.exception.SerializationException;
 import com.github.libgraviton.gdk.serialization.JsonPatcher;
@@ -48,6 +50,8 @@ public class GravitonApi {
 
     private RequestExecutor executor;
 
+    private HeaderAuth auth;
+
     public GravitonApi() {
         setup();
         this.baseUrl = properties.getProperty("graviton.base.url");
@@ -65,12 +69,18 @@ public class GravitonApi {
         this.endpointManager = endpointManager;
     }
 
+    public GravitonApi(String baseUrl, GeneratedEndpointManager endpointManager, HeaderAuth auth) {
+        this(baseUrl, endpointManager);
+        this.auth = auth;
+    }
+
     protected void setup() {
         try {
             this.properties = PropertiesLoader.load();
         } catch (IOException e) {
             throw new IllegalStateException("Unable to load properties files.", e);
         }
+        this.auth = new NoAuth();
         this.objectMapper = new GravitonObjectMapper(properties);
         this.executor = new RequestExecutor(objectMapper);
     }
@@ -234,8 +244,11 @@ public class GravitonApi {
 
     // TODO make it configurable
     protected HeaderBag.Builder getDefaultHeaders() {
-        return new HeaderBag.Builder()
+        HeaderBag.Builder headerBuilder = new HeaderBag.Builder()
                 .set("Content-Type", "application/json")
                 .set("Accept", "application/json");
+        auth.addHeader(headerBuilder);
+
+        return headerBuilder;
     }
 }
