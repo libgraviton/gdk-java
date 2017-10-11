@@ -5,6 +5,7 @@ import com.github.libgraviton.gdk.GravitonApi;
 import com.github.libgraviton.gdk.api.endpoint.EndpointInclusionStrategy;
 import com.github.libgraviton.gdk.api.endpoint.GeneratedEndpointManager;
 import com.github.libgraviton.gdk.api.endpoint.exception.UnableToLoadEndpointAssociationsException;
+import com.github.libgraviton.gdk.auth.BasicAuth;
 import com.github.libgraviton.gdk.generator.Generator;
 import com.github.libgraviton.gdk.generator.exception.GeneratorException;
 import com.github.libgraviton.gdk.generator.instructionloader.grvprofile.GrvProfileInstructionLoader;
@@ -21,6 +22,12 @@ public class GenerateMojo extends Jsonschema2PojoMojo {
 
     @Parameter(required = true)
     private String gravitonUrl;
+
+    @Parameter(required = false)
+    private String username;
+
+    @Parameter(required = false)
+    private String password;
 
     @Parameter(required = false)
     private String endpointBlacklistPath;
@@ -43,7 +50,8 @@ public class GenerateMojo extends Jsonschema2PojoMojo {
             endpointManager.setEndpointInclusionStrategy(getEndpointInclusionStrategy());
             GravitonApi gravitonApi = new GravitonApi(
                     gravitonUrl,
-                    endpointManager
+                    endpointManager,
+                    new BasicAuth(username, password)
             );
             Generator generator = new Generator(
                     generatorConfig,
