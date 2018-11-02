@@ -13,23 +13,15 @@
 
     <licenses>
         <license>
-            <name>GNU General Public License (GPL)</name>
-            <url>http://www.gnu.org/licenses/gpl.txt</url>
+            <name>MIT License</name>
+            <url>https://www.opensource.org/licenses/mit-license.php</url>
         </license>
     </licenses>
 
     <developers>
         <developer>
-            <name>Michael Wegener</name>
-            <email>michael.wegener@swisscom.com</email>
-            <organization>Swisscom</organization>
-            <organizationUrl>http://www.swisscom.com</organizationUrl>
-        </developer>
-        <developer>
-            <name>Adrian Pauli</name>
-            <email>adrian.pauli@swisscom.com</email>
-            <organization>Swisscom</organization>
-            <organizationUrl>http://www.swisscom.com</organizationUrl>
+            <name>GitHub Contributors</name>
+            <url>https://github.com/libgraviton/gdk-java/graphs/contributors</url>
         </developer>
     </developers>
 
