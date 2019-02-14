@@ -7,6 +7,7 @@ import com.github.libgraviton.gdk.api.header.HeaderBag;
 import com.github.libgraviton.gdk.api.multipart.Part;
 import com.github.libgraviton.gdk.exception.CommunicationException;
 import com.github.libgraviton.gdk.exception.UnsuccessfulRequestException;
+import com.github.libgraviton.gdk.util.okhttp.interceptor.RetryInterceptor;
 import okhttp3.*;
 
 import java.io.IOException;
@@ -21,6 +22,7 @@ public class OkHttpGateway implements GravitonGateway {
     public OkHttpGateway() {
         this(
             new OkHttpClient.Builder()
+                    .addInterceptor(new RetryInterceptor())
                     .connectTimeout(60, TimeUnit.SECONDS)
                     .writeTimeout(60, TimeUnit.SECONDS)
                     .readTimeout(60, TimeUnit.SECONDS)
