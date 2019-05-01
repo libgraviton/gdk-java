@@ -72,8 +72,10 @@ public class RetryInterceptor implements Interceptor {
         .method("OPTIONS", null)
         .build();
 
+    Response response = null;
+
     try {
-      Response response = chain.proceed(subRequest);
+      response = chain.proceed(subRequest);
 
       if (retryHttpCodes.contains(response.code())) {
         LOG.warn(
@@ -91,6 +93,10 @@ public class RetryInterceptor implements Interceptor {
           e.getClass().getCanonicalName(),
           thisUrl
       );
+    } finally {
+      if (response != null) {
+        response.body().close();
+      }
     }
 
     return false;
