@@ -18,7 +18,7 @@
     <parent>
         <groupId>com.github.libgraviton</groupId>
         <artifactId>gdk</artifactId>
-        <version>0.6.4</version>
+        <version>0.6.5</version>
     </parent>
     <artifactId>gdk-core</artifactId>
     <name>gdk-core</name>
@@ -33,7 +33,7 @@
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
-            <version>3.13.1</version>
+            <version>3.14.1</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -63,7 +63,7 @@
         <dependency>
             <groupId>com.flipkart.zjsonpatch</groupId>
             <artifactId>zjsonpatch</artifactId>
-            <version>0.4.7</version>
+            <version>0.4.8</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>

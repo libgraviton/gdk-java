@@ -5,7 +5,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.github.libgraviton</groupId>
     <artifactId>gdk</artifactId>
-    <version>0.6.4</version>
+    <version>0.6.5</version>
     <packaging>pom</packaging>
     <name>gdk</name>
     <description>Graviton Development Kit</description>
@@ -30,6 +30,14 @@
         <developerConnection>scm:git:git@github.com:libgraviton/gdk-java.git</developerConnection>
         <url>git@github.com:libgraviton/gdk-java.git</url>
     </scm>
+
+    <distributionManagement>
+        <repository>
+            <id>bintray-libgraviton-maven</id>
+            <name>libgraviton-maven</name>
+            <url>https://api.bintray.com/maven/libgraviton/maven/graviton-worker-base-java/;publish=1</url>
+        </repository>
+    </distributionManagement>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
