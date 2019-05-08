@@ -107,6 +107,10 @@ public class RequestExecutor {
         this.gateway = gateway;
     }
 
+    public GravitonGateway getGateway() {
+        return gateway;
+    }
+
     public void setObjectMapper(ObjectMapper objectMapper) {
         this.objectMapper = objectMapper;
     }

@@ -98,6 +98,14 @@ public class GravitonApi {
         return endpointManager;
     }
 
+    public RequestExecutor getExecutor() {
+        return executor;
+    }
+
+    public void setExecutor(RequestExecutor executor) {
+        this.executor = executor;
+    }
+
     /**
      * Returns the base url
      *

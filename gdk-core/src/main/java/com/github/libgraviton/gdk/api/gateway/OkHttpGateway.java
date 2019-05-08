@@ -17,7 +17,7 @@ import java.util.concurrent.TimeUnit;
 
 public class OkHttpGateway implements GravitonGateway {
 
-    private OkHttpClient okHttp;
+    protected OkHttpClient okHttp;
 
     public OkHttpGateway() {
         this(
