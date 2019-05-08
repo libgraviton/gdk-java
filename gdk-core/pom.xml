@@ -24,6 +24,7 @@
     <name>gdk-core</name>
     <url>https://github.com/libgraviton/gdk-java</url>
 
+    <!--
     <distributionManagement>
         <repository>
             <id>bintray-libgraviton-maven</id>
@@ -31,6 +32,7 @@
             <url>https://api.bintray.com/maven/libgraviton/maven/gdk-core/;publish=1</url>
         </repository>
     </distributionManagement>
+    -->
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
