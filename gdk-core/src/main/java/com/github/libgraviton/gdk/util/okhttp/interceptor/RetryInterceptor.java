@@ -63,6 +63,7 @@ public class RetryInterceptor implements Interceptor {
     HttpUrl thisUrl = chain.request()
         .url()
         .newBuilder()
+        .query(null)
         .encodedPath("/")
         .build();
 
