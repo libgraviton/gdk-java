@@ -18,7 +18,7 @@
     <parent>
         <groupId>com.github.libgraviton</groupId>
         <artifactId>gdk</artifactId>
-        <version>0.6.6</version>
+        <version>0.7.0</version>
     </parent>
     <artifactId>gdk-core</artifactId>
     <name>gdk-core</name>
@@ -34,14 +34,14 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jackson-jr.version>2.9.8</jackson-jr.version>
+        <jackson-jr.version>2.10.2</jackson-jr.version>
     </properties>
 
     <dependencies>
         <dependency>
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
-            <version>3.14.1</version>
+            <version>3.14.6</version>
         </dependency>
         <dependency>
             <groupId>commons-io</groupId>
@@ -51,7 +51,7 @@
         <dependency>
             <groupId>org.json</groupId>
             <artifactId>json</artifactId>
-            <version>20180813</version>
+            <version>20190722</version>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.jr</groupId>
@@ -71,7 +71,7 @@
         <dependency>
             <groupId>com.flipkart.zjsonpatch</groupId>
             <artifactId>zjsonpatch</artifactId>
-            <version>0.4.8</version>
+            <version>0.4.9</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
@@ -81,7 +81,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.12</version>
+            <version>4.13</version>
             <scope>test</scope>
         </dependency>
         <dependency>
