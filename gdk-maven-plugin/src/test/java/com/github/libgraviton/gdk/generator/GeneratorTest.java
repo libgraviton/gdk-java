@@ -4,6 +4,7 @@ import com.github.libgraviton.gdk.GravitonApi;
 import com.github.libgraviton.gdk.api.endpoint.Endpoint;
 import com.github.libgraviton.gdk.api.endpoint.GeneratedEndpointManager;
 import com.github.libgraviton.gdk.api.endpoint.exception.UnableToPersistEndpointAssociationsException;
+import com.github.libgraviton.gdk.exception.CommunicationException;
 import com.github.libgraviton.gdk.generator.exception.GeneratorException;
 import com.sun.codemodel.JCodeModel;
 import com.tngtech.java.junit.dataprovider.DataProvider;
@@ -42,7 +43,7 @@ public class GeneratorTest {
     private GeneratorInstructionLoader instructionLoader;
 
     @Before
-    public void setup() {
+    public void setup() throws CommunicationException {
         // Setup instruction loader mock
         List<GeneratorInstruction> instructions = Arrays.asList(
                 new GeneratorInstruction(
@@ -188,7 +189,7 @@ public class GeneratorTest {
         successfulGeneration(configTargetPackage);
     }
 
-    private File successfulGeneration(final String configTargetPackage) throws IOException, GeneratorException {
+    private File successfulGeneration(final String configTargetPackage) throws IOException, GeneratorException, CommunicationException {
 
         final File targetDir = Files.createTempDirectory("test-generator").toFile();
         GenerationConfig config = new DefaultGenerationConfig() {
