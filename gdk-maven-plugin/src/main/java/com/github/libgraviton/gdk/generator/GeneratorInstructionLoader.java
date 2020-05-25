@@ -1,5 +1,7 @@
 package com.github.libgraviton.gdk.generator;
 
+import com.github.libgraviton.gdk.exception.CommunicationException;
+
 import java.util.List;
 
 /**
@@ -14,7 +16,7 @@ public interface GeneratorInstructionLoader {
      *
      * @return The instruction set.
      */
-    List<GeneratorInstruction> loadInstructions();
+    List<GeneratorInstruction> loadInstructions() throws CommunicationException;
 
     /**
      * Loads all generator instructions.
@@ -24,6 +26,6 @@ public interface GeneratorInstructionLoader {
      *
      * @return The instruction set.
      */
-    List<GeneratorInstruction> loadInstructions(boolean reload);
+    List<GeneratorInstruction> loadInstructions(boolean reload) throws CommunicationException;
 
 }
