@@ -54,6 +54,8 @@ public class GenerateMojo extends Jsonschema2PojoMojo {
                     endpointManager,
                     new BasicAuth(username, password)
             );
+            gravitonApi.getRequestExecutor().forceHttp1();
+
             Generator generator = new Generator(
                     generatorConfig,
                     gravitonApi,
