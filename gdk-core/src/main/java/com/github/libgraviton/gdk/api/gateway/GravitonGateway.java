@@ -8,4 +8,6 @@ public interface GravitonGateway {
 
     Response execute(Request request) throws CommunicationException;
 
+    void forceHttp1();
+
 }

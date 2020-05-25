@@ -11,6 +11,7 @@ import com.github.libgraviton.gdk.util.okhttp.interceptor.RetryInterceptor;
 import okhttp3.*;
 
 import java.io.IOException;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -34,9 +35,12 @@ public class OkHttpGateway implements GravitonGateway {
         this.okHttp = okHttp;
     }
 
+    public void forceHttp1() {
+        this.okHttp = okHttp.newBuilder().protocols(Collections.singletonList(Protocol.HTTP_1_1)).build();
+    }
+
     public Response execute(Request request) throws CommunicationException {
         okhttp3.Request okHttpRequest = generateRequest(request);
-
         okhttp3.Response okHttpResponse;
         byte[] body;
         try {

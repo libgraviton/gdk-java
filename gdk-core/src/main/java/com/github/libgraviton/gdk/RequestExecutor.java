@@ -42,6 +42,13 @@ public class RequestExecutor {
     }
 
     /**
+     * forces HTTP1 on the request execution
+     */
+    public void forceHttp1() {
+        gateway.forceHttp1();
+    }
+
+    /**
      * Executes a given Graviton request.
      *
      * @param request The Graviton request
