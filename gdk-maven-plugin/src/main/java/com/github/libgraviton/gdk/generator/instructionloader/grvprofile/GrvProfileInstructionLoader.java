@@ -47,7 +47,7 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
      *
      * @return All generator instructions.
      */
-    public List<GeneratorInstruction> loadInstructions() {
+    public List<GeneratorInstruction> loadInstructions() throws CommunicationException {
         return loadInstructions(false);
     }
 
@@ -59,7 +59,7 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
      *
      * @return All generator instructions.
      */
-    public List<GeneratorInstruction> loadInstructions(boolean reload) {
+    public List<GeneratorInstruction> loadInstructions(boolean reload) throws CommunicationException {
         if (reload || null == this.loadedInstructions) {
             LOG.info("Loading endpoint definitions and schema from '" + gravitonApi.getBaseUrl() + "'.");
             loadedInstructions = new ArrayList<>();
@@ -67,8 +67,8 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
             try {
                 endpointDefinitions = loadService().getEndpointDefinitions();
             } catch (CommunicationException e) {
-                LOG.warn("Unable to load service. No instructions loaded.");
-                return loadedInstructions;
+                LOG.error("Unable to load service. No instructions loaded.", e);
+                throw e;
             }
 
             for (EndpointDefinition endpointDefinition : endpointDefinitions) {

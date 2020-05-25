@@ -6,6 +6,7 @@ import com.github.libgraviton.gdk.api.endpoint.EndpointInclusionStrategy;
 import com.github.libgraviton.gdk.api.endpoint.GeneratedEndpointManager;
 import com.github.libgraviton.gdk.api.endpoint.exception.UnableToLoadEndpointAssociationsException;
 import com.github.libgraviton.gdk.auth.BasicAuth;
+import com.github.libgraviton.gdk.exception.CommunicationException;
 import com.github.libgraviton.gdk.generator.Generator;
 import com.github.libgraviton.gdk.generator.exception.GeneratorException;
 import com.github.libgraviton.gdk.generator.instructionloader.grvprofile.GrvProfileInstructionLoader;
@@ -59,7 +60,7 @@ public class GenerateMojo extends Jsonschema2PojoMojo {
                     new GrvProfileInstructionLoader(gravitonApi)
             );
             generator.generate();
-        } catch (GeneratorException e) {
+        } catch (GeneratorException|CommunicationException  e) {
             throw new MojoExecutionException("POJO generation failed.", e);
         } catch (UnableToLoadEndpointAssociationsException e) {
             throw new MojoExecutionException(

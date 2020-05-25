@@ -4,6 +4,7 @@ import com.github.libgraviton.gdk.GravitonApi;
 import com.github.libgraviton.gdk.api.endpoint.EndpointManager;
 import com.github.libgraviton.gdk.api.endpoint.GeneratedEndpointManager;
 import com.github.libgraviton.gdk.api.endpoint.exception.UnableToPersistEndpointAssociationsException;
+import com.github.libgraviton.gdk.exception.CommunicationException;
 import com.github.libgraviton.gdk.generator.exception.GeneratorException;
 import com.sun.codemodel.JCodeModel;
 import org.jsonschema2pojo.*;
@@ -88,7 +89,7 @@ public class Generator {
      *
      * @throws GeneratorException If the POJO generation failed
      */
-    public void generate() throws GeneratorException {
+    public void generate() throws GeneratorException, CommunicationException {
         List<GeneratorInstruction> generatorInstructions = instructionLoader.loadInstructions();
         EndpointManager endpointManager = gravitonApi.getEndpointManager();
 
