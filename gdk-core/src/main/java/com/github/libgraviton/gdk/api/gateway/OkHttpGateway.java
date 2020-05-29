@@ -2,19 +2,18 @@ package com.github.libgraviton.gdk.api.gateway;
 
 import com.github.libgraviton.gdk.api.Request;
 import com.github.libgraviton.gdk.api.Response;
+import com.github.libgraviton.gdk.api.gateway.okhttp.OkHttpGatewayFactory;
 import com.github.libgraviton.gdk.api.header.Header;
 import com.github.libgraviton.gdk.api.header.HeaderBag;
 import com.github.libgraviton.gdk.api.multipart.Part;
 import com.github.libgraviton.gdk.exception.CommunicationException;
 import com.github.libgraviton.gdk.exception.UnsuccessfulRequestException;
-import com.github.libgraviton.gdk.util.okhttp.interceptor.RetryInterceptor;
 import okhttp3.*;
 
 import java.io.IOException;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.TimeUnit;
 
 public class OkHttpGateway implements GravitonGateway {
 
@@ -22,12 +21,7 @@ public class OkHttpGateway implements GravitonGateway {
 
     public OkHttpGateway() {
         this(
-            new OkHttpClient.Builder()
-                    .addInterceptor(new RetryInterceptor())
-                    .connectTimeout(60, TimeUnit.SECONDS)
-                    .writeTimeout(60, TimeUnit.SECONDS)
-                    .readTimeout(60, TimeUnit.SECONDS)
-                    .build()
+            OkHttpGatewayFactory.getInstance(true)
         );
     }
 
@@ -37,6 +31,10 @@ public class OkHttpGateway implements GravitonGateway {
 
     public void forceHttp1() {
         this.okHttp = okHttp.newBuilder().protocols(Collections.singletonList(Protocol.HTTP_1_1)).build();
+    }
+
+    public OkHttpClient getOkHttp() {
+        return okHttp;
     }
 
     public Response execute(Request request) throws CommunicationException {
