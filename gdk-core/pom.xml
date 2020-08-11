@@ -34,7 +34,7 @@
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <jackson-jr.version>2.11.0</jackson-jr.version>
+        <jackson-jr.version>2.11.2</jackson-jr.version>
     </properties>
 
     <dependencies>
@@ -71,7 +71,7 @@
         <dependency>
             <groupId>com.flipkart.zjsonpatch</groupId>
             <artifactId>zjsonpatch</artifactId>
-            <version>0.4.10</version>
+            <version>0.4.11</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
