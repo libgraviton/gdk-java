@@ -3,6 +3,7 @@ package com.github.libgraviton.gdk.util;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.Map;
 import java.util.Properties;
 
 /**
@@ -15,6 +16,8 @@ public class PropertiesLoader {
     private static final String OVERWRITE_PROPERTIES_PATH = "app.properties";
 
     private static final String SYSTEM_PROPERTY = "propFile";
+
+    private static final String ENV_PREFIX = "worker_";
 
     /**
      * Loads the Properties in the following order (if a property entry ia already loaded, it will be overridden with the new value).
@@ -57,6 +60,8 @@ public class PropertiesLoader {
 
         properties.putAll(System.getProperties());
 
+        properties = addFromEnvironment(properties, System.getenv());
+
         return properties;
     }
 
@@ -67,5 +72,24 @@ public class PropertiesLoader {
         } catch (IOException e) {
             throw new IllegalStateException("Unable to load properties files.", e);
         }
+    }
+
+    /**
+     * parses and adds stuff from a map (mostly the environment by default) and adds them as properties
+     * @param properties
+     * @param map
+     * @return
+     */
+    public static Properties addFromEnvironment(Properties properties, Map<String, String> map) {
+        for (Map.Entry<String, String> entry : map.entrySet()) {
+            if (entry.getKey().startsWith(ENV_PREFIX)) {
+                String propName = entry.getKey().substring(ENV_PREFIX.length());
+
+                // replace "__" with "." for propname
+                properties.put(propName.replace("__", "."), entry.getValue());
+            }
+        }
+
+        return properties;
     }
 }
