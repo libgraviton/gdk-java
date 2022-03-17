@@ -13,25 +13,6 @@
     <name>gdk-maven-plugin</name>
     <url>https://github.com/libgraviton/gdk-java</url>
 
-    <repositories>
-        <repository>
-            <snapshots>
-                <enabled>false</enabled>
-            </snapshots>
-            <id>artifactory</id>
-            <name>artifactory</name>
-            <url>https://bin.swisscom.com/artifactory/graviton-maven-local</url>
-        </repository>
-    </repositories>
-
-    <distributionManagement>
-        <repository>
-            <id>artifactory</id>
-            <name>artifactory</name>
-            <url>https://bin.swisscom.com/artifactory/graviton-maven-local</url>
-        </repository>
-    </distributionManagement>
-
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <jsonschema2PojoVersion>0.4.28-SNAPSHOT</jsonschema2PojoVersion>
@@ -46,6 +27,11 @@
                 <enabled>true</enabled>
                 <checksumPolicy>ignore</checksumPolicy>
             </snapshots>
+        </repository>
+        <repository>
+            <id>artifactory</id>
+            <name>artifactory</name>
+            <url>https://bin.swisscom.com/artifactory/graviton-maven-local</url>
         </repository>
     </repositories>
 
