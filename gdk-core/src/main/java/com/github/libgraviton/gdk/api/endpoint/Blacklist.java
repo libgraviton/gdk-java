@@ -11,6 +11,6 @@ public class Blacklist extends EndpointInclusionStrategy {
 
     @Override
     public boolean shouldIgnoreEndpoint(Endpoint endpoint) {
-        return endpointPaths.contains(endpoint.getPath());
+        return (endpointPaths.contains(endpoint.getPath()) || endpointPaths.contains(endpoint.getItemPath()));
     }
 }
