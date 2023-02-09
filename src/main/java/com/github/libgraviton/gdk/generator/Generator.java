@@ -12,6 +12,7 @@ import org.jsonschema2pojo.rules.RuleFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 
@@ -25,22 +26,22 @@ public class Generator {
     /**
      * The schema mapper which creates POJOs by given schemas
      */
-    private SchemaMapper schemaMapper;
+    private final SchemaMapper schemaMapper;
 
     /**
      * Configures the pojo2jsonschema generator
      */
-    private GenerationConfig config;
+    private final GenerationConfig config;
 
     /**
      * The GravitonApi instance to generator POJOs for
      */
-    private GravitonApi gravitonApi;
+    private final GravitonApi gravitonApi;
 
     /**
      * The generator instruction loader providing all endpoints
      */
-    private GeneratorInstructionLoader instructionLoader;
+    private final GeneratorInstructionLoader instructionLoader;
 
     /**
      * Constructor
@@ -104,6 +105,10 @@ public class Generator {
                 continue;
             }
 
+            if (className.toLowerCase().contains("consultant")) {
+                int hans = 3;
+            }
+
             if(endpointManager.shouldIgnoreEndpoint(definition.getEndpoint())) {
                 LOG.info(
                         "Ignoring endpoint '{}' because of white- / blacklist configuration.",
@@ -127,7 +132,14 @@ public class Generator {
         }
         try {
             if (endpointManager instanceof GeneratedEndpointManager) {
-                ((GeneratedEndpointManager) endpointManager).persist();
+                String targetDirectory = config.getTargetDirectory().getAbsolutePath() + "/gdk-resources";
+                File targetFile = new File(targetDirectory);
+                if (!targetFile.isDirectory()) {
+                    targetFile.mkdir();
+                }
+                ((GeneratedEndpointManager) endpointManager).persist(
+                        targetDirectory + "/assoc"
+                );
             }
         } catch (UnableToPersistEndpointAssociationsException e) {
             throw new GeneratorException("Unable to persist endpoint -> POJO association.", e);

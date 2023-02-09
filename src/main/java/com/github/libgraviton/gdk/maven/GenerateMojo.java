@@ -48,17 +48,12 @@ public class GenerateMojo extends Jsonschema2PojoMojo {
 
     public void execute() throws MojoExecutionException
     {
-
-
         try {
 
-            if(!generatorConfig.getTargetDirectory().mkdirs()) {
+            if (!generatorConfig.getTargetDirectory().mkdirs()) {
                 getLog().info("Target directory '" + generatorConfig.getTargetDirectory() + "' already exists. Skipping POJO generation.");
                 return;
             }
-
-            GeneratedEndpointManager endpointManager = new GeneratedEndpointManager(GeneratedEndpointManager.Mode.CREATE);
-            endpointManager.setEndpointInclusionStrategy(getEndpointInclusionStrategy());
 
             Properties props;
             try {
@@ -66,6 +61,14 @@ public class GenerateMojo extends Jsonschema2PojoMojo {
             } catch (IOException e) {
                 throw new MojoExecutionException("Unable to load worker properties", e);
             }
+
+            WorkerProperties.setOverride(
+                    WorkerProperties.GRAVITON_BASE_URL.name(),
+                    gravitonUrl
+            );
+
+            GeneratedEndpointManager endpointManager = new GeneratedEndpointManager(GeneratedEndpointManager.Mode.CREATE);
+            endpointManager.setEndpointInclusionStrategy(getEndpointInclusionStrategy());
 
             ObjectMapper objectMapper = WorkerBaseProvider.objectMapper(props);
             RqlObjectMapper rqlObjectMapper = WorkerBaseProvider.rqlObjectMapper(props);
