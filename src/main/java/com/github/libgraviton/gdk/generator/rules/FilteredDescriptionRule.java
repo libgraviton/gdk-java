@@ -1,9 +1,10 @@
-package org.jsonschema2pojo.rules;
+package com.github.libgraviton.gdk.generator.rules;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.codemodel.JDocComment;
 import com.sun.codemodel.JDocCommentable;
 import org.jsonschema2pojo.Schema;
+import org.jsonschema2pojo.rules.DescriptionRule;
 
 /**
  * Same as DescriptionRule, but but removes all '@' characters to avoid the generation of corrupt javadoc.
@@ -23,7 +24,7 @@ public class FilteredDescriptionRule extends DescriptionRule {
      * @return the JavaDoc comment created to contain the title
      */
     @Override
-    public JDocComment apply(String nodeName, JsonNode node, JDocCommentable generatableType, Schema schema) {
+    public JDocComment apply(String nodeName, JsonNode node, JsonNode parent, JDocCommentable generatableType, Schema schema) {
         JDocComment javadoc = generatableType.javadoc();
 
         String text = node.asText();
@@ -33,5 +34,4 @@ public class FilteredDescriptionRule extends DescriptionRule {
 
         return javadoc;
     }
-
 }

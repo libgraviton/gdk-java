@@ -1,7 +1,7 @@
 package com.github.libgraviton.gdk.maven;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.jr.ob.impl.POJODefinition;
+import com.github.libgraviton.gdk.generator.exception.GeneratorException;
 import com.github.libgraviton.workerbase.di.WorkerBaseProvider;
 import com.github.libgraviton.workerbase.gdk.GravitonApi;
 import com.github.libgraviton.workerbase.gdk.api.endpoint.EndpointInclusionStrategy;
@@ -10,7 +10,6 @@ import com.github.libgraviton.workerbase.gdk.api.endpoint.exception.UnableToLoad
 import com.github.libgraviton.workerbase.gdk.auth.BasicAuth;
 import com.github.libgraviton.workerbase.gdk.exception.CommunicationException;
 import com.github.libgraviton.gdk.generator.Generator;
-import com.github.libgraviton.workerbase.gdk.generator.exception.GeneratorException;
 import com.github.libgraviton.gdk.generator.instructionloader.grvprofile.GrvProfileInstructionLoader;
 import com.github.libgraviton.workerbase.gdk.serialization.mapper.RqlObjectMapper;
 import com.github.libgraviton.workerbase.helper.WorkerProperties;
@@ -49,10 +48,9 @@ public class GenerateMojo extends Jsonschema2PojoMojo {
     public void execute() throws MojoExecutionException
     {
         try {
-
             if (!generatorConfig.getTargetDirectory().mkdirs()) {
                 getLog().info("Target directory '" + generatorConfig.getTargetDirectory() + "' already exists. Skipping POJO generation.");
-                return;
+                //return;
             }
 
             Properties props;
@@ -86,7 +84,7 @@ public class GenerateMojo extends Jsonschema2PojoMojo {
                     new GrvProfileInstructionLoader(gravitonApi)
             );
             generator.generate();
-        } catch (GeneratorException|CommunicationException  e) {
+        } catch (GeneratorException | CommunicationException  e) {
             throw new MojoExecutionException("POJO generation failed.", e);
         } catch (UnableToLoadEndpointAssociationsException e) {
             throw new MojoExecutionException(
@@ -115,5 +113,4 @@ public class GenerateMojo extends Jsonschema2PojoMojo {
         }
         return endpointInclusionStrategy;
     }
-
 }

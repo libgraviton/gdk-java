@@ -26,7 +26,7 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
     /**
      * The GravitonApi instance where the endpoint definitions will be loaded from.
      */
-    private GravitonApi gravitonApi;
+    private final GravitonApi gravitonApi;
 
     /**
      * Holds all loaded generator instructions.
@@ -79,8 +79,9 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
                 } catch (CommunicationException e) {
                     LOG.warn("Unable to fetch profile from '" + endpointDefinition.getProfile() + "'. Skipping...");
                 }
-                JSONObject itemSchema = determineItemSchema(profileJson);
                 try {
+                    JSONObject itemSchema = determineItemSchema(profileJson);
+
                     loadedInstructions.add(new GeneratorInstruction(
                             determineClassName(itemSchema),
                             determinePackageName(itemSchema),
@@ -89,6 +90,8 @@ public class GrvProfileInstructionLoader implements GeneratorInstructionLoader {
                     ));
                 } catch (MalformedURLException e) {
                     LOG.warn("Skipping endpoint '" + endpointDefinition.getRef() + "' since it's a malformed Url.");
+                } catch (Throwable t) {
+                    LOG.error("Error while parsing schema on endpoint '{}', skipping...", endpointDefinition.getProfile(), t);
                 }
             }
             LOG.info("Loaded " + loadedInstructions.size() + " endpoint definitions.");

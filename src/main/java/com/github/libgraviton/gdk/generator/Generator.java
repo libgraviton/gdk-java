@@ -1,11 +1,11 @@
 package com.github.libgraviton.gdk.generator;
 
+import com.github.libgraviton.gdk.generator.exception.GeneratorException;
 import com.github.libgraviton.workerbase.gdk.GravitonApi;
 import com.github.libgraviton.workerbase.gdk.api.endpoint.EndpointManager;
 import com.github.libgraviton.workerbase.gdk.api.endpoint.GeneratedEndpointManager;
 import com.github.libgraviton.workerbase.gdk.api.endpoint.exception.UnableToPersistEndpointAssociationsException;
 import com.github.libgraviton.workerbase.gdk.exception.CommunicationException;
-import com.github.libgraviton.workerbase.gdk.generator.exception.GeneratorException;
 import com.sun.codemodel.JCodeModel;
 import org.jsonschema2pojo.*;
 import org.jsonschema2pojo.rules.RuleFactory;
@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.List;
 
 /**
@@ -94,7 +93,8 @@ public class Generator {
         List<GeneratorInstruction> generatorInstructions = instructionLoader.loadInstructions();
         EndpointManager endpointManager = gravitonApi.getEndpointManager();
 
-        LOG.info("Generating POJO classes for Graviton '" + gravitonApi.getBaseUrl() + "'.");
+        LOG.info("Generating POJO classes for Graviton '{}'.", gravitonApi.getBaseUrl());
+
         for (GeneratorInstruction definition : generatorInstructions) {
             String className = definition.getClassName();
             if (0 == className.length()) {
@@ -109,7 +109,7 @@ public class Generator {
                 int hans = 3;
             }
 
-            if(endpointManager.shouldIgnoreEndpoint(definition.getEndpoint())) {
+            if (endpointManager.shouldIgnoreEndpoint(definition.getEndpoint())) {
                 LOG.info(
                         "Ignoring endpoint '{}' because of white- / blacklist configuration.",
                         definition.getEndpoint().getItemUrl()
@@ -122,9 +122,17 @@ public class Generator {
             try {
                 schemaMapper.generate(codeModel, className, packageName, definition.getJsonSchema().toString());
                 codeModel.build(config.getTargetDirectory());
-            } catch (IOException e) {
-               throw new GeneratorException("Unable to generate POJO.", e);
+            } catch (Throwable t) {
+                LOG.error(
+                        "Error on generating POJO based on '{}', class name '{}.{}'",
+                        definition.getEndpoint().getItemPath(),
+                        packageName,
+                        className,
+                        t
+                );
+               throw new GeneratorException("Unable to generate POJO.", t);
             }
+
             endpointManager.addEndpoint(
                     packageName + (packageName.length() > 0 ? '.' : "")  + definition.getClassName(),
                     definition.getEndpoint()
@@ -175,7 +183,7 @@ public class Generator {
      * @throws GeneratorException If the rule factory cannot be created.
      */
     private static RuleFactory instantiateRuleFactory(GenerationConfig config) throws GeneratorException {
-        AnnotatorFactory annotatorFactory = new AnnotatorFactory();
+        AnnotatorFactory annotatorFactory = new AnnotatorFactory(config);
         Annotator annotator = annotatorFactory.getAnnotator(
                 annotatorFactory.getAnnotator(config.getAnnotationStyle()),
                 annotatorFactory.getAnnotator(config.getCustomAnnotator())

@@ -1,10 +1,12 @@
-package org.jsonschema2pojo.rules;
+package com.github.libgraviton.gdk.generator.rules;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JPackage;
 import com.sun.codemodel.JType;
 import org.jsonschema2pojo.Schema;
+import org.jsonschema2pojo.rules.Rule;
+import org.jsonschema2pojo.rules.RuleFactory;
 
 import java.util.List;
 import java.util.Set;
@@ -21,15 +23,17 @@ public class NonSingularArrayRule implements Rule<JPackage, JClass> {
         this.ruleFactory = ruleFactory;
     }
 
-    public JClass apply(String nodeName, JsonNode node, JPackage jpackage, Schema schema) {
-        boolean uniqueItems = node.has("uniqueItems") && node.get("uniqueItems").asBoolean();
-        boolean rootSchemaIsArray = !schema.isGenerated();
-        Object itemType = determineItemType(nodeName, node, jpackage, schema);
 
-        JClass arrayType = determineArrayType(jpackage, uniqueItems, (JType) itemType);
+    @Override
+    public JClass apply(String nodeName, JsonNode node, JsonNode parent, JPackage generatableType, Schema currentSchema) {
+        boolean uniqueItems = node.has("uniqueItems") && node.get("uniqueItems").asBoolean();
+        boolean rootSchemaIsArray = !currentSchema.isGenerated();
+        Object itemType = determineItemType(nodeName, node, generatableType, currentSchema);
+
+        JClass arrayType = determineArrayType(generatableType, uniqueItems, (JType) itemType);
 
         if(rootSchemaIsArray) {
-            schema.setJavaType(arrayType);
+            currentSchema.setJavaType(arrayType);
         }
 
         return arrayType;
@@ -48,7 +52,8 @@ public class NonSingularArrayRule implements Rule<JPackage, JClass> {
     protected Object determineItemType(String nodeName, JsonNode node, JPackage jpackage, Schema schema) {
         Object itemType;
         if(node.has("items")) {
-            itemType = this.ruleFactory.getSchemaRule().apply(nodeName, node.get("items"), jpackage, schema);
+
+            itemType = this.ruleFactory.getSchemaRule().apply(nodeName, node.get("items"), node, jpackage, schema);
         } else {
             itemType = jpackage.owner().ref(Object.class);
         }
