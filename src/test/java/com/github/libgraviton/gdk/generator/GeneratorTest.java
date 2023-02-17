@@ -1,11 +1,11 @@
 package com.github.libgraviton.gdk.generator;
 
+import com.github.libgraviton.gdk.generator.exception.GeneratorException;
 import com.github.libgraviton.workerbase.gdk.GravitonApi;
 import com.github.libgraviton.workerbase.gdk.api.endpoint.Endpoint;
 import com.github.libgraviton.workerbase.gdk.api.endpoint.GeneratedEndpointManager;
 import com.github.libgraviton.workerbase.gdk.api.endpoint.exception.UnableToPersistEndpointAssociationsException;
 import com.github.libgraviton.workerbase.gdk.exception.CommunicationException;
-import com.github.libgraviton.workerbase.gdk.generator.exception.GeneratorException;
 import com.sun.codemodel.JCodeModel;
 import com.tngtech.java.junit.dataprovider.DataProvider;
 import com.tngtech.java.junit.dataprovider.DataProviderRunner;
