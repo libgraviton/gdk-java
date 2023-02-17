@@ -105,10 +105,6 @@ public class Generator {
                 continue;
             }
 
-            if (className.toLowerCase().contains("consultant")) {
-                int hans = 3;
-            }
-
             if (endpointManager.shouldIgnoreEndpoint(definition.getEndpoint())) {
                 LOG.info(
                         "Ignoring endpoint '{}' because of white- / blacklist configuration.",
