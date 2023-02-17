@@ -2,6 +2,7 @@ package com.github.libgraviton.gdk.generator.rules;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.codemodel.JPackage;
+import org.apache.commons.lang.WordUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.jsonschema2pojo.GenerationConfig;
 import org.jsonschema2pojo.util.NameHelper;
@@ -47,15 +48,17 @@ public class GravitonNameHelper extends NameHelper {
     public String getClassName(String nodeName, JsonNode node, JPackage _package) {
         String prefix = generationConfig.getClassNamePrefix();
 
-        prefix = getContextualClassPrefix(prefix);
+        String contextPrefix = getContextualClassPrefix(prefix);
 
         String suffix = generationConfig.getClassNameSuffix();
         String fieldName = getClassName(nodeName, node);
         String capitalizedFieldName = capitalize(fieldName);
-        String fullFieldName = createFullFieldName(capitalizedFieldName, prefix, suffix);
-
+        String fullFieldName = createFullFieldName(capitalizedFieldName, "", suffix);
         String className = replaceIllegalCharacters(fullFieldName);
-        return normalizeName(className);
+
+        return contextPrefix.concat(className);
+
+        //return normalizeName(className);
     }
 
     private String createFullFieldName(String nodeName, String prefix, String suffix) {
@@ -77,7 +80,7 @@ public class GravitonNameHelper extends NameHelper {
      * @param nodeName The name of the node
      */
     public void pushToNodeContext(String nodeName) {
-        nodeContext.push(capitalizeTrailingWords(nodeName));
+        nodeContext.push(WordUtils.capitalize(capitalizeTrailingWords(nodeName)));
     }
 
     /**

@@ -93,12 +93,17 @@ public class GravitonObjectRule extends ObjectRule {
             return superType;
         }
 
+        /**
+         *
+         * this was part of the previous PR to jsonschema2pojo, but was actually never used
+         *
         if (ruleFactory.getNameHelper() instanceof GravitonNameHelper) {
             String subPackage = ((GravitonNameHelper) ruleFactory.getNameHelper()).getContextualSubPackage();
             if (subPackage.length() > 0) {
                 _package = _package.subPackage(((GravitonNameHelper) ruleFactory.getNameHelper()).getContextualSubPackage());
             }
         }
+         **/
 
         JDefinedClass jclass;
         try {
@@ -108,6 +113,10 @@ public class GravitonObjectRule extends ObjectRule {
         }
 
         jclass._extends((JClass) superType);
+
+        if (jclass.name().equalsIgnoreCase("consultant")) {
+            int hans = 3;
+        }
 
         schema.setJavaTypeIfEmpty(jclass);
 

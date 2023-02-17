@@ -14,12 +14,10 @@ public class GravitonRuleFactory extends RuleFactory {
 
     private GravitonNameHelper nameHelper;
 
-    /**
     @Override
     public Rule<JPackage, JClass> getArrayRule() {
         return new NonSingularArrayRule(this);
     }
-     **/
 
     @Override
     public Rule<JPackage, JType> getObjectRule() {
