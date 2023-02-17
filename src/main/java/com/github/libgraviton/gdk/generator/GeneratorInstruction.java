@@ -11,22 +11,22 @@ public class GeneratorInstruction {
     /**
      * The name of the generated class.
      */
-    private String className;
+    private final String className;
 
     /**
      * The sub-package name of the generated class.
      */
-    private String packageName;
+    private final String packageName;
 
     /**
      * The jsonschema of the endpoint. Will be passed to the generator to create the class.
      */
-    private JSONObject jsonSchema;
+    private final JSONObject jsonSchema;
 
     /**
      * The endpoint for which classes will be generated.
      */
-    private Endpoint endpoint;
+    private final Endpoint endpoint;
 
     /**
      * Constructor. Initializes all the things.
