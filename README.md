@@ -1,32 +1,46 @@
-# Graviton Development Kit for Java
-
-[![Build Status](https://travis-ci.org/libgraviton/gdk-java.svg?branch=develop)](https://travis-ci.org/libgraviton/gdk-java) [![Coverage Status](https://coveralls.io/repos/github/libgraviton/gdk-java/badge.svg?branch=develop)](https://coveralls.io/github/libgraviton/gdk-java?branch=develop) [![Maven Central](https://maven-badges.herokuapp.com/maven-central/com.github.libgraviton/gdk/badge.svg)](https://maven-badges.herokuapp.com/maven-central/com.github.libgraviton/gdk) [![javadoc.io](https://javadocio-badges.herokuapp.com/com.github.libgraviton/gdk-core/badge.svg)](https://javadocio-badges.herokuapp.com/com.github.libgraviton/gdk-core)
+# GDK Maven Plugin
 
 ## What is it
+The GDK Maven Plugin provides the possibility to generate Graviton POJOs during `mvn install`.
 
-The GDK is a base library which can be used for easily accessing a [Graviton](https://github.com/libgraviton/graviton) based REST API.
-
-## Modules
-The GDK for Java is split into two modules:
-* **gdk-core**: Contains all the magic to use the generated POJOs with the REST API. See also the [gdk-core documentation](gdk-core/README.md).
-* **gdk-maven-plugin**: Provides a maven plugin which allows you to generate Graviton POJOs during `mvn install`. See also the [maven plugin documentation](gdk-maven-plugin/README.md).
-
-## API Doc
-
-Please see the [gdk-core javadoc](http://www.javadoc.io/doc/com.github.libgraviton/gdk-core)
-
-## Using the library
-
+## Using the plugin
 You can use this library in your project by including this in your `pom.xml`:
 
 ```xml
-<dependencies>
-	<dependency>
-		<groupId>com.github.libgraviton</groupId>
-		<artifactId>gdk-core</artifactId>
-		<version>LATEST</version>
-	</dependency>
-</dependencies>
+<build>
+	<plugins>
+		<plugin>
+			<groupId>com.github.libgraviton</groupId>
+			<artifactId>gdk-maven-plugin</artifactId>
+			<version>LATEST</version>
+			<configuration>
+				<gravitonUrl>https://graviton.example.org</gravitonUrl>
+				<generatorConfig>
+				    <includeHashcodeAndEquals>false</includeHashcodeAndEquals>
+					<useContextualClassNames>true</useContextualClassNames>
+					<outputDirectory>the/output/dir</outputDirectory>
+					<targetPackage>the.target.package</targetPackage>
+				</generatorConfig>
+			</configuration>
+			<executions>
+				<execution>
+					<id>generate-pojos</id>
+					<goals>
+						<goal>generate</goal>
+					</goals>
+				</execution>
+			</executions>
+		</plugin>
+	</plugins>
+</build>
 ```
 
-Make sure that `version` points to the newest release on maven central (see badge above).
+Make sure that `version` points to the latest GDK version on maven central.
+IMPORTANT: To have working PATCH requests with GDK, `includeHashcodeAndEquals` and `includeToString` within generatorConfig needs to be configured false!
+
+| config element         | description                                                                                                                                                                                                                                                           |
+|:-----------------------|:----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| `gravitonUrl`          | The base url of the Graviton instance.                                                                                                                                                                                                                                |
+| `endpointBlacklistPath`| Path to a file that contains a blacklist of all the endpoints to ignore (each line of the file represents one endpoint)                                                                                                                                                                                                                              |
+| `endpointWhitelistPath`| Path to a file that contains a whitelist of all the endpoints to include (each line of the file represents one endpoint)                                                                                                                                                                                                                       |
+| `generatorConfig`      | Configuration for the underlying `joelittlejohn/jsonschema2pojo` generator. For further config options see the [maven plugin documentation of the jsonschema2pojo generator](https://github.com/joelittlejohn/jsonschema2pojo/wiki/Getting-Started#the-maven-plugin). |
