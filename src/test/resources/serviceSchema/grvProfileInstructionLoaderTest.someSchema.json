@@ -1,0 +1,34 @@
+{
+  "title": "Some Service - Collection of demo items",
+  "type": "array",
+  "items": {
+    "title": "Some Service Items",
+    "description": "This is a demo schema",
+    "type": "object",
+    "properties": {
+      "id": {
+        "title": "ID",
+        "description": "Unique identifier",
+        "type": "string",
+        "format": "custom_id"
+      },
+      "someField": {
+        "title": "Some Field",
+        "description": "This is a demo field",
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+    },
+    "x-documentClass": "Whatever\\SomeService\\SomeServiceDocument",
+    "javaInterfaces" : ["com.github.libgraviton.workerbase.gdk.data.GravitonBase"],
+    "x-recordOriginModifiable": true,
+    "additionalProperties": false,
+    "x-events": [
+      "document.demo.someservice.create",
+      "document.demo.someservice.update",
+      "document.demo.someservice.delete"
+    ]
+  }
+}
