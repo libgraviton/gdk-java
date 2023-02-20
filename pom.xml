@@ -19,11 +19,22 @@
 
     <repositories>
         <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
             <id>artifactory</id>
             <name>artifactory</name>
             <url>https://bin.swisscom.com/artifactory/graviton-maven-local</url>
         </repository>
     </repositories>
+
+    <distributionManagement>
+        <repository>
+            <id>artifactory</id>
+            <name>artifactory</name>
+            <url>https://bin.swisscom.com/artifactory/graviton-maven-local</url>
+        </repository>
+    </distributionManagement>
 
     <dependencies>
         <dependency>
