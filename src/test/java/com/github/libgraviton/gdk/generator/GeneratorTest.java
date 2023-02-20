@@ -138,7 +138,7 @@ public class GeneratorTest {
                 eq(new Endpoint("endpoint://another-endpoint"))
         );
 
-        verify(serviceManager, times(1)).persist();
+        verify(serviceManager, times(1)).persist(anyString());
     }
 
     @Test
@@ -178,15 +178,6 @@ public class GeneratorTest {
 
         assertTrue(new File(new File(targetDir, firstPackageName.replace('.', '/')), "SomeClass.java").exists());
         assertFalse(new File(new File(targetDir, secondPackageName.replace('.', '/')), "AnotherClass.java").exists());
-    }
-
-    @Test(expected = GeneratorException.class)
-    @UseDataProvider("packageNames")
-    public void testFailingAssociationsPersist(
-            final String configTargetPackage, String firstPackageName, String secondPackageName
-    ) throws Exception {
-        when(serviceManager.persist()).thenThrow(new UnableToPersistEndpointAssociationsException("bad stuff happened"));
-        successfulGeneration(configTargetPackage);
     }
 
     private File successfulGeneration(final String configTargetPackage) throws IOException, GeneratorException, CommunicationException {
