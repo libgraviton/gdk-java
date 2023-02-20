@@ -34,14 +34,13 @@ import org.jsonschema2pojo.exception.ClassAlreadyExistsException;
 import org.jsonschema2pojo.exception.GenerationException;
 import org.jsonschema2pojo.rules.ObjectRule;
 import org.jsonschema2pojo.rules.RuleFactory;
+import org.jsonschema2pojo.util.AnnotationHelper;
 import org.jsonschema2pojo.util.ParcelableHelper;
 import org.jsonschema2pojo.util.ReflectionHelper;
 import org.jsonschema2pojo.util.SerializableHelper;
-import org.jsonschema2pojo.util.AnnotationHelper;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sun.codemodel.ClassType;
-import com.sun.codemodel.JAnnotationUse;
 import com.sun.codemodel.JBlock;
 import com.sun.codemodel.JClass;
 import com.sun.codemodel.JClassAlreadyExistsException;
@@ -114,10 +113,6 @@ public class GravitonObjectRule extends ObjectRule {
 
         jclass._extends((JClass) superType);
 
-        if (jclass.name().equalsIgnoreCase("consultant")) {
-            int hans = 3;
-        }
-
         schema.setJavaTypeIfEmpty(jclass);
 
         if (node.has("title")) {
@@ -152,7 +147,7 @@ public class GravitonObjectRule extends ObjectRule {
         }
 
         if (ruleFactory.getGenerationConfig().isIncludeGeneratedAnnotation()) {
-            AnnotationHelper.addGeneratedAnnotation(jclass);
+            AnnotationHelper.addGeneratedAnnotation(ruleFactory.getGenerationConfig(), jclass);
         }
         if (ruleFactory.getGenerationConfig().isIncludeToString()) {
             addToString(jclass);
@@ -261,12 +256,15 @@ public class GravitonObjectRule extends ObjectRule {
                 } else {
                     newType = _package.owner()._class(fqn);
                 }
+                ruleFactory.getLogger().debug("Adding " + newType.fullName());
             } else {
+                final String className = ruleFactory.getNameHelper().getUniqueClassName(nodeName, node, _package);
                 if (usePolymorphicDeserialization) {
-                    newType = _package._class(JMod.PUBLIC, ruleFactory.getNameHelper().getUniqueClassName(nodeName, node, _package), ClassType.CLASS);
+                    newType = _package._class(JMod.PUBLIC, className, ClassType.CLASS);
                 } else {
-                    newType = _package._class(ruleFactory.getNameHelper().getUniqueClassName(nodeName, node, _package));
+                    newType = _package._class(className);
                 }
+                ruleFactory.getLogger().debug("Adding " + newType.fullName());
             }
         } catch (JClassAlreadyExistsException e) {
             throw new ClassAlreadyExistsException(e.getExistingClass());
@@ -319,16 +317,16 @@ public class GravitonObjectRule extends ObjectRule {
 
             superToStringInnerConditional._then().add(
                     sb.invoke("append")
-                            .arg(superString)
-                            .arg(contentStart.plus(JExpr.lit(1)))
-                            .arg(contentEnd));
+                    .arg(superString)
+                    .arg(contentStart.plus(JExpr.lit(1)))
+                    .arg(contentEnd));
 
             // Otherwise, just append super.toString()
             superToStringInnerConditional._else().add(sb.invoke("append").arg(superString));
 
             // Append a comma if needed
             body._if(sb.invoke("length").gt(baseLength))
-                    ._then().add(sb.invoke("append").arg(JExpr.lit(',')));
+            ._then().add(sb.invoke("append").arg(JExpr.lit(',')));
         }
 
         // For each included instance field, add to the StringBuilder in the field=value format
@@ -354,10 +352,10 @@ public class GravitonObjectRule extends ObjectRule {
                                 JExpr.refthis(fieldVar.name()).eq(JExpr._null()),
                                 JExpr.lit("<null>"),
                                 jclass.owner().ref(Arrays.class).staticInvoke("toString")
-                                        .arg(JExpr.refthis(fieldVar.name()))
-                                        .invoke("replace").arg(JExpr.lit('[')).arg(JExpr.lit('{'))
-                                        .invoke("replace").arg(JExpr.lit(']')).arg(JExpr.lit('}'))
-                                        .invoke("replace").arg(JExpr.lit(", ")).arg(JExpr.lit(",")))));
+                                .arg(JExpr.refthis(fieldVar.name()))
+                                .invoke("replace").arg(JExpr.lit('[')).arg(JExpr.lit('{'))
+                                .invoke("replace").arg(JExpr.lit(']')).arg(JExpr.lit('}'))
+                                .invoke("replace").arg(JExpr.lit(", ")).arg(JExpr.lit(",")))));
             } else {
                 body.add(sb.invoke("append")
                         .arg(JOp.cond(
@@ -372,12 +370,12 @@ public class GravitonObjectRule extends ObjectRule {
         // Add the trailer
         JConditional trailerConditional = body._if(
                 sb.invoke("charAt").arg(sb.invoke("length").minus(JExpr.lit(1)))
-                        .eq(JExpr.lit(',')));
+                .eq(JExpr.lit(',')));
 
         trailerConditional._then().add(
                 sb.invoke("setCharAt")
-                        .arg(sb.invoke("length").minus(JExpr.lit(1)))
-                        .arg(JExpr.lit(']')));
+                .arg(sb.invoke("length").minus(JExpr.lit(1)))
+                .arg(JExpr.lit(']')));
 
         trailerConditional._else().add(
                 sb.invoke("append").arg(JExpr.lit(']')));
@@ -525,7 +523,7 @@ public class GravitonObjectRule extends ObjectRule {
             } else {
                 fieldEquals = thisFieldRef.eq(otherFieldRef).cor(
                         thisFieldRef.ne(JExpr._null())
-                                .cand(thisFieldRef.invoke("equals").arg(otherFieldRef)));
+                        .cand(thisFieldRef.invoke("equals").arg(otherFieldRef)));
             }
 
             // Chain the equality of this field with the previous comparisons
