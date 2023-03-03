@@ -19,20 +19,21 @@
 
     <repositories>
         <repository>
+            <id>libgraviton-github</id>
+            <url>https://maven.pkg.github.com/libgraviton/gdk-java</url>
             <snapshots>
-                <enabled>false</enabled>
+                <enabled>true</enabled>
             </snapshots>
-            <id>artifactory</id>
-            <name>artifactory</name>
-            <url>https://bin.swisscom.com/artifactory/graviton-maven-local</url>
         </repository>
     </repositories>
 
     <distributionManagement>
         <repository>
-            <id>artifactory</id>
-            <name>artifactory</name>
-            <url>https://bin.swisscom.com/artifactory/graviton-maven-local</url>
+            <id>libgraviton-github</id>
+            <url>https://maven.pkg.github.com/libgraviton/gdk-java</url>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
         </repository>
     </distributionManagement>
 
@@ -40,7 +41,7 @@
         <dependency>
             <groupId>com.github.libgraviton</groupId>
             <artifactId>worker-base</artifactId>
-            <version>3.3.0</version>
+            <version>3.4.0</version>
         </dependency>
         <dependency>
             <groupId>org.jsonschema2pojo</groupId>
